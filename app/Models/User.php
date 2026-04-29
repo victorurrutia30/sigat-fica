@@ -17,9 +17,11 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
-        'name',
-        'email',
+        'nombre',
+        'correo',
         'password',
+        'rol',
+        'activo',
     ];
 
     /**
@@ -42,6 +44,12 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'activo' => 'boolean',
         ];
+    }
+
+    public function getEmailForPasswordReset(): string
+    {
+        return $this->correo;
     }
 }
