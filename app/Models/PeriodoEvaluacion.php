@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class PeriodoEvaluacion extends Model
 {
+    use HasFactory;
+
     protected $table = 'periodos_evaluacion';
 
     protected $fillable = [
