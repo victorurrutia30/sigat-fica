@@ -3,10 +3,9 @@
 namespace Database\Seeders;
 
 use Illuminate\Support\Facades\DB;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
-class CausasSeeder extends Seeder
+class CausaSeeder extends Seeder
 {
     /**
      * Run the database seeds.

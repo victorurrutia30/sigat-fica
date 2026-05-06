@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use Illuminate\Support\Facades\DB;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class MateriaSeeder extends Seeder
@@ -13,7 +12,7 @@ class MateriaSeeder extends Seeder
      */
     public function run(): void
     {
-         $ahora = now();
+        $ahora = now();
 
         $materias = [
             [
@@ -123,6 +122,5 @@ class MateriaSeeder extends Seeder
             ['codigo'],
             ['nombre', 'creditos', 'ciclo_plan', 'departamento', 'activo', 'updated_at']
         );
-
     }
 }
