@@ -32,5 +32,10 @@ class DatabaseSeeder extends Seeder
                 'activo' => true,
             ]
         );
+
+        $this->call([
+            MateriaSeeder::class,
+            CausaSeeder::class,
+        ]);
     }
 }
