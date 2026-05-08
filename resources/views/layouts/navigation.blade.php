@@ -1,13 +1,13 @@
-<nav x-data="{ open: false }" class="border-b border-gray-200 bg-white">
+<nav x-data="{ open: false }" class="border-b border-utec-gray-medium bg-white">
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div class="flex h-16 justify-between">
             <div class="flex">
                 <div class="flex shrink-0 items-center">
                     <a href="{{ auth()->user()->rol === 'coordinacion' ? route('dashboard') : route('mis-asignaciones') }}">
                         <div class="flex items-center gap-3">
-                            <x-application-logo class="block h-9 w-auto fill-current text-[#003B71]" />
+                            <x-application-logo class="block h-9 w-auto fill-current text-utec-primary" />
                             <div class="hidden leading-tight sm:block">
-                                <p class="text-sm font-bold text-[#003B71]">SIGAT-FICA</p>
+                                <p class="text-sm font-bold text-utec-primary">SIGAT-FICA</p>
                                 <p class="text-xs text-gray-500">Programa de Tutores</p>
                             </div>
                         </div>
@@ -72,7 +72,7 @@
             <div class="hidden sm:flex sm:items-center sm:ms-6">
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
-                        <button class="inline-flex items-center rounded-md border border-transparent bg-white px-3 py-2 text-sm font-medium leading-4 text-gray-600 transition hover:text-[#003B71] focus:outline-none">
+                        <button class="inline-flex items-center rounded-md border border-transparent bg-white px-3 py-2 text-sm font-medium leading-4 text-gray-600 transition hover:text-utec-primary focus:outline-none">
                             <div class="text-left">
                                 <div class="font-semibold">{{ auth()->user()->nombre }}</div>
                                 <div class="text-xs text-gray-400">
@@ -109,7 +109,7 @@
             <div class="-me-2 flex items-center sm:hidden">
                 <button
                     @click="open = ! open"
-                    class="inline-flex items-center justify-center rounded-md p-2 text-gray-400 transition hover:bg-gray-100 hover:text-[#003B71] focus:bg-gray-100 focus:text-[#003B71] focus:outline-none">
+                    class="inline-flex items-center justify-center rounded-md p-2 text-gray-400 transition hover:bg-utec-primary-soft hover:text-utec-primary focus:bg-utec-primary-soft focus:text-utec-primary focus:outline-none">
                     <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
                         <path :class="{ 'hidden': open, 'inline-flex': ! open }" class="inline-flex" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                         <path :class="{ 'hidden': ! open, 'inline-flex': open }" class="hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -174,11 +174,11 @@
             @endif
         </div>
 
-        <div class="border-t border-gray-200 pb-1 pt-4">
+        <div class="border-t border-utec-gray-medium pb-1 pt-4">
             <div class="px-4">
-                <div class="text-base font-medium text-gray-800">{{ auth()->user()->nombre }}</div>
+                <div class="text-base font-medium text-utec-gray-dark">{{ auth()->user()->nombre }}</div>
                 <div class="text-sm font-medium text-gray-500">{{ auth()->user()->correo }}</div>
-                <div class="mt-1 text-xs font-medium uppercase tracking-wide text-[#D71920]">
+                <div class="mt-1 text-xs font-medium uppercase tracking-wide text-utec-primary-light">
                     {{ auth()->user()->rol === 'coordinacion' ? 'Coordinación' : 'Tutor' }}
                 </div>
             </div>
