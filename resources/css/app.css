@@ -1,3 +1,43 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+    body {
+        @apply bg-utec-bg-light text-utec-gray-dark;
+    }
+}
+
+@layer components {
+    .btn-primary {
+        @apply inline-flex items-center justify-center rounded-md bg-utec-primary px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors duration-150 hover:bg-utec-primary-dark focus:outline-none focus:ring-2 focus:ring-utec-primary-light focus:ring-offset-2;
+    }
+
+    .btn-secondary {
+        @apply inline-flex items-center justify-center rounded-md border border-utec-gray-medium bg-white px-4 py-2 text-sm font-semibold text-utec-gray-dark shadow-sm transition-colors duration-150 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-utec-gray-medium focus:ring-offset-2;
+    }
+
+    .card {
+        @apply overflow-hidden rounded-xl border border-utec-gray-medium bg-white shadow-sm;
+    }
+
+    .card-body {
+        @apply p-6;
+    }
+
+    .card-header {
+        @apply border-b border-utec-gray-medium bg-white px-6 py-4;
+    }
+
+    .alert-sigat {
+        @apply rounded-lg border-l-4 border-utec-primary bg-utec-primary-soft p-4 text-sm text-utec-gray-dark;
+    }
+
+    .th-utec {
+        @apply bg-utec-primary px-6 py-3 text-left text-sm font-semibold text-white;
+    }
+
+    .link-utec {
+        @apply text-sm font-medium text-utec-primary transition-colors hover:text-utec-primary-dark;
+    }
+}
