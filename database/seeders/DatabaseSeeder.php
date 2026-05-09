@@ -17,10 +17,8 @@ class DatabaseSeeder extends Seeder
             CicloSeeder::class,
             UsuarioSeeder::class,
             TutorSeeder::class,
-
-            // Pendiente: estos seeders los agregará el compañero encargado de catálogos.
-            // MateriaSeeder::class,
-            // CausaSeeder::class,
+            MateriaSeeder::class,
+            CausaSeeder::class,
         ]);
     }
 }
