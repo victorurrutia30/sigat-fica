@@ -31,12 +31,11 @@ class AuthenticatedSessionController extends Controller
         $destino = match ($request->user()->rol) {
             'coordinacion' => route('dashboard', absolute: false),
             'tutor' => route('mis-asignaciones', absolute: false),
-            default => route('dashboard', absolute: false),
+            default => '/',
         };
 
-        return redirect()->intended($destino);
+        return redirect($destino);
     }
-
     /**
      * Destroy an authenticated session.
      */

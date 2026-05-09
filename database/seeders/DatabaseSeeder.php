@@ -13,24 +13,12 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        User::updateOrCreate(
-            ['correo' => 'coordinacion.demo@utec.edu.sv'],
-            [
-                'nombre' => 'Coordinación Demo',
-                'password' => Hash::make('Password123'),
-                'rol' => 'coordinacion',
-                'activo' => true,
-            ]
-        );
-
-        User::updateOrCreate(
-            ['correo' => 'tutor.demo@utec.edu.sv'],
-            [
-                'nombre' => 'Usuario Tutor Demo',
-                'password' => Hash::make('Password123'),
-                'rol' => 'tutor',
-                'activo' => true,
-            ]
-        );
+        $this->call([
+            CicloSeeder::class,
+            UsuarioSeeder::class,
+            TutorSeeder::class,
+            MateriaSeeder::class,
+            CausaSeeder::class,
+        ]);
     }
 }

@@ -3,6 +3,7 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Http\Request;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -14,6 +15,16 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'rol' => \App\Http\Middleware\CheckRol::class,
         ]);
+
+        $middleware->redirectUsersTo(function (Request $request) {
+            $usuario = $request->user();
+
+            return match ($usuario?->rol) {
+                'coordinacion' => route('dashboard', absolute: false),
+                'tutor' => route('mis-asignaciones', absolute: false),
+                default => '/',
+            };
+        });
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
