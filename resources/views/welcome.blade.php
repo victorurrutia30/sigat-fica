@@ -116,7 +116,7 @@
                         Plataforma de tutorías<br>UTEC Virtual
                     </div>
                     <div class="text-[11px] text-utec-gray-medium mt-1.5">
-                        Gestión académica integral
+                        Gestión académica integral TEXT
                     </div>
                     <div class="mt-3 bg-utec-primary h-[2px] w-8"></div>
                 </div>
