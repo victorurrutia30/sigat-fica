@@ -1,40 +1,87 @@
-<nav x-data="{ open: false }" class="bg-white border-b border-gray-100">
-    <!-- Primary Navigation Menu -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between h-16">
+<nav x-data="{ open: false }" class="border-b border-utec-gray-medium bg-white">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div class="flex h-16 justify-between">
             <div class="flex">
-                <!-- Logo -->
-                <div class="shrink-0 flex items-center">
-                    <a href="{{ Auth::user()->rol === 'coordinacion' ? route('dashboard') : route('mis-asignaciones') }}">
-                        <x-application-logo class="block h-9 w-auto fill-current text-gray-800" />
+                <div class="flex shrink-0 items-center">
+                    <a href="{{ auth()->user()->rol === 'coordinacion' ? route('dashboard') : route('mis-asignaciones') }}">
+                        <div class="flex items-center gap-3">
+                            <x-application-logo class="block h-9 w-auto fill-current text-utec-primary" />
+                            <div class="hidden leading-tight sm:block">
+                                <p class="text-sm font-bold text-utec-primary">SIGAT-FICA</p>
+                                <p class="text-xs text-gray-500">Programa de Tutores</p>
+                            </div>
+                        </div>
                     </a>
                 </div>
 
-                <!-- Navigation Links -->
-                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    @if (Auth::user()->rol === 'coordinacion')
+                <div class="hidden space-x-7 sm:-my-px sm:ms-10 sm:flex">
+                    @if (auth()->user()->rol === 'coordinacion')
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                         Dashboard
                     </x-nav-link>
+
+                    {{-- Ruta pendiente de implementar --}}
+                    <x-nav-link href="#" :active="false">
+                        Ciclos
+                    </x-nav-link>
+
+                    {{-- Ruta pendiente de implementar --}}
+                    <x-nav-link href="#" :active="false">
+                        Tutores
+                    </x-nav-link>
+
+                    {{-- Ruta pendiente de implementar --}}
+                    <x-nav-link href="#" :active="false">
+                        Materias
+                    </x-nav-link>
+
+                    {{-- Ruta pendiente de implementar --}}
+                    <x-nav-link href="#" :active="false">
+                        Secciones
+                    </x-nav-link>
+
+                    {{-- Ruta pendiente de implementar --}}
+                    <x-nav-link href="#" :active="false">
+                        Propuestas
+                    </x-nav-link>
+
+                    {{-- Ruta pendiente de implementar --}}
+                    <x-nav-link href="#" :active="false">
+                        Periodos
+                    </x-nav-link>
                     @endif
 
-                    @if (Auth::user()->rol === 'tutor')
+                    @if (auth()->user()->rol === 'tutor')
                     <x-nav-link :href="route('mis-asignaciones')" :active="request()->routeIs('mis-asignaciones')">
                         Mis asignaciones
+                    </x-nav-link>
+
+                    {{-- Ruta pendiente de implementar --}}
+                    <x-nav-link href="#" :active="false">
+                        Casos
+                    </x-nav-link>
+
+                    {{-- Ruta pendiente de implementar --}}
+                    <x-nav-link href="#" :active="false">
+                        Consolidado
                     </x-nav-link>
                     @endif
                 </div>
             </div>
 
-            <!-- Settings Dropdown -->
             <div class="hidden sm:flex sm:items-center sm:ms-6">
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
-                        <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
-                            <div>{{ Auth::user()->nombre }}</div>
+                        <button class="inline-flex items-center rounded-md border border-transparent bg-white px-3 py-2 text-sm font-medium leading-4 text-gray-600 transition hover:text-utec-primary focus:outline-none">
+                            <div class="text-left">
+                                <div class="font-semibold">{{ auth()->user()->nombre }}</div>
+                                <div class="text-xs text-gray-400">
+                                    {{ auth()->user()->rol === 'coordinacion' ? 'Coordinación' : 'Tutor' }}
+                                </div>
+                            </div>
 
-                            <div class="ms-1">
-                                <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                            <div class="ms-2">
+                                <svg class="h-4 w-4 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
                                     <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
                                 </svg>
                             </div>
@@ -43,71 +90,111 @@
 
                     <x-slot name="content">
                         <x-dropdown-link :href="route('profile.edit')">
-                            {{ __('Profile') }}
+                            Perfil
                         </x-dropdown-link>
 
-                        <!-- Authentication -->
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
 
-                            <x-dropdown-link :href="route('logout')"
-                                onclick="event.preventDefault();
-                                                this.closest('form').submit();">
-                                {{ __('Log Out') }}
+                            <x-dropdown-link
+                                :href="route('logout')"
+                                onclick="event.preventDefault(); this.closest('form').submit();">
+                                Cerrar sesión
                             </x-dropdown-link>
                         </form>
                     </x-slot>
                 </x-dropdown>
             </div>
 
-            <!-- Hamburger -->
             <div class="-me-2 flex items-center sm:hidden">
-                <button @click="open = ! open" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 focus:text-gray-500 transition duration-150 ease-in-out">
+                <button
+                    @click="open = ! open"
+                    class="inline-flex items-center justify-center rounded-md p-2 text-gray-400 transition hover:bg-utec-primary-soft hover:text-utec-primary focus:bg-utec-primary-soft focus:text-utec-primary focus:outline-none">
                     <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
-                        <path :class="{'hidden': open, 'inline-flex': ! open }" class="inline-flex" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                        <path :class="{'hidden': ! open, 'inline-flex': open }" class="hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        <path :class="{ 'hidden': open, 'inline-flex': ! open }" class="inline-flex" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        <path :class="{ 'hidden': ! open, 'inline-flex': open }" class="hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                     </svg>
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- Responsive Navigation Menu -->
-    <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
-        <div class="pt-2 pb-3 space-y-1">
-            @if (Auth::user()->rol === 'coordinacion')
+    <div :class="{ 'block': open, 'hidden': ! open }" class="hidden sm:hidden">
+        <div class="space-y-1 pb-3 pt-2">
+            @if (auth()->user()->rol === 'coordinacion')
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                 Dashboard
             </x-responsive-nav-link>
+
+            {{-- Ruta pendiente de implementar --}}
+            <x-responsive-nav-link href="#" :active="false">
+                Ciclos
+            </x-responsive-nav-link>
+
+            {{-- Ruta pendiente de implementar --}}
+            <x-responsive-nav-link href="#" :active="false">
+                Tutores
+            </x-responsive-nav-link>
+
+            {{-- Ruta pendiente de implementar --}}
+            <x-responsive-nav-link href="#" :active="false">
+                Materias
+            </x-responsive-nav-link>
+
+            {{-- Ruta pendiente de implementar --}}
+            <x-responsive-nav-link href="#" :active="false">
+                Secciones
+            </x-responsive-nav-link>
+
+            {{-- Ruta pendiente de implementar --}}
+            <x-responsive-nav-link href="#" :active="false">
+                Propuestas
+            </x-responsive-nav-link>
+
+            {{-- Ruta pendiente de implementar --}}
+            <x-responsive-nav-link href="#" :active="false">
+                Periodos
+            </x-responsive-nav-link>
             @endif
 
-            @if (Auth::user()->rol === 'tutor')
+            @if (auth()->user()->rol === 'tutor')
             <x-responsive-nav-link :href="route('mis-asignaciones')" :active="request()->routeIs('mis-asignaciones')">
                 Mis asignaciones
+            </x-responsive-nav-link>
+
+            {{-- Ruta pendiente de implementar --}}
+            <x-responsive-nav-link href="#" :active="false">
+                Casos
+            </x-responsive-nav-link>
+
+            {{-- Ruta pendiente de implementar --}}
+            <x-responsive-nav-link href="#" :active="false">
+                Consolidado
             </x-responsive-nav-link>
             @endif
         </div>
 
-        <!-- Responsive Settings Options -->
-        <div class="pt-4 pb-1 border-t border-gray-200">
+        <div class="border-t border-utec-gray-medium pb-1 pt-4">
             <div class="px-4">
-                <div class="font-medium text-base text-gray-800">{{ Auth::user()->nombre }}</div>
-                <div class="font-medium text-sm text-gray-500">{{ Auth::user()->correo }}</div>
+                <div class="text-base font-medium text-utec-gray-dark">{{ auth()->user()->nombre }}</div>
+                <div class="text-sm font-medium text-gray-500">{{ auth()->user()->correo }}</div>
+                <div class="mt-1 text-xs font-medium uppercase tracking-wide text-utec-primary-light">
+                    {{ auth()->user()->rol === 'coordinacion' ? 'Coordinación' : 'Tutor' }}
+                </div>
             </div>
 
             <div class="mt-3 space-y-1">
                 <x-responsive-nav-link :href="route('profile.edit')">
-                    {{ __('Profile') }}
+                    Perfil
                 </x-responsive-nav-link>
 
-                <!-- Authentication -->
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
 
-                    <x-responsive-nav-link :href="route('logout')"
-                        onclick="event.preventDefault();
-                                        this.closest('form').submit();">
-                        {{ __('Log Out') }}
+                    <x-responsive-nav-link
+                        :href="route('logout')"
+                        onclick="event.preventDefault(); this.closest('form').submit();">
+                        Cerrar sesión
                     </x-responsive-nav-link>
                 </form>
             </div>
