@@ -91,6 +91,7 @@ class PropuestaAsignacionService
         int $seccionId,
         int $tutorId,
         ?string $observaciones,
+        ?string $aula,
         int $usuarioId
     ): ItemPropuesta {
         return DB::transaction(function () use (
@@ -98,6 +99,7 @@ class PropuestaAsignacionService
             $seccionId,
             $tutorId,
             $observaciones,
+            $aula,
             $usuarioId
         ) {
             $propuesta->refresh();
@@ -124,6 +126,9 @@ class PropuestaAsignacionService
             }
 
             $prioridad = $this->calcularPrioridad($seccion);
+            $seccion->update([
+                'aula' => $aula,
+            ]);
 
             if ($itemExistente) {
                 $datosAnteriores = $this->snapshotItem($itemExistente);
@@ -398,6 +403,7 @@ class PropuestaAsignacionService
             'tutor' => $item->tutor?->nombre_completo,
             'seccion_id' => $item->seccion_id,
             'numero_seccion' => $item->seccion?->numero_seccion,
+            'aula' => $item->seccion?->aula,
             'materia_id' => $item->seccion?->materia_id,
             'materia_codigo' => $item->seccion?->materia?->codigo,
             'materia_nombre' => $item->seccion?->materia?->nombre,

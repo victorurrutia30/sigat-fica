@@ -17,6 +17,7 @@ class GuardarItemPropuestaRequest extends FormRequest
             'seccion_id' => ['required', 'integer', 'exists:secciones,id'],
             'tutor_id' => ['required', 'integer', 'exists:tutores,id'],
             'observaciones' => ['nullable', 'string', 'max:1000'],
+            'aula' => ['nullable', 'string', 'max:60'],
         ];
     }
 
@@ -33,6 +34,9 @@ class GuardarItemPropuestaRequest extends FormRequest
 
             'observaciones.string' => 'Las observaciones deben ser texto.',
             'observaciones.max' => 'Las observaciones no deben exceder 1000 caracteres.',
+
+            'aula.string' => 'El aula debe ser texto.',
+            'aula.max' => 'El aula no debe exceder 60 caracteres.',
         ];
     }
 
@@ -42,6 +46,7 @@ class GuardarItemPropuestaRequest extends FormRequest
             'seccion_id' => 'sección',
             'tutor_id' => 'tutor',
             'observaciones' => 'observaciones',
+            'aula' => 'aula',
         ];
     }
 }

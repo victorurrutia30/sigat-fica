@@ -7,6 +7,9 @@ use App\Http\Requests\RegistrarRespuestaDecanoRequest;
 use App\Models\ItemPropuesta;
 use App\Models\PropuestaAsignacion;
 use App\Services\PropuestaAsignacionService;
+use App\Exports\AsignacionTutoresExport;
+use Maatwebsite\Excel\Facades\Excel;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -49,6 +52,7 @@ class PropuestaAsignacionController extends Controller
             seccionId: (int) $request->validated('seccion_id'),
             tutorId: (int) $request->validated('tutor_id'),
             observaciones: $request->validated('observaciones'),
+            aula: $request->validated('aula'),
             usuarioId: $request->user()->id
         );
 
@@ -111,5 +115,40 @@ class PropuestaAsignacionController extends Controller
         return redirect()
             ->route('propuestas.index')
             ->with('success', 'Propuesta publicada correctamente. Los tutores ya pueden ver sus asignaciones.');
+    }
+
+    public function exportar(
+        Request $request,
+        PropuestaAsignacionService $propuestaService
+    ): BinaryFileResponse|RedirectResponse {
+        if ($request->user()?->rol !== 'coordinacion') {
+            abort(403, 'No tienes permiso para acceder a esta sección.');
+        }
+
+        try {
+            $propuesta = $propuestaService->obtenerOCrearParaCicloActivo($request->user()->id);
+        } catch (\Illuminate\Validation\ValidationException $exception) {
+            return redirect()
+                ->route('ciclos.index')
+                ->withErrors($exception->errors())
+                ->with('error', 'Debe existir un ciclo activo antes de exportar la propuesta.');
+        }
+
+        if ($propuesta->items->isEmpty()) {
+            return redirect()
+                ->route('propuestas.index')
+                ->with('error', 'No se puede exportar una propuesta sin asignaciones.');
+        }
+
+        $nombreArchivo = 'asignacion-tutores-'
+            . ($propuesta->ciclo?->nombre ?? 'ciclo')
+            . '-'
+            . now()->format('Ymd-His')
+            . '.xlsx';
+
+        return Excel::download(
+            new AsignacionTutoresExport($propuesta),
+            $nombreArchivo
+        );
     }
 }

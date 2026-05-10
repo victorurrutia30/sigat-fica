@@ -11,12 +11,11 @@
             </div>
 
             <div class="flex flex-wrap gap-2">
-                <button type="button"
-                    class="btn-secondary cursor-not-allowed opacity-60"
-                    disabled
-                    title="Pendiente de implementar en el siguiente bloque">
+                <a href="{{ route('propuestas.exportar') }}"
+                    class="btn-secondary {{ $propuesta->items->isEmpty() ? 'pointer-events-none cursor-not-allowed opacity-60' : '' }}"
+                    @if($propuesta->items->isEmpty()) aria-disabled="true" @endif>
                     Exportar Excel para Decano
-                </button>
+                </a>
             </div>
         </div>
     </x-slot>
@@ -247,6 +246,26 @@
 
                                                     @if($hayErrorFila)
                                                     @error('tutor_id')
+                                                    <p class="form-error">{{ $message }}</p>
+                                                    @enderror
+                                                    @endif
+                                                </div>
+
+                                                <div>
+                                                    <label for="aula_{{ $seccion->id }}" class="form-label">
+                                                        Aula
+                                                    </label>
+
+                                                    <input type="text"
+                                                        name="aula"
+                                                        id="aula_{{ $seccion->id }}"
+                                                        value="{{ old('aula', $seccion->aula) }}"
+                                                        class="input-field"
+                                                        maxlength="60"
+                                                        placeholder="{{ $seccion->modalidad === 'en_linea' ? 'EN LÍNEA' : 'Ej. A-301' }}">
+
+                                                    @if($hayErrorFila)
+                                                    @error('aula')
                                                     <p class="form-error">{{ $message }}</p>
                                                     @enderror
                                                     @endif

@@ -234,7 +234,11 @@ class AsignacionTutoresExport implements FromCollection, WithHeadings, WithMappi
             return 'VIRTUAL';
         }
 
-        return $seccion->aula ?: '';
+        if ($seccion->modalidad === 'en_linea') {
+            return 'EN LÍNEA';
+        }
+
+        return $seccion->aula ?: 'No definida';
     }
 
     private function formatearModalidad(?string $modalidad): string

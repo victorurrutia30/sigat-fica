@@ -33,6 +33,9 @@ Route::middleware(['auth', 'verified', 'rol:coordinacion'])->group(function () {
     Route::get('propuestas', [PropuestaAsignacionController::class, 'index'])
         ->name('propuestas.index');
 
+    Route::get('propuestas/exportar', [PropuestaAsignacionController::class, 'exportar'])
+        ->name('propuestas.exportar');
+
     Route::post('propuestas/items', [PropuestaAsignacionController::class, 'store'])
         ->name('propuestas.items.store');
 
