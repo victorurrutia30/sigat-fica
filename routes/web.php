@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CicloController;
+use App\Http\Controllers\MateriaController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -14,6 +15,7 @@ Route::get('/dashboard', function () {
 
 Route::middleware(['auth', 'verified', 'rol:coordinacion'])->group(function () {
     Route::resource('ciclos', CicloController::class);
+    Route::resource('materias', MateriaController::class);
 });
 
 Route::middleware('auth')->group(function () {

@@ -20,8 +20,7 @@
                         Dashboard
                     </x-nav-link>
 
-                    {{-- Ruta pendiente de implementar --}}
-                    <x-nav-link href="#" :active="false">
+                    <x-nav-link :href="route('ciclos.index')" :active="request()->routeIs('ciclos.*')">
                         Ciclos
                     </x-nav-link>
 
@@ -30,8 +29,7 @@
                         Tutores
                     </x-nav-link>
 
-                    {{-- Ruta pendiente de implementar --}}
-                    <x-nav-link href="#" :active="false">
+                    <x-nav-link :href="route('materias.index')" :active="request()->routeIs('materias.*')">
                         Materias
                     </x-nav-link>
 
@@ -126,8 +124,7 @@
                 Dashboard
             </x-responsive-nav-link>
 
-            {{-- Ruta pendiente de implementar --}}
-            <x-responsive-nav-link href="#" :active="false">
+            <x-responsive-nav-link :href="route('ciclos.index')" :active="request()->routeIs('ciclos.*')">
                 Ciclos
             </x-responsive-nav-link>
 
@@ -136,8 +133,7 @@
                 Tutores
             </x-responsive-nav-link>
 
-            {{-- Ruta pendiente de implementar --}}
-            <x-responsive-nav-link href="#" :active="false">
+            <x-responsive-nav-link :href="route('materias.index')" :active="request()->routeIs('materias.*')">
                 Materias
             </x-responsive-nav-link>
 

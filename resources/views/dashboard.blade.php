@@ -59,7 +59,7 @@
                     </p>
 
                     <div class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                        <a href="#" class="rounded-lg border border-utec-gray-medium p-4 text-sm font-medium text-utec-gray-dark transition hover:border-utec-primary-light hover:bg-utec-primary-soft hover:text-utec-primary">
+                        <a href="{{ route('ciclos.index') }}" class="rounded-lg border border-utec-gray-medium p-4 text-sm font-medium text-utec-gray-dark transition hover:border-utec-primary-light hover:bg-utec-primary-soft hover:text-utec-primary">
                             Ciclos
                         </a>
 
@@ -67,7 +67,7 @@
                             Tutores
                         </a>
 
-                        <a href="#" class="rounded-lg border border-utec-gray-medium p-4 text-sm font-medium text-utec-gray-dark transition hover:border-utec-primary-light hover:bg-utec-primary-soft hover:text-utec-primary">
+                        <a href="{{ route('materias.index') }}" class="rounded-lg border border-utec-gray-medium p-4 text-sm font-medium text-utec-gray-dark transition hover:border-utec-primary-light hover:bg-utec-primary-soft hover:text-utec-primary">
                             Materias
                         </a>
 
