@@ -3,6 +3,7 @@
 use App\Http\Controllers\CicloController;
 use App\Http\Controllers\MateriaController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\TutorController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -16,6 +17,8 @@ Route::get('/dashboard', function () {
 Route::middleware(['auth', 'verified', 'rol:coordinacion'])->group(function () {
     Route::resource('ciclos', CicloController::class);
     Route::resource('materias', MateriaController::class);
+    Route::resource('tutores', TutorController::class)
+        ->parameters(['tutores' => 'tutor']);
 });
 
 Route::middleware('auth')->group(function () {

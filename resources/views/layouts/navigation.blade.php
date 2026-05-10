@@ -24,8 +24,7 @@
                         Ciclos
                     </x-nav-link>
 
-                    {{-- Ruta pendiente de implementar --}}
-                    <x-nav-link href="#" :active="false">
+                    <x-nav-link :href="route('tutores.index')" :active="request()->routeIs('tutores.*')">
                         Tutores
                     </x-nav-link>
 
@@ -128,8 +127,7 @@
                 Ciclos
             </x-responsive-nav-link>
 
-            {{-- Ruta pendiente de implementar --}}
-            <x-responsive-nav-link href="#" :active="false">
+            <x-responsive-nav-link :href="route('tutores.index')" :active="request()->routeIs('tutores.*')">
                 Tutores
             </x-responsive-nav-link>
 

@@ -63,7 +63,7 @@
                             Ciclos
                         </a>
 
-                        <a href="#" class="rounded-lg border border-utec-gray-medium p-4 text-sm font-medium text-utec-gray-dark transition hover:border-utec-primary-light hover:bg-utec-primary-soft hover:text-utec-primary">
+                        <a href="{{ route('tutores.index') }}" class="rounded-lg border border-utec-gray-medium p-4 text-sm font-medium text-utec-gray-dark transition hover:border-utec-primary-light hover:bg-utec-primary-soft hover:text-utec-primary">
                             Tutores
                         </a>
 
