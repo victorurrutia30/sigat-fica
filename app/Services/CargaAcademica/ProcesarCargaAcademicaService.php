@@ -260,20 +260,16 @@ class ProcesarCargaAcademicaService
     }
     private function filaNoAcademica(array $datos): bool
     {
-        $camposClave = [
-            'codigo_materia',
-            'nombre_materia',
-            'tipo',
-            'docente_titular',
-        ];
+        $codigoMateria = trim((string) ($datos['codigo_materia'] ?? ''));
+        $tipo = trim((string) ($datos['tipo'] ?? ''));
 
-        foreach ($camposClave as $campo) {
-            if (($datos[$campo] ?? '') !== '') {
-                return false;
-            }
+        // Los cuadros resumen al final de algunas hojas traen números en columnas
+        // como SEC, pero no traen código de materia ni modalidad. No son secciones.
+        if ($codigoMateria === '' && $tipo === '') {
+            return true;
         }
 
-        return true;
+        return false;
     }
 
     private function filaVacia(Collection|array $fila): bool
