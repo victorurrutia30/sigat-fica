@@ -93,11 +93,15 @@ class ProcesarCargaAcademicaService
                 continue;
             }
 
-            $resultado->incrementar('filas_leidas');
-
             $datos = $this->normalizarDatosFila(
                 $this->mapeadorColumnas->extraerDatosFila($fila, $mapa)
             );
+
+            if ($this->filaNoAcademica($datos)) {
+                continue;
+            }
+
+            $resultado->incrementar('filas_leidas');
 
             try {
                 $this->validarDatosMinimos($datos);
@@ -253,6 +257,23 @@ class ProcesarCargaAcademicaService
         }
 
         return array_values($horarios);
+    }
+    private function filaNoAcademica(array $datos): bool
+    {
+        $camposClave = [
+            'codigo_materia',
+            'nombre_materia',
+            'tipo',
+            'docente_titular',
+        ];
+
+        foreach ($camposClave as $campo) {
+            if (($datos[$campo] ?? '') !== '') {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private function filaVacia(Collection|array $fila): bool
