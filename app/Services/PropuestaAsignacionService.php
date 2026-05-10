@@ -269,7 +269,11 @@ class PropuestaAsignacionService
         int $usuarioId
     ): PropuestaAsignacion {
         return DB::transaction(function () use ($propuesta, $usuarioId) {
-            $propuesta->refresh();
+            if ($propuesta->publicado) {
+                throw ValidationException::withMessages([
+                    'publicado' => 'La propuesta ya está publicada.',
+                ]);
+            }
 
             if ($propuesta->estado_aprobacion !== 'aprobado') {
                 throw ValidationException::withMessages([

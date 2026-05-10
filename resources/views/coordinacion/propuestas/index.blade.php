@@ -405,14 +405,22 @@
                                 @csrf
                                 @method('PATCH')
 
+                                @php
+                                $puedePublicar = $propuesta->estado_aprobacion === 'aprobado' && ! $propuesta->publicado;
+                                @endphp
+
                                 <button type="submit"
-                                    class="btn-primary {{ $propuesta->estado_aprobacion !== 'aprobado' ? 'cursor-not-allowed opacity-60' : '' }}"
-                                    @disabled($propuesta->estado_aprobacion !== 'aprobado')>
-                                    Publicar propuesta
+                                    class="btn-primary {{ ! $puedePublicar ? 'cursor-not-allowed opacity-60' : '' }}"
+                                    @disabled(! $puedePublicar)>
+                                    {{ $propuesta->publicado ? 'Propuesta publicada' : 'Publicar propuesta' }}
                                 </button>
                             </form>
 
-                            @if($propuesta->estado_aprobacion !== 'aprobado')
+                            @if($propuesta->publicado)
+                            <p class="form-hint">
+                                La propuesta ya fue publicada. Si modificas asignaciones, volverá a estado pendiente y deberá aprobarse nuevamente.
+                            </p>
+                            @elseif($propuesta->estado_aprobacion !== 'aprobado')
                             <p class="form-hint">
                                 Debes registrar aprobación del Decano antes de publicar.
                             </p>
