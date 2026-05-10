@@ -28,6 +28,7 @@ class PropuestaAsignacionController extends Controller
                 'ciclo' => $ciclo,
                 'seccionesCandidatas' => $seccionesCandidatas,
                 'tutores' => $tutores,
+                'itemsPorSeccion' => $propuesta->items->keyBy('seccion_id'),
             ]);
         } catch (\Illuminate\Validation\ValidationException $exception) {
             return redirect()
