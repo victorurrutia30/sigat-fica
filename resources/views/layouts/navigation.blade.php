@@ -32,9 +32,8 @@
                         Materias
                     </x-nav-link>
 
-                    {{-- Ruta pendiente de implementar --}}
-                    <x-nav-link href="#" :active="false">
-                        Secciones
+                    <x-nav-link :href="route('carga-academica.create')" :active="request()->routeIs('carga-academica.*')">
+                        Carga académica
                     </x-nav-link>
 
                     {{-- Ruta pendiente de implementar --}}
@@ -135,9 +134,8 @@
                 Materias
             </x-responsive-nav-link>
 
-            {{-- Ruta pendiente de implementar --}}
-            <x-responsive-nav-link href="#" :active="false">
-                Secciones
+            <x-responsive-nav-link :href="route('carga-academica.create')" :active="request()->routeIs('carga-academica.*')">
+                Carga académica
             </x-responsive-nav-link>
 
             {{-- Ruta pendiente de implementar --}}

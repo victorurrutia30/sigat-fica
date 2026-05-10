@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CargaAcademicaController;
 use App\Http\Controllers\CicloController;
 use App\Http\Controllers\MateriaController;
 use App\Http\Controllers\ProfileController;
@@ -19,6 +20,10 @@ Route::middleware(['auth', 'verified', 'rol:coordinacion'])->group(function () {
     Route::resource('materias', MateriaController::class);
     Route::resource('tutores', TutorController::class)
         ->parameters(['tutores' => 'tutor']);
+    Route::get('carga-academica/importar', [CargaAcademicaController::class, 'create'])
+        ->name('carga-academica.create');
+    Route::post('carga-academica/importar', [CargaAcademicaController::class, 'store'])
+        ->name('carga-academica.store');
 });
 
 Route::middleware('auth')->group(function () {
