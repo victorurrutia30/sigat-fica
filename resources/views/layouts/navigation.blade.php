@@ -36,8 +36,7 @@
                         Carga académica
                     </x-nav-link>
 
-                    {{-- Ruta pendiente de implementar --}}
-                    <x-nav-link href="#" :active="false">
+                    <x-nav-link :href="route('propuestas.index')" :active="request()->routeIs('propuestas.*')">
                         Propuestas
                     </x-nav-link>
 
@@ -138,8 +137,7 @@
                 Carga académica
             </x-responsive-nav-link>
 
-            {{-- Ruta pendiente de implementar --}}
-            <x-responsive-nav-link href="#" :active="false">
+            <x-responsive-nav-link :href="route('propuestas.index')" :active="request()->routeIs('propuestas.*')">
                 Propuestas
             </x-responsive-nav-link>
 
