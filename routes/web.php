@@ -4,6 +4,7 @@ use App\Http\Controllers\CargaAcademicaController;
 use App\Http\Controllers\CicloController;
 use App\Http\Controllers\MateriaController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\PropuestaAsignacionController;
 use App\Http\Controllers\TutorController;
 use Illuminate\Support\Facades\Route;
 
@@ -17,13 +18,32 @@ Route::get('/dashboard', function () {
 
 Route::middleware(['auth', 'verified', 'rol:coordinacion'])->group(function () {
     Route::resource('ciclos', CicloController::class);
+
     Route::resource('materias', MateriaController::class);
+
     Route::resource('tutores', TutorController::class)
         ->parameters(['tutores' => 'tutor']);
+
     Route::get('carga-academica/importar', [CargaAcademicaController::class, 'create'])
         ->name('carga-academica.create');
+
     Route::post('carga-academica/importar', [CargaAcademicaController::class, 'store'])
         ->name('carga-academica.store');
+
+    Route::get('propuestas', [PropuestaAsignacionController::class, 'index'])
+        ->name('propuestas.index');
+
+    Route::post('propuestas/items', [PropuestaAsignacionController::class, 'store'])
+        ->name('propuestas.items.store');
+
+    Route::delete('propuestas/items/{itemPropuesta}', [PropuestaAsignacionController::class, 'destroy'])
+        ->name('propuestas.items.destroy');
+
+    Route::patch('propuestas/{propuesta}/respuesta-decano', [PropuestaAsignacionController::class, 'registrarRespuestaDecano'])
+        ->name('propuestas.respuesta-decano');
+
+    Route::patch('propuestas/{propuesta}/publicar', [PropuestaAsignacionController::class, 'publicar'])
+        ->name('propuestas.publicar');
 });
 
 Route::middleware('auth')->group(function () {
