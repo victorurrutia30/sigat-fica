@@ -31,6 +31,18 @@ class MateriaRequest extends FormRequest
                 'departamento' => trim($this->input('departamento')),
             ]);
         }
+
+        if ($this->input('creditos') === '') {
+            $this->merge([
+                'creditos' => null,
+            ]);
+        }
+
+        if ($this->input('ciclo_plan') === '') {
+            $this->merge([
+                'ciclo_plan' => null,
+            ]);
+        }
     }
 
     public function rules(): array
@@ -50,13 +62,13 @@ class MateriaRequest extends FormRequest
                 'max:150',
             ],
             'creditos' => [
-                'required',
+                'nullable',
                 'integer',
                 'min:1',
                 'max:10',
             ],
             'ciclo_plan' => [
-                'required',
+                'nullable',
                 'integer',
                 'min:1',
                 'max:10',
@@ -65,6 +77,14 @@ class MateriaRequest extends FormRequest
                 'nullable',
                 'string',
                 'max:100',
+            ],
+            'gestionada_por_coordinacion' => [
+                'nullable',
+                'boolean',
+            ],
+            'requiere_revision' => [
+                'nullable',
+                'boolean',
             ],
             'activo' => [
                 'nullable',
@@ -85,12 +105,10 @@ class MateriaRequest extends FormRequest
             'nombre.string' => 'El nombre de la materia debe ser texto.',
             'nombre.max' => 'El nombre no debe superar los 150 caracteres.',
 
-            'creditos.required' => 'La cantidad de créditos es obligatoria.',
             'creditos.integer' => 'La cantidad de créditos debe ser un número entero.',
             'creditos.min' => 'La cantidad de créditos debe ser al menos 1.',
             'creditos.max' => 'La cantidad de créditos no debe ser mayor que 10.',
 
-            'ciclo_plan.required' => 'El ciclo del plan es obligatorio.',
             'ciclo_plan.integer' => 'El ciclo del plan debe ser un número entero.',
             'ciclo_plan.min' => 'El ciclo del plan debe estar entre 1 y 10.',
             'ciclo_plan.max' => 'El ciclo del plan debe estar entre 1 y 10.',
@@ -98,6 +116,8 @@ class MateriaRequest extends FormRequest
             'departamento.string' => 'El departamento debe ser texto.',
             'departamento.max' => 'El departamento no debe superar los 100 caracteres.',
 
+            'gestionada_por_coordinacion.boolean' => 'El indicador de gestión por Coordinación no tiene un valor válido.',
+            'requiere_revision.boolean' => 'El indicador de revisión no tiene un valor válido.',
             'activo.boolean' => 'El estado activo no tiene un valor válido.',
         ];
     }
@@ -110,6 +130,8 @@ class MateriaRequest extends FormRequest
             'creditos' => 'créditos',
             'ciclo_plan' => 'ciclo del plan',
             'departamento' => 'departamento',
+            'gestionada_por_coordinacion' => 'gestionada por Coordinación',
+            'requiere_revision' => 'requiere revisión',
             'activo' => 'activo',
         ];
     }

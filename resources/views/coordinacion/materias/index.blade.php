@@ -3,7 +3,7 @@
         <div class="flex items-center justify-between">
             <div>
                 <h2 class="text-xl font-bold text-utec-primary">Materias</h2>
-                <p class="text-sm text-gray-500">Catálogo de materias usadas para secciones y asignaciones.</p>
+                <p class="text-sm text-gray-500">Catálogo de materias usadas para carga académica y propuesta de asignación.</p>
             </div>
 
             <a href="{{ route('materias.create') }}" class="btn-primary">
@@ -28,7 +28,7 @@
 
             <div class="card">
                 <div class="card-body">
-                    <form method="GET" action="{{ route('materias.index') }}" class="mb-5 grid grid-cols-1 gap-3 md:grid-cols-4 md:items-end">
+                    <form method="GET" action="{{ route('materias.index') }}" class="mb-5 grid grid-cols-1 gap-3 md:grid-cols-5 md:items-end">
                         <div class="md:col-span-2">
                             <label for="busqueda" class="form-label">Buscar</label>
                             <input
@@ -49,7 +49,25 @@
                             </select>
                         </div>
 
-                        <div class="flex gap-2">
+                        <div>
+                            <label for="gestion" class="form-label">Gestión</label>
+                            <select name="gestion" id="gestion" class="input-field">
+                                <option value="">Todas</option>
+                                <option value="gestionadas" @selected($gestion==='gestionadas' )>Gestionadas</option>
+                                <option value="no_gestionadas" @selected($gestion==='no_gestionadas' )>No gestionadas</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label for="revision" class="form-label">Revisión</label>
+                            <select name="revision" id="revision" class="input-field">
+                                <option value="">Todas</option>
+                                <option value="pendientes" @selected($revision==='pendientes' )>Pendientes</option>
+                                <option value="completas" @selected($revision==='completas' )>Completas</option>
+                            </select>
+                        </div>
+
+                        <div class="md:col-span-5 flex gap-2">
                             <button type="submit" class="btn-primary">
                                 Filtrar
                             </button>
@@ -79,21 +97,45 @@
                                     <td class="td-utec font-semibold">
                                         {{ $materia->codigo }}
                                     </td>
+
                                     <td class="td-utec">
-                                        {{ $materia->nombre }}
-                                        @if($materia->ciclo_plan <= 2)
-                                            <span class="ml-2 badge-warning">Prioritaria</span>
+                                        <div class="font-medium text-utec-gray-dark">
+                                            {{ $materia->nombre }}
+                                        </div>
+
+                                        <div class="mt-2 flex flex-wrap gap-1">
+                                            @if($materia->gestionada_por_coordinacion)
+                                            <span class="badge-success">Gestionada</span>
+                                            @else
+                                            <span class="badge-muted">No gestionada</span>
                                             @endif
+
+                                            @if($materia->esPrioritaria())
+                                            <span class="badge-warning">Prioritaria</span>
+                                            @endif
+
+                                            @if($materia->requiere_revision)
+                                            <span class="badge-warning">Pendiente de revisión</span>
+                                            @endif
+                                        </div>
                                     </td>
+
                                     <td class="td-utec">
                                         {{ $materia->creditos }}
                                     </td>
+
                                     <td class="td-utec">
+                                        @if($materia->ciclo_plan)
                                         Ciclo {{ $materia->ciclo_plan }}
+                                        @else
+                                        <span class="text-sm text-gray-500">Pendiente</span>
+                                        @endif
                                     </td>
+
                                     <td class="td-utec">
                                         {{ $materia->departamento ?: 'No definido' }}
                                     </td>
+
                                     <td class="td-utec">
                                         @if($materia->activo)
                                         <span class="badge-success">Activa</span>
@@ -101,6 +143,7 @@
                                         <span class="badge-muted">Inactiva</span>
                                         @endif
                                     </td>
+
                                     <td class="td-utec">
                                         <div class="flex justify-end gap-2">
                                             <a href="{{ route('materias.edit', $materia) }}" class="link-utec">
