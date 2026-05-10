@@ -40,4 +40,40 @@
     .link-utec {
         @apply text-sm font-medium text-utec-primary transition-colors hover:text-utec-primary-dark;
     }
+
+        .btn-danger {
+        @apply inline-flex items-center justify-center rounded-md border border-red-300 bg-white px-4 py-2 text-sm font-semibold text-red-700 shadow-sm transition-colors duration-150 hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2;
+    }
+
+    .input-field {
+        @apply w-full rounded-md border-utec-gray-medium text-sm text-utec-gray-dark shadow-sm focus:border-utec-primary-light focus:ring-utec-primary-light;
+    }
+
+    .form-label {
+        @apply mb-1 block text-sm font-medium text-utec-gray-dark;
+    }
+
+    .form-error {
+        @apply mt-1 text-xs text-red-600;
+    }
+
+    .form-hint {
+        @apply mt-1 text-xs text-gray-500;
+    }
+
+    .td-utec {
+        @apply px-6 py-4 text-sm text-utec-gray-dark;
+    }
+
+    .badge-success {
+        @apply inline-flex rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800;
+    }
+
+    .badge-warning {
+        @apply inline-flex rounded-full bg-orange-100 px-2.5 py-0.5 text-xs font-medium text-orange-800;
+    }
+
+    .badge-muted {
+        @apply inline-flex rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-700;
+    }
 }
