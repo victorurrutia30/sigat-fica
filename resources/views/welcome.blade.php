@@ -3,133 +3,125 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>UTEC Virtual — Gestión de Tutorías</title>
-    <link rel="icon" type="image/png" href="{{ asset('images/logo-utec.png') }}">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=Figtree:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>SIGAT-FICA</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <style>
-        .font-serif-custom { font-family: 'Cormorant Garamond', serif; }
-        .hero-title { font-size: clamp(56px, 7vw, 88px); line-height: 0.95; letter-spacing: -0.02em; }
-        .bg-grid {
-            background-image:
-                linear-gradient(rgba(90,21,51,0.04) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(90,21,51,0.04) 1px, transparent 1px);
-            background-size: 40px 40px;
-        }
-    </style>
 </head>
-<body class="bg-utec-bg-light text-utec-gray-dark h-screen overflow-hidden">
+<body class="bg-white h-screen flex items-center justify-center overflow-hidden">
 
-    {{-- Decorative ambient blobs --}}
-    <div class="fixed -top-28 -left-28 w-[500px] h-[500px] rounded-full pointer-events-none
-                bg-[radial-gradient(circle,rgba(90,21,51,0.10)_0%,transparent_70%)]"></div>
-    <div class="fixed -bottom-24 -right-24 w-[400px] h-[400px] rounded-full pointer-events-none
-                bg-[radial-gradient(circle,rgba(61,13,34,0.06)_0%,transparent_70%)]"></div>
-    <div class="bg-grid fixed inset-0 pointer-events-none"></div>
+    <div class="grid grid-cols-2 w-full max-w-5xl mx-auto rounded-2xl overflow-hidden shadow-xl"
+         style="height: 88vh; max-height: 620px;">
 
-    {{-- Header --}}
-    <header class="fixed top-0 left-0 right-0 z-50 flex items-center px-16 py-7">
-        <a href="/" class="flex items-center gap-3 no-underline">
-            @if(file_exists(public_path('images/LOGO.png')))
-                <img src="{{ asset('images/LOGO.png') }}" alt="UTEC" class="w-8 h-8 object-contain">
-            @else
-                <div class="w-8 h-8 rounded-md flex items-center justify-center
-                            bg-utec-primary text-white text-xs font-bold">
-                    UV
+        <div class="bg-utec-primary flex flex-col justify-between p-12 relative overflow-hidden">
+
+            <div class="absolute -top-12 -right-12 w-52 h-52 rounded-full border border-white/10 pointer-events-none"></div>
+            <div class="absolute top-4 right-4 w-32 h-32 rounded-full border border-white/6 pointer-events-none"></div>
+            <div class="absolute -bottom-10 -left-10 w-40 h-40 rounded-full pointer-events-none"
+                 style="background: rgba(61,13,34,0.55)"></div>
+
+            <div class="relative z-10">
+                <div class="inline-flex items-center gap-2 bg-white/10 border border-white/15
+                            rounded-full px-3 py-1.5 mb-8">
+                    <div class="w-1.5 h-1.5 rounded-full bg-utec-primary-soft"></div>
+                    <span class="text-[10px] text-white/70 uppercase tracking-widest font-medium">
+                        FICA · UTEC
+                    </span>
                 </div>
-            @endif
-            <div>
-                <div class="text-[13px] font-semibold uppercase tracking-[0.06em] text-utec-gray-dark">
-                    UTEC <span class="text-utec-primary">Virtual</span>
-                </div>
-                <div class="text-[10px] uppercase tracking-[0.15em] text-utec-gray-medium font-light">
-                    Universidad Tecnológica
-                </div>
-            </div>
-        </a>
-    </header>
 
-    {{-- Main two-column layout --}}
-    <main class="h-screen grid grid-cols-2">
+                <h1 class="text-[30px] font-medium text-white leading-snug mb-4">
+                    Sistema de gestión<br>
+                    de tutorías<br>
+                </h1>
 
-        {{-- Left: hero content --}}
-        <div class="flex flex-col justify-center px-16">
+                <p class="text-[13px] text-white/65 leading-relaxed max-w-[240px] mb-8">
+                    Asignación, seguimiento y control de consolidados para el programa de tutores.
+                </p>
 
-            <p class="text-[10px] uppercase tracking-[0.2em] font-medium mb-5 text-utec-primary">
-                Sistema de gestión de tutorías — UTEC Virtual
-            </p>
-
-            <h1 class="hero-title font-serif-custom font-normal mb-7 text-utec-gray-dark">
-                Gestión de<br>
-                <span class="text-utec-primary">Tutorías</span>
-            </h1>
-
-            <p class="text-[13px] leading-[1.75] max-w-[340px] mb-8 font-light text-utec-gray-dark/70">
-                Administra, asigna y da seguimiento a las tutorías académicas
-                de forma eficiente desde una sola plataforma institucional.
-            </p>
-
-            @if (Route::has('login'))
-                @auth
-                    <a href="{{ url('/dashboard') }}"
-                       class="btn-primary self-start text-[11px] uppercase tracking-[0.14em] px-9 py-3.5 rounded-sm">
-                        Ir al sistema
-                    </a>
-                @else
-                    <a href="{{ route('login') }}"
-                       class="btn-primary self-start text-[11px] uppercase tracking-[0.14em] px-9 py-3.5 rounded-sm">
-                        Iniciar sesión
-                    </a>
-                @endauth
-            @endif
-        </div>
-
-        {{-- Right: image panel --}}
-        <div class="relative overflow-hidden flex items-center justify-center">
-            @if(file_exists(public_path('images/01-A.png')))
-                <img src="{{ asset('images/01-A.png') }}" alt="UTEC Virtual"
-                     class="w-full h-full object-cover grayscale-[15%]">
-            @else
-                <div class="w-full h-full flex items-center justify-center
-                            bg-gradient-to-br from-utec-primary-soft to-utec-gray-medium/20">
-                    <div class="text-center opacity-30">
-                        <div class="font-serif-custom font-light leading-none text-utec-primary"
-                             style="font-size:140px;">U</div>
-                        <div class="mx-auto mb-4 bg-utec-primary h-[3px] w-[60px]"></div>
-                        <div class="text-[11px] uppercase tracking-[0.2em] text-utec-gray-medium">
-                            Universidad Tecnológica
+                {{-- Features --}}
+                <div class="flex flex-col gap-4">
+                    @foreach([
+                        ['ti-users-group',    'Asignación de tutores',   'Validación de DTCs y horarios'],
+                        ['ti-clipboard-list', 'Seguimiento de casos',    'Gestiones y causas por estudiante'],
+                        ['ti-chart-bar',      'Control de consolidados', 'Tablero de cumplimiento por periodo'],
+                    ] as [$icon, $title, $desc])
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-white/15 flex items-center justify-center flex-shrink-0">
+                            <i class="ti {{ $icon }} text-white text-sm" aria-hidden="true"></i>
+                        </div>
+                        <div>
+                            <p class="text-[12.5px] font-semibold text-white">{{ $title }}</p>
+                            <p class="text-[11.5px] text-white/65">{{ $desc }}</p>
                         </div>
                     </div>
-                </div>
-            @endif
-
-            {{-- Floating info card --}}
-            <div class="card absolute bottom-12 shadow-xl"
-                 style="left:50%; transform:translateX(-50%); min-width:220px; max-width:260px;">
-                <div class="card-body">
-                    <div class="text-[9px] uppercase tracking-[0.18em] font-semibold mb-1.5 text-utec-primary">
-                        Sistema institucional
-                    </div>
-                    <div class="font-serif-custom text-[18px] font-medium text-utec-gray-dark leading-tight">
-                        Plataforma de tutorías<br>UTEC Virtual
-                    </div>
-                    <div class="text-[11px] text-utec-gray-medium mt-1.5">
-                        Gestión académica integral TEXT
-                    </div>
-                    <div class="mt-3 bg-utec-primary h-[2px] w-8"></div>
+                    @endforeach
                 </div>
             </div>
+
+            <div class="relative z-10 flex gap-2">
+                <span class="bg-white/8 border border-white/12 rounded-md px-2.5 py-1
+                             text-[10px] text-white/50 uppercase tracking-widest">SIGAT-FICA</span>
+                <span class="bg-white/8 border border-white/12 rounded-md px-2.5 py-1
+                             text-[10px] text-white/50 uppercase tracking-widest">2026</span>
+            </div>
         </div>
-    </main>
 
-    {{-- Side decorative label --}}
-    <div class="fixed right-6 top-1/2 -translate-y-1/2 rotate-90
-                text-[9px] uppercase tracking-[0.22em] text-utec-gray-medium/60
-                whitespace-nowrap pointer-events-none select-none">
-        UTEC
+        <div class="flex flex-col" style="min-height: 0;">
+
+            <div class="relative overflow-hidden" style="flex: 1; min-height: 0;">
+
+                @if(file_exists(public_path('images/IMG-WELCOME.png')))
+                    <img src="{{ asset('images/IMG-WELCOME.png') }}" alt="UTEC"
+                         class="w-full h-full object-cover">
+                @else
+                    <div class="w-full h-full flex items-center justify-center
+                                bg-gradient-to-br from-utec-primary-soft to-utec-gray-medium/30">
+                        <div class="text-center opacity-40">
+                            <div class="text-[100px] font-light text-utec-primary leading-none">U</div>
+                            <div class="w-10 h-0.5 bg-utec-primary mx-auto my-2"></div>
+                            <div class="text-[10px] uppercase tracking-[.18em] text-utec-primary-light">
+                                Universidad Tecnológica
+                            </div>
+                        </div>
+                    </div>
+                @endif
+
+                <div class="absolute inset-0 bg-gradient-to-t from-utec-primary/55 to-transparent pointer-events-none"></div>
+
+                <div class="absolute bottom-4 left-4 right-4 bg-white/95 backdrop-blur-sm rounded-xl p-4">
+                    <p class="text-[9px] font-semibold uppercase tracking-[.16em] text-utec-primary mb-1">
+                        Sistema institucional
+                    </p>
+                    <p class="text-[15px] font-medium text-utec-gray-dark leading-snug mb-2">
+                        Plataforma de tutorías<br>SIGAT-FICA
+                    </p>
+                    <div class="w-6 h-0.5 bg-utec-primary rounded-full"></div>
+                </div>
+            </div>
+
+            <div class="bg-white border-t border-utec-gray-medium/40
+                        px-8 py-5 flex items-center justify-between gap-4 flex-shrink-0">
+                <div>
+                    <p class="text-[14px] font-medium text-utec-gray-dark">¿Listo para comenzar?</p>
+                    <p class="text-[12px] text-utec-gray-medium">Acceso restringido al personal autorizado</p>
+                </div>
+
+                @auth
+                    <a href="{{ url('/dashboard') }}"
+                       class="btn-primary flex items-center gap-2 whitespace-nowrap">
+                        Ir al sistema
+                        <i class="ti ti-arrow-right" aria-hidden="true"></i>
+                    </a>
+                @else
+                   <a href="{{ route('login') }}"
+                        id="btn-login"
+                        class="btn-primary flex items-center gap-2 whitespace-nowrap">
+                            <i class="ti ti-arrow-right" id="btn-icon" aria-hidden="true"></i>
+                            <span id="btn-texto">Iniciar sesión</span>
+                    </a>
+                @endauth
+            </div>
+        </div>
+
     </div>
-
 </body>
 </html>
