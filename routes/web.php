@@ -9,6 +9,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PropuestaAsignacionController;
 use App\Http\Controllers\TutorController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\CausaController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -25,6 +26,9 @@ Route::middleware(['auth', 'verified', 'rol:coordinacion'])->group(function () {
 
     Route::resource('tutores', TutorController::class)
         ->parameters(['tutores' => 'tutor']);
+
+    Route::resource('causas', CausaController::class)
+        ->parameters(['causas' => 'causa']);
 
     Route::resource('periodos', PeriodoEvaluacionController::class)
         ->parameters(['periodos' => 'periodoEvaluacion']);

@@ -101,6 +101,14 @@
                                 Gestionar periodos y fechas límite de consolidado.
                             </span>
                         </a>
+
+                        <a href="{{ route('causas.index') }}"
+                            class="rounded-lg border border-utec-gray-medium p-4 text-sm font-medium text-utec-gray-dark transition hover:border-utec-primary-light hover:bg-utec-primary-soft hover:text-utec-primary">
+                            Catálogo de causas
+                            <span class="mt-1 block text-xs text-gray-500">
+                                Gestionar causas para casos de seguimiento.
+                            </span>
+                        </a>
                     </div>
                 </div>
             </div>
