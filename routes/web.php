@@ -7,6 +7,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PropuestaAsignacionController;
 use App\Http\Controllers\TutorController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\MisAsignacionesController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -55,8 +56,8 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-Route::get('/mis-asignaciones', function () {
-    return view('tutor.mis-asignaciones');
-})->middleware(['auth', 'rol:tutor'])->name('mis-asignaciones');
+Route::get('/mis-asignaciones', [MisAsignacionesController::class, 'index'])
+    ->middleware(['auth', 'rol:tutor'])
+    ->name('mis-asignaciones');
 
 require __DIR__ . '/auth.php';

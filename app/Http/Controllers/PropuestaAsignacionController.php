@@ -140,6 +140,10 @@ class PropuestaAsignacionController extends Controller
                 ->with('error', 'No se puede exportar una propuesta sin asignaciones.');
         }
 
+        $propuesta->forceFill([
+            'enviado_en' => now(),
+        ])->save();
+
         $nombreArchivo = 'asignacion-tutores-'
             . ($propuesta->ciclo?->nombre ?? 'ciclo')
             . '-'
