@@ -20,28 +20,23 @@
                         Dashboard
                     </x-nav-link>
 
-                    {{-- Ruta pendiente de implementar --}}
-                    <x-nav-link href="#" :active="false">
+                    <x-nav-link :href="route('ciclos.index')" :active="request()->routeIs('ciclos.*')">
                         Ciclos
                     </x-nav-link>
 
-                    {{-- Ruta pendiente de implementar --}}
-                    <x-nav-link href="#" :active="false">
+                    <x-nav-link :href="route('tutores.index')" :active="request()->routeIs('tutores.*')">
                         Tutores
                     </x-nav-link>
 
-                    {{-- Ruta pendiente de implementar --}}
-                    <x-nav-link href="#" :active="false">
+                    <x-nav-link :href="route('materias.index')" :active="request()->routeIs('materias.*')">
                         Materias
                     </x-nav-link>
 
-                    {{-- Ruta pendiente de implementar --}}
-                    <x-nav-link href="#" :active="false">
-                        Secciones
+                    <x-nav-link :href="route('carga-academica.create')" :active="request()->routeIs('carga-academica.*')">
+                        Carga académica
                     </x-nav-link>
 
-                    {{-- Ruta pendiente de implementar --}}
-                    <x-nav-link href="#" :active="false">
+                    <x-nav-link :href="route('propuestas.index')" :active="request()->routeIs('propuestas.*')">
                         Propuestas
                     </x-nav-link>
 
@@ -126,28 +121,23 @@
                 Dashboard
             </x-responsive-nav-link>
 
-            {{-- Ruta pendiente de implementar --}}
-            <x-responsive-nav-link href="#" :active="false">
+            <x-responsive-nav-link :href="route('ciclos.index')" :active="request()->routeIs('ciclos.*')">
                 Ciclos
             </x-responsive-nav-link>
 
-            {{-- Ruta pendiente de implementar --}}
-            <x-responsive-nav-link href="#" :active="false">
+            <x-responsive-nav-link :href="route('tutores.index')" :active="request()->routeIs('tutores.*')">
                 Tutores
             </x-responsive-nav-link>
 
-            {{-- Ruta pendiente de implementar --}}
-            <x-responsive-nav-link href="#" :active="false">
+            <x-responsive-nav-link :href="route('materias.index')" :active="request()->routeIs('materias.*')">
                 Materias
             </x-responsive-nav-link>
 
-            {{-- Ruta pendiente de implementar --}}
-            <x-responsive-nav-link href="#" :active="false">
-                Secciones
+            <x-responsive-nav-link :href="route('carga-academica.create')" :active="request()->routeIs('carga-academica.*')">
+                Carga académica
             </x-responsive-nav-link>
 
-            {{-- Ruta pendiente de implementar --}}
-            <x-responsive-nav-link href="#" :active="false">
+            <x-responsive-nav-link :href="route('propuestas.index')" :active="request()->routeIs('propuestas.*')">
                 Propuestas
             </x-responsive-nav-link>
 

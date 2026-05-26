@@ -18,16 +18,21 @@ class Seccion extends Model
         'materia_id',
         'numero_seccion',
         'modalidad',
+        'requiere_tutor',
         'aula',
         'nombre_titular',
         'correo_titular',
+        'codigo_docente_titular',
+        'categoria_docente_titular',
         'capacidad',
+        'observaciones_carga',
     ];
 
     protected function casts(): array
     {
         return [
             'capacidad' => 'integer',
+            'requiere_tutor' => 'boolean',
         ];
     }
 
@@ -59,5 +64,20 @@ class Seccion extends Model
     public function casosSeguimiento(): HasMany
     {
         return $this->hasMany(CasoSeguimiento::class, 'seccion_id');
+    }
+
+    public function esVirtual(): bool
+    {
+        return $this->modalidad === 'virtual';
+    }
+
+    public function esEnLinea(): bool
+    {
+        return $this->modalidad === 'en_linea';
+    }
+
+    public function puedeEntrarEnPropuesta(): bool
+    {
+        return $this->requiere_tutor && $this->materia?->gestionada_por_coordinacion;
     }
 }

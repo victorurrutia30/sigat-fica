@@ -18,6 +18,8 @@ class Materia extends Model
         'creditos',
         'ciclo_plan',
         'departamento',
+        'gestionada_por_coordinacion',
+        'requiere_revision',
         'activo',
     ];
 
@@ -26,6 +28,8 @@ class Materia extends Model
         return [
             'creditos' => 'integer',
             'ciclo_plan' => 'integer',
+            'gestionada_por_coordinacion' => 'boolean',
+            'requiere_revision' => 'boolean',
             'activo' => 'boolean',
         ];
     }
@@ -33,5 +37,15 @@ class Materia extends Model
     public function secciones(): HasMany
     {
         return $this->hasMany(Seccion::class, 'materia_id');
+    }
+
+    public function esPrioritaria(): bool
+    {
+        return $this->ciclo_plan !== null && $this->ciclo_plan <= 2;
+    }
+
+    public function estaCompletaParaAsignacion(): bool
+    {
+        return ! $this->requiere_revision && $this->ciclo_plan !== null;
     }
 }
