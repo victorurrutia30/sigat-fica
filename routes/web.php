@@ -3,11 +3,12 @@
 use App\Http\Controllers\CargaAcademicaController;
 use App\Http\Controllers\CicloController;
 use App\Http\Controllers\MateriaController;
+use App\Http\Controllers\MisAsignacionesController;
+use App\Http\Controllers\PeriodoEvaluacionController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PropuestaAsignacionController;
 use App\Http\Controllers\TutorController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\MisAsignacionesController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -24,6 +25,9 @@ Route::middleware(['auth', 'verified', 'rol:coordinacion'])->group(function () {
 
     Route::resource('tutores', TutorController::class)
         ->parameters(['tutores' => 'tutor']);
+
+    Route::resource('periodos', PeriodoEvaluacionController::class)
+        ->parameters(['periodos' => 'periodoEvaluacion']);
 
     Route::get('carga-academica/importar', [CargaAcademicaController::class, 'create'])
         ->name('carga-academica.create');

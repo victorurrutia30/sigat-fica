@@ -40,8 +40,7 @@
                         Propuestas
                     </x-nav-link>
 
-                    {{-- Ruta pendiente de implementar --}}
-                    <x-nav-link href="#" :active="false">
+                    <x-nav-link :href="route('periodos.index')" :active="request()->routeIs('periodos.*')">
                         Periodos
                     </x-nav-link>
                     @endif
@@ -141,8 +140,7 @@
                 Propuestas
             </x-responsive-nav-link>
 
-            {{-- Ruta pendiente de implementar --}}
-            <x-responsive-nav-link href="#" :active="false">
+            <x-responsive-nav-link :href="route('periodos.index')" :active="request()->routeIs('periodos.*')">
                 Periodos
             </x-responsive-nav-link>
             @endif

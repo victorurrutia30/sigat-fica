@@ -76,4 +76,28 @@
     .badge-muted {
         @apply inline-flex rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-700;
     }
+
+        .alert-success {
+        @apply rounded-r-md border-l-4 border-green-600 bg-green-50 px-4 py-3 text-sm text-green-800;
+    }
+
+    .alert-error {
+        @apply rounded-r-md border-l-4 border-red-600 bg-red-50 px-4 py-3 text-sm text-red-800;
+    }
+
+    .alert-warning {
+        @apply rounded-r-md border-l-4 border-orange-600 bg-orange-50 px-4 py-3 text-sm text-orange-800;
+    }
+
+    .alert-info {
+        @apply rounded-r-md border-l-4 border-blue-600 bg-blue-50 px-4 py-3 text-sm text-blue-800;
+    }
+
+    .badge-danger {
+        @apply inline-flex rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-medium text-red-800;
+    }
+
+    .badge-info {
+        @apply inline-flex rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800;
+    }
 }
