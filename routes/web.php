@@ -10,6 +10,7 @@ use App\Http\Controllers\PropuestaAsignacionController;
 use App\Http\Controllers\TutorController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CausaController;
+use App\Http\Controllers\CasoSeguimientoController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -67,5 +68,10 @@ Route::middleware('auth')->group(function () {
 Route::get('/mis-asignaciones', [MisAsignacionesController::class, 'index'])
     ->middleware(['auth', 'rol:tutor'])
     ->name('mis-asignaciones');
+
+Route::resource('casos', CasoSeguimientoController::class)
+    ->only(['index', 'create', 'store', 'show'])
+    ->parameters(['casos' => 'casoSeguimiento'])
+    ->middleware(['auth', 'rol:tutor']);
 
 require __DIR__ . '/auth.php';

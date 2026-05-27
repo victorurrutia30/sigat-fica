@@ -57,12 +57,11 @@
 
                     {{-- Ruta pendiente de implementar --}}
                     <x-nav-link href="#" :active="false">
-                        Casos
+                        Consolidado
                     </x-nav-link>
 
-                    {{-- Ruta pendiente de implementar --}}
-                    <x-nav-link href="#" :active="false">
-                        Consolidado
+                    <x-nav-link :href="route('casos.index')" :active="request()->routeIs('casos.*')">
+                        Casos
                     </x-nav-link>
                     @endif
                 </div>
@@ -163,12 +162,11 @@
 
             {{-- Ruta pendiente de implementar --}}
             <x-responsive-nav-link href="#" :active="false">
-                Casos
+                Consolidado
             </x-responsive-nav-link>
 
-            {{-- Ruta pendiente de implementar --}}
-            <x-responsive-nav-link href="#" :active="false">
-                Consolidado
+            <x-responsive-nav-link :href="route('casos.index')" :active="request()->routeIs('casos.*')">
+                Casos
             </x-responsive-nav-link>
             @endif
         </div>
