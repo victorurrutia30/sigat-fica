@@ -57,7 +57,7 @@
                         </p>
 
                         {{-- Ruta pendiente de implementar --}}
-                        <a href="#" class="link-utec mt-4 inline-flex">
+                        <a href="{{ route('casos.index') }}" class="link-utec mt-4 inline-flex">
                             Ver casos
                         </a>
                     </div>

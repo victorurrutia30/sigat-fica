@@ -1,65 +1,79 @@
-<nav x-data="{ open: false }" class="border-b border-utec-gray-medium bg-white">
+<nav x-data="{ open: false }" class="bg-utec-primary shadow-md">
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div class="flex h-16 justify-between">
+
             <div class="flex">
                 <div class="flex shrink-0 items-center">
                     <a href="{{ auth()->user()->rol === 'coordinacion' ? route('dashboard') : route('mis-asignaciones') }}">
                         <div class="flex items-center gap-3">
-                            <x-application-logo class="block h-9 w-auto fill-current text-utec-primary" />
+                            <img src="{{ asset('images/LOGO.png') }}" alt="SIGAT-FICA" class="block h-9 w-auto" />
                             <div class="hidden leading-tight sm:block">
-                                <p class="text-sm font-bold text-utec-primary">SIGAT-FICA</p>
-                                <p class="text-xs text-gray-500">Programa de Tutores</p>
+                                <p class="text-sm font-bold text-white">SIGAT-FICA</p>
+                                <p class="text-[11px] text-white/50">Programa de Tutores</p>
                             </div>
                         </div>
                     </a>
                 </div>
 
-                <div class="hidden space-x-7 sm:-my-px sm:ms-10 sm:flex">
+                <div class="hidden sm:-my-px sm:ms-10 sm:flex sm:items-center sm:gap-0.5">
                     @if (auth()->user()->rol === 'coordinacion')
-                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                        Dashboard
-                    </x-nav-link>
-
-                    <x-nav-link :href="route('ciclos.index')" :active="request()->routeIs('ciclos.*')">
-                        Ciclos
-                    </x-nav-link>
-
-                    <x-nav-link :href="route('tutores.index')" :active="request()->routeIs('tutores.*')">
-                        Tutores
-                    </x-nav-link>
-
-                    <x-nav-link :href="route('materias.index')" :active="request()->routeIs('materias.*')">
-                        Materias
-                    </x-nav-link>
-
-                    <x-nav-link :href="route('carga-academica.create')" :active="request()->routeIs('carga-academica.*')">
-                        Carga académica
-                    </x-nav-link>
-
-                    <x-nav-link :href="route('propuestas.index')" :active="request()->routeIs('propuestas.*')">
-                        Propuestas
-                    </x-nav-link>
-
-                    {{-- Ruta pendiente de implementar --}}
-                    <x-nav-link href="#" :active="false">
-                        Periodos
-                    </x-nav-link>
+                        <a href="{{ route('dashboard') }}"
+                           class="inline-flex items-center border-b-2 px-3 py-2 text-sm font-medium transition-colors
+                                  {{ request()->routeIs('dashboard')
+                                     ? 'border-white text-white'
+                                     : 'border-transparent text-white/65 hover:border-white/40 hover:text-white' }}">
+                            Dashboard
+                        </a>
+                        <a href="{{ route('ciclos.index') }}"
+                           class="inline-flex items-center border-b-2 px-3 py-2 text-sm font-medium transition-colors
+                                  {{ request()->routeIs('ciclos.*')
+                                     ? 'border-white text-white'
+                                     : 'border-transparent text-white/65 hover:border-white/40 hover:text-white' }}">
+                            Ciclos
+                        </a>
+                        <a href="{{ route('tutores.index') }}"
+                           class="inline-flex items-center border-b-2 px-3 py-2 text-sm font-medium transition-colors
+                                  {{ request()->routeIs('tutores.*')
+                                     ? 'border-white text-white'
+                                     : 'border-transparent text-white/65 hover:border-white/40 hover:text-white' }}">
+                            Tutores
+                        </a>
+                        <a href="{{ route('materias.index') }}"
+                           class="inline-flex items-center border-b-2 px-3 py-2 text-sm font-medium transition-colors
+                                  {{ request()->routeIs('materias.*')
+                                     ? 'border-white text-white'
+                                     : 'border-transparent text-white/65 hover:border-white/40 hover:text-white' }}">
+                            Materias
+                        </a>
+                        <a href="{{ route('carga-academica.create') }}"
+                           class="inline-flex items-center border-b-2 px-3 py-2 text-sm font-medium transition-colors
+                                  {{ request()->routeIs('carga-academica.*')
+                                     ? 'border-white text-white'
+                                     : 'border-transparent text-white/65 hover:border-white/40 hover:text-white' }}">
+                            Carga académica
+                        </a>
+                        <a href="{{ route('propuestas.index') }}"
+                           class="inline-flex items-center border-b-2 px-3 py-2 text-sm font-medium transition-colors
+                                  {{ request()->routeIs('propuestas.*')
+                                     ? 'border-white text-white'
+                                     : 'border-transparent text-white/65 hover:border-white/40 hover:text-white' }}">
+                            Propuestas
+                        </a>
+                        <span class="inline-flex items-center border-b-2 border-transparent px-3 py-2 text-sm font-medium text-white/30 cursor-default">
+                            Periodos
+                        </span>
                     @endif
 
                     @if (auth()->user()->rol === 'tutor')
-                    <x-nav-link :href="route('mis-asignaciones')" :active="request()->routeIs('mis-asignaciones')">
-                        Mis asignaciones
-                    </x-nav-link>
-
-                    {{-- Ruta pendiente de implementar --}}
-                    <x-nav-link href="#" :active="false">
-                        Casos
-                    </x-nav-link>
-
-                    {{-- Ruta pendiente de implementar --}}
-                    <x-nav-link href="#" :active="false">
-                        Consolidado
-                    </x-nav-link>
+                        <a href="{{ route('mis-asignaciones') }}"
+                           class="inline-flex items-center border-b-2 px-3 py-2 text-sm font-medium transition-colors
+                                  {{ request()->routeIs('mis-asignaciones')
+                                     ? 'border-white text-white'
+                                     : 'border-transparent text-white/65 hover:border-white/40 hover:text-white' }}">
+                            Mis asignaciones
+                        </a>
+                        <span class="inline-flex items-center border-b-2 border-transparent px-3 py-2 text-sm font-medium text-white/30 cursor-default">Casos</span>
+                        <span class="inline-flex items-center border-b-2 border-transparent px-3 py-2 text-sm font-medium text-white/30 cursor-default">Consolidado</span>
                     @endif
                 </div>
             </div>
@@ -67,19 +81,21 @@
             <div class="hidden sm:flex sm:items-center sm:ms-6">
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
-                        <button class="inline-flex items-center rounded-md border border-transparent bg-white px-3 py-2 text-sm font-medium leading-4 text-gray-600 transition hover:text-utec-primary focus:outline-none">
-                            <div class="text-left">
-                                <div class="font-semibold">{{ auth()->user()->nombre }}</div>
-                                <div class="text-xs text-gray-400">
+                        <button class="inline-flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition hover:bg-white/10 focus:outline-none">
+                            <div class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-white/20 text-xs font-bold text-white ring-2 ring-white/20">
+                                {{ strtoupper(substr(auth()->user()->nombre, 0, 1)) }}
+                            </div>
+                            <div class="hidden text-left lg:block">
+                                <div class="text-sm font-semibold text-white">
+                                    {{ auth()->user()->nombre }}
+                                </div>
+                                <div class="text-[11px] text-white/50">
                                     {{ auth()->user()->rol === 'coordinacion' ? 'Coordinación' : 'Tutor' }}
                                 </div>
                             </div>
-
-                            <div class="ms-2">
-                                <svg class="h-4 w-4 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                                </svg>
-                            </div>
+                            <svg class="h-4 w-4 text-white/40" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                            </svg>
                         </button>
                     </x-slot>
 
@@ -87,10 +103,8 @@
                         <x-dropdown-link :href="route('profile.edit')">
                             Perfil
                         </x-dropdown-link>
-
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
-
                             <x-dropdown-link
                                 :href="route('logout')"
                                 onclick="event.preventDefault(); this.closest('form').submit();">
@@ -104,88 +118,90 @@
             <div class="-me-2 flex items-center sm:hidden">
                 <button
                     @click="open = ! open"
-                    class="inline-flex items-center justify-center rounded-md p-2 text-gray-400 transition hover:bg-utec-primary-soft hover:text-utec-primary focus:bg-utec-primary-soft focus:text-utec-primary focus:outline-none">
+                    class="inline-flex items-center justify-center rounded-md p-2 text-white/60 transition hover:bg-white/10 hover:text-white focus:outline-none">
                     <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
                         <path :class="{ 'hidden': open, 'inline-flex': ! open }" class="inline-flex" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                         <path :class="{ 'hidden': ! open, 'inline-flex': open }" class="hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                     </svg>
                 </button>
             </div>
+
         </div>
     </div>
 
-    <div :class="{ 'block': open, 'hidden': ! open }" class="hidden sm:hidden">
-        <div class="space-y-1 pb-3 pt-2">
+    <div :class="{ 'block': open, 'hidden': ! open }" class="hidden sm:hidden border-t border-white/10">
+        <div class="space-y-0.5 pb-3 pt-2 px-3">
             @if (auth()->user()->rol === 'coordinacion')
-            <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                Dashboard
-            </x-responsive-nav-link>
-
-            <x-responsive-nav-link :href="route('ciclos.index')" :active="request()->routeIs('ciclos.*')">
-                Ciclos
-            </x-responsive-nav-link>
-
-            <x-responsive-nav-link :href="route('tutores.index')" :active="request()->routeIs('tutores.*')">
-                Tutores
-            </x-responsive-nav-link>
-
-            <x-responsive-nav-link :href="route('materias.index')" :active="request()->routeIs('materias.*')">
-                Materias
-            </x-responsive-nav-link>
-
-            <x-responsive-nav-link :href="route('carga-academica.create')" :active="request()->routeIs('carga-academica.*')">
-                Carga académica
-            </x-responsive-nav-link>
-
-            <x-responsive-nav-link :href="route('propuestas.index')" :active="request()->routeIs('propuestas.*')">
-                Propuestas
-            </x-responsive-nav-link>
-
-            {{-- Ruta pendiente de implementar --}}
-            <x-responsive-nav-link href="#" :active="false">
-                Periodos
-            </x-responsive-nav-link>
+                <a href="{{ route('dashboard') }}"
+                   class="block border-l-2 px-3 py-2 text-sm font-medium transition
+                          {{ request()->routeIs('dashboard') ? 'border-white bg-white/10 text-white' : 'border-transparent text-white/65 hover:bg-white/10 hover:border-white/40 hover:text-white' }}">
+                    Dashboard
+                </a>
+                <a href="{{ route('ciclos.index') }}"
+                   class="block border-l-2 px-3 py-2 text-sm font-medium transition
+                          {{ request()->routeIs('ciclos.*') ? 'border-white bg-white/10 text-white' : 'border-transparent text-white/65 hover:bg-white/10 hover:border-white/40 hover:text-white' }}">
+                    Ciclos
+                </a>
+                <a href="{{ route('tutores.index') }}"
+                   class="block border-l-2 px-3 py-2 text-sm font-medium transition
+                          {{ request()->routeIs('tutores.*') ? 'border-white bg-white/10 text-white' : 'border-transparent text-white/65 hover:bg-white/10 hover:border-white/40 hover:text-white' }}">
+                    Tutores
+                </a>
+                <a href="{{ route('materias.index') }}"
+                   class="block border-l-2 px-3 py-2 text-sm font-medium transition
+                          {{ request()->routeIs('materias.*') ? 'border-white bg-white/10 text-white' : 'border-transparent text-white/65 hover:bg-white/10 hover:border-white/40 hover:text-white' }}">
+                    Materias
+                </a>
+                <a href="{{ route('carga-academica.create') }}"
+                   class="block border-l-2 px-3 py-2 text-sm font-medium transition
+                          {{ request()->routeIs('carga-academica.*') ? 'border-white bg-white/10 text-white' : 'border-transparent text-white/65 hover:bg-white/10 hover:border-white/40 hover:text-white' }}">
+                    Carga académica
+                </a>
+                <a href="{{ route('propuestas.index') }}"
+                   class="block border-l-2 px-3 py-2 text-sm font-medium transition
+                          {{ request()->routeIs('propuestas.*') ? 'border-white bg-white/10 text-white' : 'border-transparent text-white/65 hover:bg-white/10 hover:border-white/40 hover:text-white' }}">
+                    Propuestas
+                </a>
+                <span class="block border-l-2 border-transparent px-3 py-2 text-sm font-medium text-white/30">Periodos</span>
             @endif
 
             @if (auth()->user()->rol === 'tutor')
-            <x-responsive-nav-link :href="route('mis-asignaciones')" :active="request()->routeIs('mis-asignaciones')">
-                Mis asignaciones
-            </x-responsive-nav-link>
-
-            {{-- Ruta pendiente de implementar --}}
-            <x-responsive-nav-link href="#" :active="false">
-                Casos
-            </x-responsive-nav-link>
-
-            {{-- Ruta pendiente de implementar --}}
-            <x-responsive-nav-link href="#" :active="false">
-                Consolidado
-            </x-responsive-nav-link>
+                <a href="{{ route('mis-asignaciones') }}"
+                   class="block border-l-2 px-3 py-2 text-sm font-medium transition
+                          {{ request()->routeIs('mis-asignaciones') ? 'border-white bg-white/10 text-white' : 'border-transparent text-white/65 hover:bg-white/10 hover:border-white/40 hover:text-white' }}">
+                    Mis asignaciones
+                </a>
+                <span class="block border-l-2 border-transparent px-3 py-2 text-sm font-medium text-white/30">Casos</span>
+                <span class="block border-l-2 border-transparent px-3 py-2 text-sm font-medium text-white/30">Consolidado</span>
             @endif
         </div>
 
-        <div class="border-t border-utec-gray-medium pb-1 pt-4">
-            <div class="px-4">
-                <div class="text-base font-medium text-utec-gray-dark">{{ auth()->user()->nombre }}</div>
-                <div class="text-sm font-medium text-gray-500">{{ auth()->user()->correo }}</div>
-                <div class="mt-1 text-xs font-medium uppercase tracking-wide text-utec-primary-light">
-                    {{ auth()->user()->rol === 'coordinacion' ? 'Coordinación' : 'Tutor' }}
+        <div class="border-t border-white/10 pb-3 pt-4">
+            <div class="flex items-center gap-3 px-4">
+                <div class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-white/20 text-sm font-bold text-white ring-2 ring-white/20">
+                    {{ strtoupper(substr(auth()->user()->nombre, 0, 1)) }}
+                </div>
+                <div>
+                    <div class="text-sm font-semibold text-white">{{ auth()->user()->nombre }}</div>
+                    <div class="text-xs text-white/50">{{ auth()->user()->correo }}</div>
+                    <div class="mt-0.5 text-[10px] font-semibold uppercase tracking-wide text-white/40">
+                        {{ auth()->user()->rol === 'coordinacion' ? 'Coordinación' : 'Tutor' }}
+                    </div>
                 </div>
             </div>
 
-            <div class="mt-3 space-y-1">
-                <x-responsive-nav-link :href="route('profile.edit')">
+            <div class="mt-3 space-y-0.5 px-3">
+                <a href="{{ route('profile.edit') }}"
+                   class="block border-l-2 border-transparent px-3 py-2 text-sm font-medium text-white/65 hover:bg-white/10 hover:border-white/40 hover:text-white transition">
                     Perfil
-                </x-responsive-nav-link>
-
+                </a>
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
-
-                    <x-responsive-nav-link
-                        :href="route('logout')"
-                        onclick="event.preventDefault(); this.closest('form').submit();">
+                    <button type="submit"
+                            onclick="event.preventDefault(); this.closest('form').submit();"
+                            class="block w-full text-left border-l-2 border-transparent px-3 py-2 text-sm font-medium text-white/65 hover:bg-white/10 hover:border-white/40 hover:text-white transition">
                         Cerrar sesión
-                    </x-responsive-nav-link>
+                    </button>
                 </form>
             </div>
         </div>
