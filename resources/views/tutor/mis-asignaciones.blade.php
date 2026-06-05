@@ -1,10 +1,10 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex flex-col gap-1">
-            <h2 class="text-xl font-semibold leading-tight text-utec-gray-dark">
+            <h2 class="mt-0.5 text-xl font-bold text-utec-gray-dark">
                 Mis asignaciones
             </h2>
-            <p class="text-sm text-gray-500">
+            <p class="text-sm text-gray-400">
                 Consulta visual de las secciones asignadas al tutor.
             </p>
         </div>

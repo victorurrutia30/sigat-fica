@@ -72,7 +72,13 @@
                                      : 'border-transparent text-white/65 hover:border-white/40 hover:text-white' }}">
                             Mis asignaciones
                         </a>
-                        <span class="inline-flex items-center border-b-2 border-transparent px-3 py-2 text-sm font-medium text-white/30 cursor-default">Casos</span>
+                        <a href="{{ route('casos.index') }}"
+                            class="inline-flex items-center border-b-2 px-3 py-2 text-sm font-medium transition-colors
+                                    {{ request()->routeIs('casos.*')
+                                        ? 'border-white text-white'
+                                        : 'border-transparent text-white/65 hover:border-white/40 hover:text-white' }}">
+                            Mis casos
+                        </a>
                         <span class="inline-flex items-center border-b-2 border-transparent px-3 py-2 text-sm font-medium text-white/30 cursor-default">Consolidado</span>
                     @endif
                 </div>

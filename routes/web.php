@@ -6,6 +6,7 @@ use App\Http\Controllers\MateriaController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PropuestaAsignacionController;
 use App\Http\Controllers\TutorController;
+use App\Http\Controllers\CasoSeguimientoController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -58,5 +59,10 @@ Route::middleware('auth')->group(function () {
 Route::get('/mis-asignaciones', function () {
     return view('tutor.mis-asignaciones');
 })->middleware(['auth', 'rol:tutor'])->name('mis-asignaciones');
+
+Route::middleware(['auth', 'rol:tutor'])->group(function () {
+    Route::get('casos', [CasoSeguimientoController::class, 'index'])->name('casos.index');
+    Route::get('casos/create', [CasoSeguimientoController::class, 'create'])->name('casos.create');
+});
 
 require __DIR__ . '/auth.php';
