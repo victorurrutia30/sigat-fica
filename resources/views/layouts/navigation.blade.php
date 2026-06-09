@@ -55,8 +55,7 @@
                         Mis asignaciones
                     </x-nav-link>
 
-                    {{-- Ruta pendiente de implementar --}}
-                    <x-nav-link href="#" :active="false">
+                    <x-nav-link :href="route('consolidado.index')" :active="request()->routeIs('consolidado.*')">
                         Consolidado
                     </x-nav-link>
 
@@ -64,9 +63,7 @@
                         Casos
                     </x-nav-link>
 
-                    <x-nav-link :href="route('consolidado.index')" :active="request()->routeIs('consolidado.*')">
-                        Consolidado
-                    </x-nav-link>
+
                     @endif
                 </div>
             </div>
@@ -164,8 +161,7 @@
                 Mis asignaciones
             </x-responsive-nav-link>
 
-            {{-- Ruta pendiente de implementar --}}
-            <x-responsive-nav-link href="#" :active="false">
+            <x-responsive-nav-link :href="route('consolidado.index')" :active="request()->routeIs('consolidado.*')">
                 Consolidado
             </x-responsive-nav-link>
 
@@ -173,9 +169,7 @@
                 Casos
             </x-responsive-nav-link>
 
-            <x-responsive-nav-link :href="route('consolidado.index')" :active="request()->routeIs('consolidado.*')">
-                Consolidado
-            </x-responsive-nav-link>
+
             @endif
         </div>
 
