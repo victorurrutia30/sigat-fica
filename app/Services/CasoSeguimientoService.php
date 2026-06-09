@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\CasoSeguimiento;
+use App\Models\Causa;
 use App\Models\Estudiante;
 use App\Models\ItemPropuesta;
 use App\Models\NominaSeccion;
@@ -12,6 +13,7 @@ use App\Models\User;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
+
 
 class CasoSeguimientoService
 {
@@ -156,6 +158,57 @@ class CasoSeguimientoService
                 'cerrado' => false,
                 'cerrado_en' => null,
                 'registrado_por' => $usuario->id,
+            ]);
+        });
+    }
+
+    public function cerrarCaso(
+        CasoSeguimiento $caso,
+        User $usuario,
+        array $datos
+    ): CasoSeguimiento {
+        return DB::transaction(function () use ($caso, $usuario, $datos) {
+            $this->validarAccesoTutor($caso, $usuario);
+
+            if ($caso->cerrado) {
+                throw ValidationException::withMessages([
+                    'caso' => 'Este caso ya se encuentra cerrado.',
+                ]);
+            }
+
+            $gestionesRegistradas = $caso->gestiones()->count();
+
+            if ($gestionesRegistradas === 0) {
+                throw ValidationException::withMessages([
+                    'gestiones' => 'Debe registrar al menos una gestión antes de cerrar el caso.',
+                ]);
+            }
+
+            $causaActiva = Causa::query()
+                ->whereKey($datos['causa_id'])
+                ->where('activo', true)
+                ->exists();
+
+            if (! $causaActiva) {
+                throw ValidationException::withMessages([
+                    'causa_id' => 'La causa seleccionada no existe o está inactiva.',
+                ]);
+            }
+
+            $caso->update([
+                'causa_id' => $datos['causa_id'],
+                'resultado_final' => $datos['resultado_final'],
+                'cerrado' => true,
+                'cerrado_en' => now(),
+            ]);
+
+            return $caso->fresh([
+                'periodoEvaluacion.ciclo',
+                'seccion.materia',
+                'estudiante',
+                'tutor',
+                'causa',
+                'gestiones',
             ]);
         });
     }

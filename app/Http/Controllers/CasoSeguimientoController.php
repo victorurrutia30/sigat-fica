@@ -10,6 +10,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
+use App\Http\Requests\CasoCierreRequest;
+use App\Models\Causa;
 
 class CasoSeguimientoController extends Controller
 {
@@ -99,6 +101,67 @@ class CasoSeguimientoController extends Controller
         return view('tutor.casos.show', [
             'caso' => $casoSeguimiento,
         ]);
+    }
+
+    public function cierre(
+        CasoSeguimiento $casoSeguimiento,
+        Request $request,
+        CasoSeguimientoService $casoService
+    ): View|RedirectResponse {
+        $casoService->validarAccesoTutor($casoSeguimiento, $request->user());
+
+        $casoSeguimiento->load([
+            'periodoEvaluacion.ciclo',
+            'seccion.materia',
+            'estudiante',
+            'tutor',
+            'causa',
+            'gestiones',
+        ]);
+
+        if ($casoSeguimiento->cerrado) {
+            return redirect()
+                ->route('casos.show', $casoSeguimiento)
+                ->with('error', 'Este caso ya se encuentra cerrado.');
+        }
+
+        if ($casoSeguimiento->gestiones->isEmpty()) {
+            return redirect()
+                ->route('casos.show', $casoSeguimiento)
+                ->with('error', 'Debe registrar al menos una gestión antes de cerrar el caso.');
+        }
+
+        $causas = Causa::query()
+            ->where('activo', true)
+            ->orderBy('nombre')
+            ->get();
+
+        if ($causas->isEmpty()) {
+            return redirect()
+                ->route('casos.show', $casoSeguimiento)
+                ->with('error', 'No hay causas activas disponibles. Solicita a Coordinación registrar al menos una causa.');
+        }
+
+        return view('tutor.casos.cierre', [
+            'caso' => $casoSeguimiento,
+            'causas' => $causas,
+        ]);
+    }
+
+    public function cerrar(
+        CasoCierreRequest $request,
+        CasoSeguimiento $casoSeguimiento,
+        CasoSeguimientoService $casoService
+    ): RedirectResponse {
+        $casoService->cerrarCaso(
+            caso: $casoSeguimiento,
+            usuario: $request->user(),
+            datos: $request->validated()
+        );
+
+        return redirect()
+            ->route('casos.show', $casoSeguimiento)
+            ->with('success', 'Caso cerrado correctamente.');
     }
 
     public function edit(CasoSeguimiento $casoSeguimiento): RedirectResponse

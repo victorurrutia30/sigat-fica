@@ -96,8 +96,20 @@
                                 </div>
                             </dl>
 
-                            <div class="mt-5 rounded-md border border-utec-gray-medium bg-gray-50 p-4 text-sm text-gray-600">
-                                La edición de causa, resultado final y cierre se implementará en el bloque de gestiones.
+                            <div class="mt-5 flex flex-wrap gap-3">
+                                @if($caso->cerrado)
+                                <span class="badge-success">
+                                    Caso cerrado
+                                </span>
+                                @elseif($caso->gestiones->isEmpty())
+                                <span class="badge-warning">
+                                    Registra al menos una gestión para poder cerrar el caso.
+                                </span>
+                                @else
+                                <a href="{{ route('casos.cierre', $caso) }}" class="btn-primary">
+                                    Cerrar caso
+                                </a>
+                                @endif
                             </div>
                         </div>
                     </div>

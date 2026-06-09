@@ -75,6 +75,14 @@ Route::resource('casos', CasoSeguimientoController::class)
     ->parameters(['casos' => 'casoSeguimiento'])
     ->middleware(['auth', 'rol:tutor']);
 
+Route::get('casos/{casoSeguimiento}/cierre', [CasoSeguimientoController::class, 'cierre'])
+    ->middleware(['auth', 'rol:tutor'])
+    ->name('casos.cierre');
+
+Route::patch('casos/{casoSeguimiento}/cerrar', [CasoSeguimientoController::class, 'cerrar'])
+    ->middleware(['auth', 'rol:tutor'])
+    ->name('casos.cerrar');
+
 Route::get('casos/{casoSeguimiento}/gestiones/create', [GestionCasoController::class, 'create'])
     ->middleware(['auth', 'rol:tutor'])
     ->name('gestiones.create');
