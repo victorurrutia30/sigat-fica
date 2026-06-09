@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CausaController;
 use App\Http\Controllers\CasoSeguimientoController;
 use App\Http\Controllers\GestionCasoController;
+use App\Http\Controllers\ConsolidadoController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -90,5 +91,13 @@ Route::get('casos/{casoSeguimiento}/gestiones/create', [GestionCasoController::c
 Route::post('casos/{casoSeguimiento}/gestiones', [GestionCasoController::class, 'store'])
     ->middleware(['auth', 'rol:tutor'])
     ->name('gestiones.store');
+
+Route::get('consolidado', [ConsolidadoController::class, 'index'])
+    ->middleware(['auth', 'rol:tutor'])
+    ->name('consolidado.index');
+
+Route::patch('consolidado/entregar', [ConsolidadoController::class, 'entregar'])
+    ->middleware(['auth', 'rol:tutor'])
+    ->name('consolidado.entregar');
 
 require __DIR__ . '/auth.php';

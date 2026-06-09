@@ -63,6 +63,10 @@
                     <x-nav-link :href="route('casos.index')" :active="request()->routeIs('casos.*')">
                         Casos
                     </x-nav-link>
+
+                    <x-nav-link :href="route('consolidado.index')" :active="request()->routeIs('consolidado.*')">
+                        Consolidado
+                    </x-nav-link>
                     @endif
                 </div>
             </div>
@@ -167,6 +171,10 @@
 
             <x-responsive-nav-link :href="route('casos.index')" :active="request()->routeIs('casos.*')">
                 Casos
+            </x-responsive-nav-link>
+
+            <x-responsive-nav-link :href="route('consolidado.index')" :active="request()->routeIs('consolidado.*')">
+                Consolidado
             </x-responsive-nav-link>
             @endif
         </div>
