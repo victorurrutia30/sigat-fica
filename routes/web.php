@@ -36,6 +36,15 @@ Route::middleware(['auth', 'verified', 'rol:coordinacion'])->group(function () {
     Route::resource('periodos', PeriodoEvaluacionController::class)
         ->parameters(['periodos' => 'periodoEvaluacion']);
 
+    Route::get('consolidados', [ConsolidadoController::class, 'coordinacionIndex'])
+        ->name('consolidados.index');
+
+    Route::get('consolidados/{consolidado}', [ConsolidadoController::class, 'coordinacionShow'])
+        ->name('consolidados.show');
+
+    Route::patch('consolidados/{consolidado}/observacion', [ConsolidadoController::class, 'guardarObservacion'])
+        ->name('consolidados.observacion');
+
     Route::get('carga-academica/importar', [CargaAcademicaController::class, 'create'])
         ->name('carga-academica.create');
 

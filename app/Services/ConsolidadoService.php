@@ -10,6 +10,8 @@ use App\Models\User;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
+use App\Models\Ciclo;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class ConsolidadoService
 {
@@ -183,5 +185,155 @@ class ConsolidadoService
                 'tutor',
             ]);
         });
+    }
+
+    public function periodosParaFiltro()
+    {
+        return PeriodoEvaluacion::query()
+            ->with('ciclo')
+            ->orderByDesc('activo')
+            ->orderByDesc('fecha_inicio')
+            ->get();
+    }
+
+    public function obtenerPeriodoActivoOpcional(): ?PeriodoEvaluacion
+    {
+        return PeriodoEvaluacion::query()
+            ->with('ciclo')
+            ->where('activo', true)
+            ->whereHas('ciclo', function ($query) {
+                $query->where('activo', true);
+            })
+            ->first();
+    }
+
+    public function consolidadosParaCoordinacion(array $filtros): LengthAwarePaginator
+    {
+        $periodoId = $filtros['periodo_id'] ?? null;
+        $estado = $filtros['estado'] ?? null;
+        $busqueda = $filtros['busqueda'] ?? null;
+
+        return Consolidado::query()
+            ->select('consolidados.*')
+            ->selectSub(function ($query) {
+                $query->from('casos_seguimiento')
+                    ->selectRaw('COUNT(*)')
+                    ->whereColumn('casos_seguimiento.periodo_evaluacion_id', 'consolidados.periodo_evaluacion_id')
+                    ->whereColumn('casos_seguimiento.tutor_id', 'consolidados.tutor_id');
+            }, 'casos_total_count')
+            ->selectSub(function ($query) {
+                $query->from('casos_seguimiento')
+                    ->selectRaw('COUNT(*)')
+                    ->whereColumn('casos_seguimiento.periodo_evaluacion_id', 'consolidados.periodo_evaluacion_id')
+                    ->whereColumn('casos_seguimiento.tutor_id', 'consolidados.tutor_id')
+                    ->where('cerrado', true);
+            }, 'casos_cerrados_count')
+            ->selectSub(function ($query) {
+                $query->from('casos_seguimiento')
+                    ->selectRaw('COUNT(*)')
+                    ->whereColumn('casos_seguimiento.periodo_evaluacion_id', 'consolidados.periodo_evaluacion_id')
+                    ->whereColumn('casos_seguimiento.tutor_id', 'consolidados.tutor_id')
+                    ->where('cerrado', false);
+            }, 'casos_abiertos_count')
+            ->with([
+                'periodoEvaluacion.ciclo',
+                'tutor',
+            ])
+            ->when($periodoId, function ($query) use ($periodoId) {
+                $query->where('periodo_evaluacion_id', $periodoId);
+            })
+            ->when($estado, function ($query) use ($estado) {
+                $query->where('estado_entrega', $estado);
+            })
+            ->when($busqueda, function ($query) use ($busqueda) {
+                $query->whereHas('tutor', function ($subquery) use ($busqueda) {
+                    $subquery->where('nombre_completo', 'like', "%{$busqueda}%")
+                        ->orWhere('codigo_empleado', 'like', "%{$busqueda}%")
+                        ->orWhere('correo_institucional', 'like', "%{$busqueda}%");
+                });
+            })
+            ->orderByRaw("
+            CASE estado_entrega
+                WHEN 'pendiente' THEN 1
+                WHEN 'con_observaciones' THEN 2
+                WHEN 'entregado' THEN 3
+                ELSE 4
+            END
+        ")
+            ->orderByDesc('updated_at')
+            ->paginate(10)
+            ->withQueryString();
+    }
+
+    public function metricasParaCoordinacion(?int $periodoId = null): array
+    {
+        $consolidados = Consolidado::query()
+            ->with('periodoEvaluacion')
+            ->when($periodoId, function ($query) use ($periodoId) {
+                $query->where('periodo_evaluacion_id', $periodoId);
+            })
+            ->get();
+
+        $hoy = now()->startOfDay();
+
+        return [
+            'total' => $consolidados->count(),
+            'pendientes' => $consolidados->where('estado_entrega', 'pendiente')->count(),
+            'entregados' => $consolidados->where('estado_entrega', 'entregado')->count(),
+            'con_observaciones' => $consolidados->where('estado_entrega', 'con_observaciones')->count(),
+            'atrasados' => $consolidados
+                ->filter(function ($consolidado) use ($hoy) {
+                    return $consolidado->periodoEvaluacion
+                        && $consolidado->periodoEvaluacion->fecha_limite_consolidado->startOfDay()->lt($hoy)
+                        && $consolidado->estado_entrega !== 'entregado';
+                })
+                ->count(),
+        ];
+    }
+
+    public function detalleParaCoordinacion(Consolidado $consolidado): array
+    {
+        $consolidado->load([
+            'periodoEvaluacion.ciclo',
+            'tutor',
+        ]);
+
+        $casos = CasoSeguimiento::query()
+            ->with([
+                'periodoEvaluacion',
+                'seccion.materia',
+                'estudiante',
+                'tutor',
+                'causa',
+                'gestiones.registradoPor',
+            ])
+            ->where('periodo_evaluacion_id', $consolidado->periodo_evaluacion_id)
+            ->where('tutor_id', $consolidado->tutor_id)
+            ->orderBy('cerrado')
+            ->orderByDesc('created_at')
+            ->get();
+
+        $diagnostico = $this->diagnosticarCasos($casos);
+
+        return [
+            'consolidado' => $consolidado,
+            'casos' => $casos,
+            'diagnostico' => $diagnostico,
+        ];
+    }
+
+    public function guardarObservacionCoordinacion(
+        Consolidado $consolidado,
+        string $observacion
+    ): Consolidado {
+        $consolidado->forceFill([
+            'observaciones_coord' => $observacion,
+            'estado_entrega' => 'con_observaciones',
+        ])->save();
+
+        return $consolidado->fresh([
+            'periodoEvaluacion.ciclo',
+            'tutor',
+        ]);
     }
 }

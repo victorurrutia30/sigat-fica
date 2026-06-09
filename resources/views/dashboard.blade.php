@@ -109,6 +109,15 @@
                                 Gestionar causas para casos de seguimiento.
                             </span>
                         </a>
+
+                        <a href="{{ route('consolidados.index') }}"
+                            class="rounded-lg border border-utec-gray-medium p-4 text-sm font-medium text-utec-gray-dark transition hover:border-utec-primary-light hover:bg-utec-primary-soft hover:text-utec-primary">
+                            Consolidados
+                            <span class="mt-1 block text-xs text-gray-500">
+                                Revisar entregas, observaciones y cumplimiento por tutor.
+                            </span>
+                        </a>
+
                     </div>
                 </div>
             </div>

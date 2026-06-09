@@ -8,6 +8,8 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
+use App\Http\Requests\ConsolidadoObservacionRequest;
+use App\Models\Consolidado;
 
 class ConsolidadoController extends Controller
 {
@@ -61,5 +63,59 @@ class ConsolidadoController extends Controller
         return redirect()
             ->route('consolidado.index')
             ->with('success', 'Consolidado entregado correctamente.');
+    }
+
+    public function coordinacionIndex(
+        Request $request,
+        ConsolidadoService $consolidadoService
+    ): View {
+        $periodoActivo = $consolidadoService->obtenerPeriodoActivoOpcional();
+
+        $periodoId = $request->integer('periodo_id') ?: $periodoActivo?->id;
+        $estado = $request->string('estado')->toString();
+        $busqueda = $request->string('busqueda')->toString();
+
+        $periodos = $consolidadoService->periodosParaFiltro();
+
+        $consolidados = $consolidadoService->consolidadosParaCoordinacion([
+            'periodo_id' => $periodoId,
+            'estado' => $estado ?: null,
+            'busqueda' => $busqueda ?: null,
+        ]);
+
+        $metricas = $consolidadoService->metricasParaCoordinacion($periodoId);
+
+        return view('coordinacion.consolidados.index', compact(
+            'periodos',
+            'periodoId',
+            'estado',
+            'busqueda',
+            'consolidados',
+            'metricas'
+        ));
+    }
+
+    public function coordinacionShow(
+        Consolidado $consolidado,
+        ConsolidadoService $consolidadoService
+    ): View {
+        $contexto = $consolidadoService->detalleParaCoordinacion($consolidado);
+
+        return view('coordinacion.consolidados.show', $contexto);
+    }
+
+    public function guardarObservacion(
+        ConsolidadoObservacionRequest $request,
+        Consolidado $consolidado,
+        ConsolidadoService $consolidadoService
+    ): RedirectResponse {
+        $consolidadoService->guardarObservacionCoordinacion(
+            consolidado: $consolidado,
+            observacion: $request->validated('observaciones_coord')
+        );
+
+        return redirect()
+            ->route('consolidados.show', $consolidado)
+            ->with('success', 'Observación registrada correctamente.');
     }
 }

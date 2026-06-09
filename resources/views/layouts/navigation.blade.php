@@ -48,6 +48,10 @@
                         Causas
                     </x-nav-link>
 
+                    <x-nav-link :href="route('consolidados.index')" :active="request()->routeIs('consolidados.*')">
+                        Consolidados
+                    </x-nav-link>
+
                     @endif
 
                     @if (auth()->user()->rol === 'tutor')
@@ -151,6 +155,10 @@
 
             <x-responsive-nav-link :href="route('causas.index')" :active="request()->routeIs('causas.*')">
                 Causas
+            </x-responsive-nav-link>
+
+            <x-responsive-nav-link :href="route('consolidados.index')" :active="request()->routeIs('consolidados.*')">
+                Consolidados
             </x-responsive-nav-link>
 
 
