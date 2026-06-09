@@ -11,6 +11,7 @@ use App\Http\Controllers\TutorController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CausaController;
 use App\Http\Controllers\CasoSeguimientoController;
+use App\Http\Controllers\GestionCasoController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -73,5 +74,13 @@ Route::resource('casos', CasoSeguimientoController::class)
     ->only(['index', 'create', 'store', 'show'])
     ->parameters(['casos' => 'casoSeguimiento'])
     ->middleware(['auth', 'rol:tutor']);
+
+Route::get('casos/{casoSeguimiento}/gestiones/create', [GestionCasoController::class, 'create'])
+    ->middleware(['auth', 'rol:tutor'])
+    ->name('gestiones.create');
+
+Route::post('casos/{casoSeguimiento}/gestiones', [GestionCasoController::class, 'store'])
+    ->middleware(['auth', 'rol:tutor'])
+    ->name('gestiones.store');
 
 require __DIR__ . '/auth.php';

@@ -149,9 +149,15 @@
                             @endif
 
                             <div class="mt-5">
+                                @if($caso->cerrado)
                                 <button type="button" class="btn-secondary opacity-60" disabled>
-                                    Agregar gestión — pendiente
+                                    Caso cerrado
                                 </button>
+                                @else
+                                <a href="{{ route('gestiones.create', $caso) }}" class="btn-primary">
+                                    Agregar gestión
+                                </a>
+                                @endif
                             </div>
                         </div>
                     </div>
