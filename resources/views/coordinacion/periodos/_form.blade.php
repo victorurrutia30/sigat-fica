@@ -17,8 +17,7 @@
             @foreach($ciclos as $ciclo)
             <option
                 value="{{ $ciclo->id }}"
-                @selected((string) old('ciclo_id', $periodo->ciclo_id ?? optional($ciclos->firstWhere('activo', true))->id) === (string) $ciclo->id)
-                >
+                @selected((string) old('ciclo_id', $periodo->ciclo_id ?? optional($ciclos->firstWhere('activo', true))->id) === (string) $ciclo->id)>
                 {{ $ciclo->nombre }} {{ $ciclo->activo ? '(Activo)' : '' }}
             </option>
             @endforeach
@@ -27,6 +26,10 @@
         @error('ciclo_id')
         <p class="form-error">{{ $message }}</p>
         @enderror
+
+        <p class="form-hint">
+            Para este prototipo solo se permite crear o editar periodos del ciclo activo.
+        </p>
     </div>
 
     <div>
@@ -103,7 +106,7 @@
         @enderror
 
         <p class="form-hint">
-            Debe ser igual o posterior a la fecha de fin del periodo.
+            Debe ser igual o posterior a la fecha de fin del periodo y estar dentro de las fechas del ciclo activo.
         </p>
     </div>
 
