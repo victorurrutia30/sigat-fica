@@ -3,7 +3,9 @@
         <div class="flex items-center justify-between">
             <div>
                 <h2 class="text-xl font-bold text-utec-primary">Materias</h2>
-                <p class="text-sm text-gray-500">Catálogo de materias usadas para carga académica y propuesta de asignación.</p>
+                <p class="text-sm text-gray-500">
+                    Catálogo de materias usadas para carga académica y propuesta de asignación.
+                </p>
             </div>
 
             <a href="{{ route('materias.create') }}" class="btn-primary">
@@ -37,7 +39,7 @@
                                 id="busqueda"
                                 value="{{ $busqueda }}"
                                 class="input-field"
-                                placeholder="Código, nombre o departamento">
+                                placeholder="Código, nombre o código de cátedra">
                         </div>
 
                         <div>
@@ -67,7 +69,7 @@
                             </select>
                         </div>
 
-                        <div class="md:col-span-5 flex gap-2">
+                        <div class="flex gap-2 md:col-span-5">
                             <button type="submit" class="btn-primary">
                                 Filtrar
                             </button>
@@ -84,13 +86,13 @@
                                 <tr>
                                     <th class="th-utec">Código</th>
                                     <th class="th-utec">Materia</th>
-                                    <th class="th-utec">Créditos</th>
-                                    <th class="th-utec">Ciclo plan</th>
-                                    <th class="th-utec">Departamento</th>
+                                    <th class="th-utec">Plan de estudios</th>
+                                    <th class="th-utec">Código de cátedra</th>
                                     <th class="th-utec">Estado</th>
                                     <th class="th-utec text-right">Acciones</th>
                                 </tr>
                             </thead>
+
                             <tbody class="divide-y divide-utec-gray-medium bg-white">
                                 @forelse($materias as $materia)
                                 <tr class="hover:bg-utec-primary-soft">
@@ -110,10 +112,6 @@
                                             <span class="badge-muted">No gestionada</span>
                                             @endif
 
-                                            @if($materia->esPrioritaria())
-                                            <span class="badge-warning">Prioritaria</span>
-                                            @endif
-
                                             @if($materia->requiere_revision)
                                             <span class="badge-warning">Pendiente de revisión</span>
                                             @endif
@@ -121,12 +119,8 @@
                                     </td>
 
                                     <td class="td-utec">
-                                        {{ $materia->creditos }}
-                                    </td>
-
-                                    <td class="td-utec">
                                         @if($materia->ciclo_plan)
-                                        Ciclo {{ $materia->ciclo_plan }}
+                                        Plan: ciclo {{ $materia->ciclo_plan }}
                                         @else
                                         <span class="text-sm text-gray-500">Pendiente</span>
                                         @endif
@@ -167,7 +161,7 @@
                                 </tr>
                                 @empty
                                 <tr>
-                                    <td colspan="7" class="px-6 py-8 text-center text-sm text-gray-500">
+                                    <td colspan="6" class="px-6 py-8 text-center text-sm text-gray-500">
                                         No hay materias registradas.
                                     </td>
                                 </tr>
