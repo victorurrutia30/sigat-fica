@@ -67,8 +67,8 @@ class CasoCierreRequest extends FormRequest
             'cuota_cancelada' => [
                 'nullable',
                 'integer',
-                'min:0',
-                'max:99',
+                'min:1',
+                'max:6',
             ],
         ];
     }
@@ -90,8 +90,8 @@ class CasoCierreRequest extends FormRequest
             'matricula.boolean' => 'El valor de matrícula no es válido.',
 
             'cuota_cancelada.integer' => 'La cuota cancelada debe ser un número entero.',
-            'cuota_cancelada.min' => 'La cuota cancelada no puede ser menor que 0.',
-            'cuota_cancelada.max' => 'La cuota cancelada no puede ser mayor que 99.',
+            'cuota_cancelada.min' => 'La cuota cancelada debe ser un número entre 1 y 6.',
+            'cuota_cancelada.max' => 'La cuota cancelada debe ser un número entre 1 y 6.',
         ];
     }
 

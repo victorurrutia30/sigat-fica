@@ -200,18 +200,18 @@
                                     name="cuota_cancelada"
                                     id="cuota_cancelada"
                                     value="{{ old('cuota_cancelada', $caso->cuota_cancelada) }}"
-                                    min="0"
-                                    max="99"
+                                    min="1"
+                                    max="6"
                                     step="1"
                                     class="input-field"
-                                    placeholder="Ej. 1, 2, 3">
+                                    placeholder="Ej. 1, 2, 3, 4, 5 o 6">
 
                                 @error('cuota_cancelada')
                                 <p class="form-error">{{ $message }}</p>
                                 @enderror
 
                                 <p class="form-hint">
-                                    Campo opcional. Si no se conoce la cuota cancelada, déjalo vacío.
+                                    Campo opcional. Si se registra, debe ser un número entre 1 y 6.
                                 </p>
                             </div>
                         </div>
