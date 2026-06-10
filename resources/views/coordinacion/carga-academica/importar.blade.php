@@ -285,7 +285,7 @@
                                 <li>Las filas con tipo <span class="font-semibold">Par</span> se ignoran con advertencia.</li>
                                 <li><span class="font-semibold">P</span> se importa como presencial.</li>
                                 <li><span class="font-semibold">EL</span> y <span class="font-semibold">E.L.</span> se importan como en línea.</li>
-                                <li><span class="font-semibold">V</span> se importa como virtual, sin horario y sin requerir tutor por defecto.</li>
+                                <li><span class="font-semibold">V</span> se importa como virtual, sin horario, y puede entrar a propuesta si la materia está gestionada por Coordinación.</li>
                                 <li>Si una materia no existe, se crea como pendiente de revisión.</li>
                                 <li>El orden de columnas puede cambiar, pero no deben eliminarse los encabezados obligatorios.</li>
                             </ul>
