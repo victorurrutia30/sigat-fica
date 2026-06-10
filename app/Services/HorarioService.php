@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\ItemPropuesta;
 use App\Models\Seccion;
+use App\Models\Tutor;
 use Carbon\Carbon;
 
 class HorarioService
@@ -89,6 +90,87 @@ class HorarioService
         return $choques;
     }
 
+    /**
+     * Devuelve choques entre la sección candidata y la carga académica
+     * que el tutor ya imparte como docente titular.
+     */
+    public function obtenerChoquesCargaDocente(
+        Tutor $tutor,
+        Seccion $seccionNueva
+    ): array {
+        $seccionNueva->loadMissing(['materia', 'horarios']);
+
+        if ($seccionNueva->horarios->isEmpty()) {
+            return [];
+        }
+
+        $codigoEmpleado = trim((string) $tutor->codigo_empleado);
+
+        if ($codigoEmpleado === '') {
+            return [];
+        }
+
+        $seccionesDocente = Seccion::query()
+            ->with(['materia', 'horarios'])
+            ->where('ciclo_id', $seccionNueva->ciclo_id)
+            ->where('codigo_docente_titular', $codigoEmpleado)
+            ->whereHas('horarios')
+            ->get();
+
+        if ($seccionesDocente->isEmpty()) {
+            return [];
+        }
+
+        $choques = [];
+
+        foreach ($seccionesDocente as $seccionDocente) {
+            foreach ($seccionNueva->horarios as $horarioNuevo) {
+                foreach ($seccionDocente->horarios as $horarioDocente) {
+                    if ((int) $horarioNuevo->dia_semana !== (int) $horarioDocente->dia_semana) {
+                        continue;
+                    }
+
+                    if (! $this->seTraslapan(
+                        $horarioNuevo->hora_inicio,
+                        $horarioNuevo->hora_fin,
+                        $horarioDocente->hora_inicio,
+                        $horarioDocente->hora_fin
+                    )) {
+                        continue;
+                    }
+
+                    $choques[] = [
+                        'dia_semana' => (int) $horarioNuevo->dia_semana,
+                        'dia_nombre' => $this->nombreDia((int) $horarioNuevo->dia_semana),
+                        'tutor' => [
+                            'id' => $tutor->id,
+                            'codigo_empleado' => $tutor->codigo_empleado,
+                            'nombre' => $tutor->nombre_completo,
+                        ],
+                        'seccion_nueva' => [
+                            'id' => $seccionNueva->id,
+                            'materia' => $seccionNueva->materia?->nombre,
+                            'codigo_materia' => $seccionNueva->materia?->codigo,
+                            'numero_seccion' => $seccionNueva->numero_seccion,
+                            'hora_inicio' => $this->formatearHora($horarioNuevo->hora_inicio),
+                            'hora_fin' => $this->formatearHora($horarioNuevo->hora_fin),
+                        ],
+                        'clase_docente' => [
+                            'id' => $seccionDocente->id,
+                            'materia' => $seccionDocente->materia?->nombre,
+                            'codigo_materia' => $seccionDocente->materia?->codigo,
+                            'numero_seccion' => $seccionDocente->numero_seccion,
+                            'hora_inicio' => $this->formatearHora($horarioDocente->hora_inicio),
+                            'hora_fin' => $this->formatearHora($horarioDocente->hora_fin),
+                        ],
+                    ];
+                }
+            }
+        }
+
+        return $choques;
+    }
+
     public function tieneChoque(
         int $tutorId,
         int $seccionId,
@@ -125,6 +207,33 @@ class HorarioService
             $existente['numero_seccion'],
             $existente['hora_inicio'],
             $existente['hora_fin']
+        );
+    }
+
+    public function mensajeChoqueCargaDocente(array $choques): string
+    {
+        if (empty($choques)) {
+            return '';
+        }
+
+        $primerChoque = $choques[0];
+
+        $tutor = $primerChoque['tutor'];
+        $nueva = $primerChoque['seccion_nueva'];
+        $claseDocente = $primerChoque['clase_docente'];
+
+        return sprintf(
+            'El tutor %s ya imparte una clase con choque de horario el día %s. Sección candidata: %s %s, %s-%s. Clase docente: %s %s, %s-%s.',
+            $tutor['nombre'],
+            $primerChoque['dia_nombre'],
+            $nueva['codigo_materia'],
+            $nueva['numero_seccion'],
+            $nueva['hora_inicio'],
+            $nueva['hora_fin'],
+            $claseDocente['codigo_materia'],
+            $claseDocente['numero_seccion'],
+            $claseDocente['hora_inicio'],
+            $claseDocente['hora_fin']
         );
     }
 

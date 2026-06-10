@@ -129,6 +129,17 @@ class PropuestaAsignacionService
                 ]);
             }
 
+            $choquesCargaDocente = $this->horarioService->obtenerChoquesCargaDocente(
+                tutor: $tutor,
+                seccionNueva: $seccion
+            );
+
+            if (! empty($choquesCargaDocente)) {
+                throw ValidationException::withMessages([
+                    'tutor_id' => $this->horarioService->mensajeChoqueCargaDocente($choquesCargaDocente),
+                ]);
+            }
+
             $prioridad = $this->calcularPrioridad($seccion);
             $seccion->update([
                 'aula' => $aula,
