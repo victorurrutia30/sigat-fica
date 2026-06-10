@@ -14,14 +14,15 @@ use App\Http\Controllers\CasoSeguimientoController;
 use App\Http\Controllers\GestionCasoController;
 use App\Http\Controllers\ConsolidadoController;
 use App\Http\Controllers\TableroCumplimientoController;
+use App\Http\Controllers\DashboardController;
 
 Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified', 'rol:coordinacion'])->name('dashboard');
+Route::get('/dashboard', [DashboardController::class, 'index'])
+    ->middleware(['auth', 'verified', 'rol:coordinacion'])
+    ->name('dashboard');
 
 Route::middleware(['auth', 'verified', 'rol:coordinacion'])->group(function () {
 
