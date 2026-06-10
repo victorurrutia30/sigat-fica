@@ -98,9 +98,9 @@
                 </div>
             </div>
 
-            @if($propuesta->publicado)
+            @if($propuesta->publicado || $propuesta->estado_aprobacion === 'aprobado')
             <div class="alert-warning">
-                Esta propuesta ya fue publicada. Si modificas asignaciones, el sistema debe volverla a estado pendiente y dejará de estar visible para tutores hasta nueva aprobación.
+                Esta propuesta ya fue aprobada o publicada. Si reemplazas un tutor, el sistema volverá la propuesta a estado pendiente, la dejará no publicada y requerirá una nueva aprobación del Decano.
             </div>
             @endif
 
@@ -273,13 +273,22 @@
 
                                                 <div>
                                                     <label for="observaciones_{{ $seccion->id }}" class="form-label">
-                                                        Observaciones
+                                                        {{ $item ? 'Motivo u observaciones del cambio' : 'Observaciones' }}
+                                                        @if($item)
+                                                        <span class="text-red-500">*</span>
+                                                        @endif
                                                     </label>
 
                                                     <textarea name="observaciones"
                                                         id="observaciones_{{ $seccion->id }}"
                                                         rows="2"
                                                         class="input-field">{{ old('observaciones', $item?->observaciones) }}</textarea>
+
+                                                    @if($item)
+                                                    <p class="form-hint">
+                                                        Si cambias el tutor, este texto se usará como motivo del reemplazo en el historial.
+                                                    </p>
+                                                    @endif
 
                                                     @if($hayErrorFila)
                                                     @error('observaciones')
@@ -290,7 +299,7 @@
 
                                                 <div class="flex flex-wrap items-center gap-2">
                                                     <button type="submit" class="btn-primary">
-                                                        {{ $item ? 'Actualizar' : 'Asignar' }}
+                                                        {{ $item ? 'Guardar cambio' : 'Asignar tutor' }}
                                                     </button>
 
                                                     @if($item)
@@ -299,6 +308,12 @@
                                                     <span class="badge-muted">Sin asignar</span>
                                                     @endif
                                                 </div>
+
+                                                @if($item && ($propuesta->publicado || $propuesta->estado_aprobacion === 'aprobado'))
+                                                <p class="form-hint">
+                                                    Cambiar el tutor de esta asignación reactivará la aprobación del Decano.
+                                                </p>
+                                                @endif
                                             </form>
 
                                             @if($item)
@@ -460,16 +475,80 @@
                                 Aún no hay cambios registrados.
                             </p>
                             @else
-                            <div class="space-y-3">
+                            <div class="space-y-4">
                                 @foreach($propuesta->historialCambios->sortByDesc('created_at')->take(8) as $cambio)
-                                <div class="border-b border-gray-200 pb-3 last:border-0 last:pb-0">
-                                    <p class="text-sm font-semibold text-utec-gray-dark">
-                                        {{ str_replace('_', ' ', ucfirst($cambio->tipo_cambio)) }}
-                                    </p>
-                                    <p class="text-sm text-gray-600">
+                                <div class="border-b border-gray-200 pb-4 last:border-0 last:pb-0">
+                                    <div class="flex flex-wrap items-center gap-2">
+                                        @if($cambio->esReemplazoTutor())
+                                        <span class="badge-warning">
+                                            Reemplazo de tutor
+                                        </span>
+                                        @elseif($cambio->tipo_cambio === 'publicado')
+                                        <span class="badge-success">
+                                            Publicación
+                                        </span>
+                                        @elseif($cambio->tipo_cambio === 'observacion_decano')
+                                        <span class="badge-info">
+                                            Respuesta del Decano
+                                        </span>
+                                        @elseif($cambio->tipo_cambio === 'item_eliminado')
+                                        <span class="badge-danger">
+                                            Asignación eliminada
+                                        </span>
+                                        @else
+                                        <span class="badge-muted">
+                                            {{ $cambio->tipoCambioLegible() }}
+                                        </span>
+                                        @endif
+                                    </div>
+
+                                    <p class="mt-2 text-sm text-gray-600">
                                         {{ $cambio->descripcion }}
                                     </p>
-                                    <p class="mt-1 text-xs text-gray-500">
+
+                                    @if($cambio->esReemplazoTutor())
+                                    <div class="mt-3 rounded-md bg-orange-50 px-3 py-3 text-sm text-orange-900">
+                                        <div class="space-y-1">
+                                            <p>
+                                                <span class="font-semibold">Materia:</span>
+                                                {{ $cambio->materiaCodigo() ?? 'Sin código' }}
+                                                —
+                                                {{ $cambio->materiaNombre() ?? 'Materia no disponible' }}
+                                            </p>
+
+                                            <p>
+                                                <span class="font-semibold">Sección:</span>
+                                                {{ $cambio->numeroSeccion() ?? 'No disponible' }}
+                                            </p>
+
+                                            @if($cambio->aula())
+                                            <p>
+                                                <span class="font-semibold">Aula:</span>
+                                                {{ $cambio->aula() }}
+                                            </p>
+                                            @endif
+
+                                            <p>
+                                                <span class="font-semibold">Tutor anterior:</span>
+                                                {{ $cambio->tutorAnterior() ?? 'No disponible' }}
+                                            </p>
+
+                                            <p>
+                                                <span class="font-semibold">Tutor nuevo:</span>
+                                                {{ $cambio->tutorNuevo() ?? 'No disponible' }}
+                                            </p>
+
+                                            @if($cambio->motivoReemplazo())
+                                            <p>
+                                                <span class="font-semibold">Motivo:</span>
+                                                {{ $cambio->motivoReemplazo() }}
+                                            </p>
+                                            @endif
+                                        </div>
+                                    </div>
+                                    @endif
+
+                                    <p class="mt-2 text-xs text-gray-500">
                                         {{ $cambio->created_at?->format('d/m/Y H:i') }}
                                         ·
                                         {{ $cambio->modificadoPor?->nombre ?? 'Usuario no disponible' }}
