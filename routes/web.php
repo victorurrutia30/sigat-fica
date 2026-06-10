@@ -39,11 +39,11 @@ Route::middleware(['auth', 'verified', 'rol:coordinacion'])->group(function () {
     Route::get('consolidados', [ConsolidadoController::class, 'coordinacionIndex'])
         ->name('consolidados.index');
 
+    Route::get('consolidados/periodos/{periodoEvaluacion}/exportar-institucional', [ConsolidadoController::class, 'exportarPeriodoInstitucional'])
+        ->name('consolidados.periodos.exportar-institucional');
+
     Route::get('consolidados/{consolidado}', [ConsolidadoController::class, 'coordinacionShow'])
         ->name('consolidados.show');
-
-    Route::get('consolidados/{consolidado}/exportar-institucional', [ConsolidadoController::class, 'exportarInstitucional'])
-        ->name('consolidados.exportar-institucional');
 
     Route::patch('consolidados/{consolidado}/observacion', [ConsolidadoController::class, 'guardarObservacion'])
         ->name('consolidados.observacion');

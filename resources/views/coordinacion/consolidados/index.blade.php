@@ -125,6 +125,16 @@
                         </div>
                     </form>
 
+                    @if($periodoId)
+                    <div class="mb-5 flex flex-wrap justify-end gap-3">
+                        <a
+                            href="{{ route('consolidados.periodos.exportar-institucional', $periodoId) }}"
+                            class="btn-primary">
+                            Exportar consolidado institucional del periodo
+                        </a>
+                    </div>
+                    @endif
+
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-utec-gray-medium">
                             <thead>

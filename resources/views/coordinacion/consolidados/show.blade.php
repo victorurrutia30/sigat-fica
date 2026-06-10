@@ -11,8 +11,10 @@
             </div>
 
             <div class="flex flex-wrap gap-2">
-                <a href="{{ route('consolidados.exportar-institucional', $consolidado) }}" class="btn-primary">
-                    Exportar Excel
+                <a
+                    href="{{ route('consolidados.periodos.exportar-institucional', $consolidado->periodo_evaluacion_id) }}"
+                    class="btn-primary">
+                    Exportar periodo
                 </a>
 
                 <a href="{{ route('consolidados.index', ['periodo_id' => $consolidado->periodo_evaluacion_id]) }}" class="btn-secondary">
