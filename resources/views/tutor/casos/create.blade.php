@@ -48,7 +48,28 @@
                 </div>
 
                 <div class="card-body">
-                    <form method="POST" action="{{ route('casos.store') }}">
+                    <form
+                        method="POST"
+                        action="{{ route('casos.store') }}"
+                        x-data="{
+        carne: '{{ old('carne') }}',
+        correo: '{{ old('correo') }}',
+        normalizarCarne() {
+            let digitos = (this.carne || '').replace(/\D/g, '').slice(0, 10);
+
+            if (digitos.length <= 2) {
+                this.carne = digitos;
+            } else if (digitos.length <= 6) {
+                this.carne = digitos.slice(0, 2) + '-' + digitos.slice(2);
+            } else {
+                this.carne = digitos.slice(0, 2) + '-' + digitos.slice(2, 6) + '-' + digitos.slice(6, 10);
+            }
+
+            if (digitos.length === 10) {
+                this.correo = digitos + '@mail.utec.edu.sv';
+            }
+        }
+    }">
                         @csrf
 
                         <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -91,15 +112,21 @@
                                     type="text"
                                     name="carne"
                                     id="carne"
-                                    value="{{ old('carne') }}"
-                                    class="input-field uppercase"
-                                    maxlength="20"
-                                    placeholder="Ej. 25-1234-2026"
+                                    x-model="carne"
+                                    x-on:input="normalizarCarne"
+                                    class="input-field"
+                                    inputmode="numeric"
+                                    maxlength="12"
+                                    placeholder="Ej. 27-4855-2026"
                                     required>
 
                                 @error('carne')
                                 <p class="form-error">{{ $message }}</p>
                                 @enderror
+
+                                <p class="form-hint">
+                                    Escribe 10 dígitos. El sistema lo formatea como 27-4855-2026.
+                                </p>
                             </div>
                             <div>
                                 <label for="nombres" class="form-label">
@@ -150,14 +177,21 @@
                                     type="email"
                                     name="correo"
                                     id="correo"
-                                    value="{{ old('correo') }}"
-                                    class="input-field"
+                                    x-model="correo"
+                                    class="input-field bg-gray-50"
                                     maxlength="191"
-                                    placeholder="correo@ejemplo.com">
+                                    placeholder="2748552026@mail.utec.edu.sv"
+                                    readonly
+                                    required>
 
                                 @error('correo')
                                 <p class="form-error">{{ $message }}</p>
                                 @enderror
+
+                                <p class="form-hint">
+                                    Se genera automáticamente con el carné sin guiones: carnet@mail.utec.edu.sv.
+                                </p>
+
                             </div>
 
                             <div>
@@ -195,6 +229,8 @@
                             </button>
                         </div>
                     </form>
+
+
                 </div>
             </div>
         </div>
