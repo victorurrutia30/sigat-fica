@@ -5,6 +5,16 @@
     Los usuarios con rol <span class="font-semibold">Tutor</span> pueden vincularse a un tutor registrado cuando necesiten acceso al portal.
 </div>
 
+@if(isset($tutorPreseleccionado) && $tutorPreseleccionado)
+<div class="mb-5 rounded-md border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800">
+    Se usarán los datos del tutor:
+    <span class="font-semibold">{{ $tutorPreseleccionado->nombre_completo }}</span>
+    —
+    {{ $tutorPreseleccionado->correo_institucional }}.
+    Define la contraseña inicial antes de crear la cuenta.
+</div>
+@endif
+
 <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
     <div>
         <label for="nombre" class="form-label">
@@ -14,7 +24,7 @@
             type="text"
             name="nombre"
             id="nombre"
-            value="{{ old('nombre', $usuario->nombre ?? '') }}"
+            value="{{ old('nombre', $usuario->nombre ?? $tutorPreseleccionado?->nombre_completo ?? '') }}"
             class="input-field"
             maxlength="255"
             required>
@@ -31,7 +41,7 @@
             type="email"
             name="correo"
             id="correo"
-            value="{{ old('correo', $usuario->correo ?? '') }}"
+            value="{{ old('correo', $usuario->correo ?? $tutorPreseleccionado?->correo_institucional ?? '') }}"
             class="input-field"
             maxlength="255"
             placeholder="nombre@utec.edu.sv"
@@ -47,10 +57,16 @@
         </label>
         <select name="rol" id="rol" class="input-field" required>
             <option value="">Seleccione...</option>
-            <option value="coordinacion" @selected(old('rol', $usuario->rol ?? '') === 'coordinacion')>
+
+            <option
+                value="coordinacion"
+                @selected(old('rol', $usuario->rol ?? ($tutorPreseleccionado ? 'tutor' : '')) === 'coordinacion')>
                 Coordinación
             </option>
-            <option value="tutor" @selected(old('rol', $usuario->rol ?? '') === 'tutor')>
+
+            <option
+                value="tutor"
+                @selected(old('rol', $usuario->rol ?? ($tutorPreseleccionado ? 'tutor' : '')) === 'tutor')>
                 Tutor
             </option>
         </select>
@@ -66,7 +82,7 @@
         <select name="tutor_id" id="tutor_id" class="input-field">
             <option value="">Sin tutor vinculado</option>
             @foreach($tutoresDisponibles as $tutor)
-            <option value="{{ $tutor->id }}" @selected((int) old('tutor_id', $usuario->tutor?->id ?? 0) === $tutor->id)>
+            <option value="{{ $tutor->id }}" @selected((int) old('tutor_id', $usuario->tutor?->id ?? $tutorPreseleccionado?->id ?? 0) === $tutor->id)>
                 {{ $tutor->nombre_completo }} — {{ $tutor->codigo_empleado }}
             </option>
             @endforeach

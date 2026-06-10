@@ -140,6 +140,12 @@
                                                 Editar
                                             </a>
 
+                                            @if(! $tutor->usuario && $tutor->puedeAsignarseComoTutor() && $tutor->correo_institucional)
+                                            <a href="{{ route('usuarios.create', ['tutor_id' => $tutor->id]) }}" class="link-utec">
+                                                Crear usuario
+                                            </a>
+                                            @endif
+
                                             <form
                                                 action="{{ route('tutores.destroy', $tutor) }}"
                                                 method="POST"

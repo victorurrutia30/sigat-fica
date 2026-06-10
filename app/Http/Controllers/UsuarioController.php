@@ -9,6 +9,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
+use Illuminate\Http\Request;
 
 
 class UsuarioController extends Controller
@@ -49,11 +50,38 @@ class UsuarioController extends Controller
         ));
     }
 
-    public function create(): View
+    public function create(Request $request): View|RedirectResponse
     {
         $tutoresDisponibles = $this->tutoresDisponibles();
+        $tutorPreseleccionado = null;
 
-        return view('coordinacion.usuarios.create', compact('tutoresDisponibles'));
+        if ($request->filled('tutor_id')) {
+            $tutorPreseleccionado = $tutoresDisponibles
+                ->firstWhere('id', (int) $request->integer('tutor_id'));
+
+            if (! $tutorPreseleccionado) {
+                return redirect()
+                    ->route('usuarios.create')
+                    ->with('error', 'Solo puedes crear usuarios desde tutores activos, habilitados, sin cuenta vinculada y aptos para tutorías.');
+            }
+
+            $correoTutor = strtolower(trim((string) $tutorPreseleccionado->correo_institucional));
+
+            $correoYaExiste = User::query()
+                ->where('correo', $correoTutor)
+                ->exists();
+
+            if ($correoYaExiste) {
+                return redirect()
+                    ->route('usuarios.create')
+                    ->with('error', 'Ya existe una cuenta de usuario con el correo institucional de este tutor.');
+            }
+        }
+
+        return view('coordinacion.usuarios.create', compact(
+            'tutoresDisponibles',
+            'tutorPreseleccionado'
+        ));
     }
 
     public function store(UsuarioRequest $request): RedirectResponse
@@ -156,6 +184,11 @@ class UsuarioController extends Controller
         return Tutor::query()
             ->where('activo', true)
             ->whereNull('deleted_at')
+            ->where('habilitado_para_tutorias', true)
+            ->where(function ($query) {
+                $query->where('tiempo_completo', true)
+                    ->orWhere('es_excepcion_tutoria', true);
+            })
             ->where(function ($query) use ($usuario) {
                 $query->whereNull('usuario_id');
 

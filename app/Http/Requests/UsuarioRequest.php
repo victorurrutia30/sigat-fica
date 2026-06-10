@@ -99,6 +99,19 @@ class UsuarioRequest extends FormRequest
                     return;
                 }
 
+                $tutor = Tutor::query()
+                    ->whereKey($tutorId)
+                    ->first();
+
+                if (! $tutor || ! $tutor->puedeAsignarseComoTutor()) {
+                    $validator->errors()->add(
+                        'tutor_id',
+                        'Solo puedes vincular usuarios a tutores activos, habilitados y aptos para tutorías.'
+                    );
+
+                    return;
+                }
+
                 $tutorOcupado = Tutor::withTrashed()
                     ->whereKey($tutorId)
                     ->whereNotNull('usuario_id')
@@ -178,7 +191,7 @@ class UsuarioRequest extends FormRequest
             'activo.boolean' => 'El estado activo no tiene un valor válido.',
 
             'tutor_id.integer' => 'El tutor seleccionado no es válido.',
-            'tutor_id.exists' => 'El tutor seleccionado no existe o no está activo.',
+            'tutor_id.exists' => 'El tutor seleccionado no existe, no está activo o no está disponible.',
         ];
     }
 
