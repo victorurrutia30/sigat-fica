@@ -23,6 +23,30 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
 class ConsolidadoSeccionSheet implements FromCollection, WithHeadings, WithTitle, WithColumnWidths, WithStyles, WithEvents, WithDrawings
 {
+    // ── Paleta de marca UTEC ────────────────────────────────────────────────
+    private const MAROON_900  = '3D0D22';  // más oscuro — fila universidad
+    private const MAROON_700  = '5A1533';  // maroon primario
+    private const MAROON_500  = '7B2448';  // medio — banner, cabecera simbología
+    private const MAROON_100  = 'EDD9E3';  // muy claro — celdas label, spacers
+    private const MAROON_050  = 'F7F0F4';  // casi blanco — filas vacías
+    private const ROSE_DIVIDER = 'C9A0B4'; // borde acento entre label y valor
+    private const RULE_INNER  = 'DCC8D0';  // líneas internas delgadas
+    private const ROW_ALT     = 'F5ECF0';  // tint alternado en filas de datos
+    private const TEXT_BODY   = '2B2B2B';  // texto cuerpo
+    private const WHITE       = 'FFFFFF';
+
+    // ── Mapa de filas heading (datos desde row 23) ──────────────────────────
+    private const ROW_UNIV    = 1;
+    private const ROW_FACULTY = 2;
+    private const ROW_PROGRAM = 3;
+    private const ROW_GAP     = 4;   // separador delgado maroon
+    private const ROW_BANNER  = 5;
+    // Rows  6–14  = sección info (label | valor | separador | código | descripción)
+    // Rows 15–20  = spacers
+    private const ROW_TITLE   = 21;
+    private const ROW_HEADERS = 22;
+    // Row  23+    = datos
+
     private ?Collection $filas = null;
 
     public function __construct(
@@ -38,9 +62,13 @@ class ConsolidadoSeccionSheet implements FromCollection, WithHeadings, WithTitle
             periodo: $periodo,
             item: null,
             indice: 1,
-            sinAsignaciones: true
+            sinAsignaciones: true,
         );
     }
+
+    // ────────────────────────────────────────────────────────────────────────
+    // DATOS
+    // ────────────────────────────────────────────────────────────────────────
 
     public function collection(): Collection
     {
@@ -49,21 +77,13 @@ class ConsolidadoSeccionSheet implements FromCollection, WithHeadings, WithTitle
         }
 
         if ($this->sinAsignaciones || ! $this->item) {
-            $this->filas = collect([
-                $this->fila([
-                    'No hay secciones asignadas para este periodo.',
-                ]),
+            return $this->filas = collect([
+                $this->fila(['No hay secciones asignadas para este periodo.']),
             ]);
-
-            return $this->filas;
         }
 
         $casos = CasoSeguimiento::query()
-            ->with([
-                'estudiante',
-                'causa',
-                'gestiones',
-            ])
+            ->with(['estudiante', 'causa', 'gestiones'])
             ->where('periodo_evaluacion_id', $this->periodo->id)
             ->where('seccion_id', $this->item->seccion_id)
             ->where('tutor_id', $this->item->tutor_id)
@@ -71,32 +91,40 @@ class ConsolidadoSeccionSheet implements FromCollection, WithHeadings, WithTitle
             ->get();
 
         if ($casos->isEmpty()) {
-            $this->filas = collect([
-                $this->fila([
-                    'Todos han hecho examen parcial',
-                ]),
+            return $this->filas = collect([
+                $this->fila(['Todos han hecho examen parcial']),
             ]);
-
-            return $this->filas;
         }
 
-        $this->filas = $casos->values()->map(function (CasoSeguimiento $caso) {
-            return [
-                $caso->estudiante?->carne ?? '',
-                $caso->estudiante?->nombre_completo ?? '',
-                '',
-                $caso->detalle_inasistencia ?: ($caso->causa?->nombre ?? ''),
-                $caso->resultado_consolidado === 'rc' ? 'X' : '',
-                $caso->resultado_consolidado === 'rm' ? 'X' : '',
-                $caso->resultado_consolidado === 'abm' ? 'X' : '',
-                $caso->resultado_consolidado === 'abc' ? 'X' : '',
-                $caso->matricula ? 'X' : '',
-                $caso->cuota_cancelada ?? '',
-            ];
-        });
-
-        return $this->filas;
+        return $this->filas = $casos->values()->map(fn(CasoSeguimiento $caso) => [
+            $caso->estudiante?->carne ?? '',
+            $caso->estudiante?->nombre_completo ?? '',
+            '',
+            $caso->detalle_inasistencia ?: ($caso->causa?->nombre ?? ''),
+            $caso->resultado_consolidado === 'rc'  ? 'X' : '',
+            $caso->resultado_consolidado === 'rm'  ? 'X' : '',
+            $caso->resultado_consolidado === 'abm' ? 'X' : '',
+            $caso->resultado_consolidado === 'abc' ? 'X' : '',
+            $caso->matricula ? 'X' : '',
+            $caso->cuota_cancelada ?? '',
+        ]);
     }
+
+    // ────────────────────────────────────────────────────────────────────────
+    // HEADINGS (22 filas fijas)
+    //
+    // Col:  A                    B               C    D    E    F               G:J (merged)
+    // ---   -------------------  ----------      ---  ---  ---  --------------- -------------------
+    // r6    Facultad             FICA            ·    ·    ·    Formulario      Inasistencia a…
+    // r7    Ciclo                value           ·    ·    ·    —               —
+    // r8    Asignatura           value           ·    ·    ·    —               —
+    // r9    Sección              value           ·    ·    ·    SIMBOLOGÍA      (merged F9:J9)
+    // r10   Docente              value           ·    ·    ·    R/C             Retiro de ciclo
+    // r11   Tutor(a)             value           ·    ·    ·    R/M             Retiro de materia
+    // r12   —                    —               ·    ·    ·    AB/M            Abandono de materia
+    // r13   Inscritos (general)  value           ·    ·    ·    AB/C            Abandono del ciclo
+    // r14   Inscritos (nvo ing.) value           ·    ·    ·    —               —
+    // ────────────────────────────────────────────────────────────────────────
 
     public function headings(): array
     {
@@ -104,44 +132,44 @@ class ConsolidadoSeccionSheet implements FromCollection, WithHeadings, WithTitle
 
         $seccion = $this->item?->seccion;
         $materia = $seccion?->materia;
-        $tutor = $this->item?->tutor;
+        $tutor   = $this->item?->tutor;
 
         return [
-            $this->fila([' Universidad Tecnologica de El Salvador ']),
-            $this->fila([' Programa de Tutores ']),
-            $this->fila([' Decanato de Estudiantes ']),
-            $this->fila([]),
-            $this->fila([' Programa de Tutores ']),
-            $this->fila(['Facultad de: Informatica y Ciencias Aplicadas', null, null, null, 'Formulario']),
-            $this->fila(['Ciclo  ' . ($this->periodo->ciclo?->nombre ?? 'No definido'), null, null, null, ' Inasistencia']),
-            $this->fila(['Asignatura: ' . ($materia?->nombre ?? 'No definida')]),
-            $this->fila(['Sección: ', $seccion?->numero_seccion ?? '', null, null, ' Simbologia ']),
-            $this->fila(['Docente: ' . ($seccion?->nombre_titular ?? ''), null, null, null, 'R/C']),
-            $this->fila(['Tutor(a) : ' . ($tutor?->nombre_completo ?? ''), null, null, null, 'Retiro de ciclo ']),
-            $this->fila([null, null, null, null, 'R/M']),
-            $this->fila(['Inscritos en General : ' . ($seccion?->capacidad ?? ''), null, null, null, 'Retiro de materia ']),
-            $this->fila(['Incritos  de nuevo ingreso: ', null, null, null, 'AB/M']),
-            $this->fila([null, null, null, null, 'Abandono de materia']),
-            $this->fila([null, null, null, null, 'AB/C']),
-            $this->fila([null, null, null, null, 'Abandono del Ciclo']),
-            $this->fila([]),
-            $this->fila([]),
-            $this->fila([]),
-            $this->fila(['Nómina de alumnos que no realizaron primera evaluación']),
-            [
-                'Carnet',
-                'Nombre del Alumno',
-                'Apellidos del Alumno ',
-                ' Detalle de Inasistencia a primera evaluación',
-                'R/C',
-                'R/M',
-                'AB/M',
-                'AB/C',
-                'Matricula',
-                'Nº/cuota cancelada',
-            ],
+            // ── Bloque header ─────────────────────────────────────────
+            $this->fila(['UNIVERSIDAD TECNOLÓGICA DE EL SALVADOR']),                    // 1
+            $this->fila(['FACULTAD DE INFORMÁTICA Y CIENCIAS APLICADAS']),              // 2
+            $this->fila(['PROGRAMA DE TUTORES · DECANATO DE ESTUDIANTES']),             // 3
+            $this->fila([]),                                                             // 4 spacer delgado
+            $this->fila(['NÓMINA DE INASISTENCIA A PRIMERA EVALUACIÓN']),               // 5
+
+            // ── Sección info ──────────────────────────────────────────
+            ['Facultad',               'Informática y Ciencias Aplicadas',       null, null, null, 'Formulario',  'Inasistencia a Primera Evaluación', null, null, null],  //  6
+            ['Ciclo',                  $this->periodo->ciclo?->nombre ?? '—',    null, null, null, null,          null,                                null, null, null],  //  7
+            ['Asignatura',             $materia?->nombre ?? '—',                 null, null, null, null,          null,                                null, null, null],  //  8
+            ['Sección',                $seccion?->numero_seccion ?? '—',         null, null, null, 'SIMBOLOGÍA',  null,                                null, null, null],  //  9
+            ['Docente',                $seccion?->nombre_titular ?? '—',         null, null, null, 'R/C',         'Retiro de ciclo',                   null, null, null],  // 10
+            ['Tutor(a)',               $tutor?->nombre_completo ?? '—',          null, null, null, 'R/M',         'Retiro de materia',                 null, null, null],  // 11
+            [null,                     null,                                       null, null, null, 'AB/M',        'Abandono de materia',               null, null, null],  // 12
+            ['Inscritos (general)',    $seccion?->capacidad ?? '—',              null, null, null, 'AB/C',        'Abandono del ciclo',                null, null, null],  // 13
+            ['Inscritos (nuevo ing.)', '',                                        null, null, null, null,          null,                                null, null, null],  // 14
+
+            // ── Spacers ───────────────────────────────────────────────
+            $this->fila([]),  // 15
+            $this->fila([]),  // 16
+            $this->fila([]),  // 17
+            $this->fila([]),  // 18
+            $this->fila([]),  // 19
+            $this->fila([]),  // 20
+
+            // ── Bloque tabla ──────────────────────────────────────────
+            $this->fila(['NÓMINA DE ALUMNOS QUE NO REALIZARON PRIMERA EVALUACIÓN']),   // 21
+            ['Carnet', 'Nombre del Alumno', 'Apellidos del Alumno', 'Detalle de inasistencia a primera evaluación', 'R/C', 'R/M', 'AB/M', 'AB/C', 'Matrícula', 'Nº/cuota cancelada'],  // 22
         ];
     }
+
+    // ────────────────────────────────────────────────────────────────────────
+    // METADATA
+    // ────────────────────────────────────────────────────────────────────────
 
     public function title(): string
     {
@@ -152,12 +180,7 @@ class ConsolidadoSeccionSheet implements FromCollection, WithHeadings, WithTitle
         $seccion = $this->item->seccion;
         $materia = $seccion?->materia;
 
-        $nombre = trim(sprintf(
-            '%s %s',
-            $materia?->nombre ?? 'Materia',
-            $seccion?->numero_seccion ?? ''
-        ));
-
+        $nombre = trim(sprintf('%s %s', $materia?->nombre ?? 'Materia', $seccion?->numero_seccion ?? ''));
         $nombre = preg_replace('/[\\\\\\/\\?\\*\\[\\]:]/', ' ', $nombre) ?? $nombre;
         $nombre = preg_replace('/\s+/', ' ', $nombre) ?? $nombre;
 
@@ -167,138 +190,292 @@ class ConsolidadoSeccionSheet implements FromCollection, WithHeadings, WithTitle
     public function columnWidths(): array
     {
         return [
-            'A' => 18,
-            'B' => 28,
-            'C' => 28,
-            'D' => 55,
-            'E' => 10,
-            'F' => 10,
-            'G' => 10,
+            'A' => 20,   // labels / Carnet
+            'B' => 28,   // valores info / Nombre
+            'C' => 26,   // valores info / Apellidos
+            'D' => 40,   // valores info / Detalle inasistencia
+            'E' => 4,    // separador visual (sin contenido)
+            'F' => 14,   // código simbología
+            'G' => 10,   // descripción simbología
             'H' => 10,
-            'I' => 14,
-            'J' => 18,
+            'I' => 12,
+            'J' => 14,   // Nº cuota
         ];
     }
+
+    // ────────────────────────────────────────────────────────────────────────
+    // ESTILOS BASE (se aplican antes de registerEvents)
+    // ────────────────────────────────────────────────────────────────────────
 
     public function styles(Worksheet $sheet): array
     {
         return [
-            1 => [
-                'font' => [
-                    'bold' => true,
-                    'size' => 12,
-                ],
+            self::ROW_UNIV => [
+                'font' => ['bold' => true, 'size' => 13, 'color' => ['rgb' => self::WHITE]],
+                'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => self::MAROON_900]],
             ],
-            2 => [
-                'font' => [
-                    'bold' => true,
-                    'size' => 12,
-                ],
+            self::ROW_FACULTY => [
+                'font' => ['bold' => true, 'size' => 11, 'color' => ['rgb' => self::WHITE]],
+                'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => self::MAROON_700]],
             ],
-            3 => [
-                'font' => [
-                    'bold' => true,
-                    'size' => 12,
-                ],
+            self::ROW_PROGRAM => [
+                'font' => ['bold' => false, 'size' => 9, 'color' => ['rgb' => 'E8C8D4']],
+                'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => self::MAROON_700]],
             ],
-            21 => [
-                'font' => [
-                    'bold' => true,
-                    'size' => 11,
-                ],
-                'fill' => [
-                    'fillType' => Fill::FILL_SOLID,
-                    'startColor' => ['rgb' => 'D9D9D9'],
-                ],
+            self::ROW_BANNER => [
+                'font' => ['bold' => true, 'size' => 11, 'color' => ['rgb' => self::WHITE]],
+                'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => self::MAROON_500]],
             ],
-            22 => [
-                'font' => [
-                    'bold' => true,
-                    'color' => ['rgb' => 'FFFFFF'],
-                ],
-                'fill' => [
-                    'fillType' => Fill::FILL_SOLID,
-                    'startColor' => ['rgb' => '5A1533'],
-                ],
+            self::ROW_TITLE => [
+                'font' => ['bold' => true, 'size' => 10, 'color' => ['rgb' => self::MAROON_900]],
+                'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => self::MAROON_100]],
+            ],
+            self::ROW_HEADERS => [
+                'font' => ['bold' => true, 'size' => 9, 'color' => ['rgb' => self::WHITE]],
+                'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => self::MAROON_700]],
                 'alignment' => [
                     'horizontal' => Alignment::HORIZONTAL_CENTER,
-                    'vertical' => Alignment::VERTICAL_CENTER,
+                    'vertical'   => Alignment::VERTICAL_CENTER,
+                    'wrapText'   => true,
                 ],
             ],
         ];
     }
+
+    // ────────────────────────────────────────────────────────────────────────
+    // EVENTOS (layout y estilos post-render)
+    // ────────────────────────────────────────────────────────────────────────
 
     public function registerEvents(): array
     {
         return [
             AfterSheet::class => function (AfterSheet $event) {
-                $sheet = $event->sheet->getDelegate();
+                $ws = $event->sheet->getDelegate();
 
-                $cantidadFilas = max($this->collection()->count(), 1);
-                $ultimaFila = 22 + $cantidadFilas;
+                $rowCount    = max($this->collection()->count(), 1);
+                $lastDataRow = self::ROW_HEADERS + $rowCount;
 
-                foreach ([1, 2, 3, 5, 21] as $fila) {
-                    $sheet->mergeCells("A{$fila}:J{$fila}");
-                }
+                // ── Configuración hoja ────────────────────────────────
+                $ws->freezePane('A23');
+                $ws->setAutoFilter('A22:J' . $lastDataRow);
+                $ws->setShowGridLines(false);
+                $ws->setPrintGridlines(false);
 
-                $sheet->freezePane('A23');
-                $sheet->setAutoFilter("A22:J{$ultimaFila}");
-
-                $sheet->getStyle("A1:J{$ultimaFila}")
+                // ── Global: centrado vertical + wrap ──────────────────
+                $ws->getStyle('A1:J' . $lastDataRow)
                     ->getAlignment()
                     ->setVertical(Alignment::VERTICAL_CENTER)
                     ->setWrapText(true);
 
-                $sheet->getStyle('A1:J3')
-                    ->getAlignment()
-                    ->setHorizontal(Alignment::HORIZONTAL_CENTER);
-
-                $sheet->getStyle('A21:J21')
-                    ->getAlignment()
-                    ->setHorizontal(Alignment::HORIZONTAL_CENTER);
-
-                $sheet->getStyle("A22:J{$ultimaFila}")
-                    ->getBorders()
-                    ->getAllBorders()
-                    ->setBorderStyle(Border::BORDER_THIN);
-
-                $sheet->getStyle("A23:C{$ultimaFila}")
-                    ->getAlignment()
-                    ->setHorizontal(Alignment::HORIZONTAL_LEFT);
-
-                $sheet->getStyle("E23:J{$ultimaFila}")
-                    ->getAlignment()
-                    ->setHorizontal(Alignment::HORIZONTAL_CENTER);
-
-                $sheet->getStyle("D23:D{$ultimaFila}")
-                    ->getAlignment()
-                    ->setHorizontal(Alignment::HORIZONTAL_LEFT);
-
-                $primeraFila = $this->collection()->first();
-
-                if (
-                    is_array($primeraFila)
-                    && in_array($primeraFila[0] ?? '', [
-                        'Todos han hecho examen parcial',
-                        'No hay secciones asignadas para este periodo.',
-                    ], true)
-                ) {
-                    $sheet->mergeCells('A23:J23');
-
-                    $sheet->getStyle('A23:J23')
+                // ── Merges ────────────────────────────────────────────
+                // Filas full-width
+                foreach ([1, 2, 3, 4, 5, 21] as $r) {
+                    $ws->mergeCells("A{$r}:J{$r}");
+                }
+                // Alineación centrada en filas full-width (excepto row 4)
+                foreach ([1, 2, 3, 5, 21] as $r) {
+                    $ws->getStyle("A{$r}:J{$r}")
                         ->getAlignment()
                         ->setHorizontal(Alignment::HORIZONTAL_CENTER);
-
-                    $sheet->getStyle('A23:J23')
-                        ->getFont()
-                        ->setBold(true);
                 }
 
-                $sheet->getRowDimension(21)->setRowHeight(22);
-                $sheet->getRowDimension(22)->setRowHeight(30);
+                // Panel izquierdo: B:D merged por fila
+                foreach ([6, 7, 8, 9, 10, 11, 13, 14] as $r) {
+                    $ws->mergeCells("B{$r}:D{$r}");
+                }
+
+                // Panel derecho
+                $ws->mergeCells('G6:J6');    // valor "Formulario"
+                $ws->mergeCells('F9:J9');    // cabecera SIMBOLOGÍA (span completo)
+                foreach ([10, 11, 12, 13] as $r) {
+                    $ws->mergeCells("G{$r}:J{$r}");
+                }
+
+                // ── Alturas de fila ───────────────────────────────────
+                $ws->getRowDimension(1)->setRowHeight(26);
+                $ws->getRowDimension(2)->setRowHeight(20);
+                $ws->getRowDimension(3)->setRowHeight(16);
+                $ws->getRowDimension(4)->setRowHeight(4);    // separador delgado maroon
+                $ws->getRowDimension(5)->setRowHeight(24);
+
+                foreach (range(6, 14) as $r) {
+                    $ws->getRowDimension($r)->setRowHeight(22);
+                }
+                foreach (range(15, 20) as $r) {
+                    $ws->getRowDimension($r)->setRowHeight(8);
+                }
+
+                $ws->getRowDimension(21)->setRowHeight(22);
+                $ws->getRowDimension(22)->setRowHeight(34);
+
+                foreach (range(23, $lastDataRow) as $r) {
+                    $ws->getRowDimension($r)->setRowHeight(22);
+                }
+
+                // ── Header block ──────────────────────────────────────
+                // Row 4: delgado maroon que "sella" el bloque de encabezados
+                $ws->getStyle('A4:J4')->applyFromArray([
+                    'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => self::MAROON_900]],
+                ]);
+
+                // ── Panel info izquierdo (A6:D14) ─────────────────────
+                // Base blanco
+                $ws->getStyle('A6:D14')->applyFromArray([
+                    'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => self::WHITE]],
+                ]);
+
+                // Celdas label (col A): rosado + bold maroon
+                foreach ([6, 7, 8, 9, 10, 11, 13, 14] as $r) {
+                    $ws->getStyle("A{$r}")->applyFromArray([
+                        'font'      => ['bold' => true, 'size' => 9, 'color' => ['rgb' => self::MAROON_700]],
+                        'fill'      => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => self::MAROON_100]],
+                        'alignment' => ['horizontal' => Alignment::HORIZONTAL_LEFT, 'indent' => 1],
+                    ]);
+                    $ws->getStyle("B{$r}:D{$r}")->applyFromArray([
+                        'font'      => ['size' => 9, 'color' => ['rgb' => self::TEXT_BODY]],
+                        'alignment' => ['horizontal' => Alignment::HORIZONTAL_LEFT, 'indent' => 1],
+                    ]);
+                }
+                // Row 12: fila vacía en el lado izquierdo
+                $ws->getStyle('A12:D12')->applyFromArray([
+                    'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => 'F6F6F6']],
+                ]);
+
+                // Bordes panel izquierdo
+                $ws->getStyle('A6:D14')->applyFromArray([
+                    'borders' => ['outline' => ['borderStyle' => Border::BORDER_MEDIUM, 'color' => ['rgb' => self::MAROON_700]]],
+                ]);
+                foreach (range(7, 14) as $r) {
+                    $ws->getStyle("A{$r}:D{$r}")->applyFromArray([
+                        'borders' => ['top' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => self::RULE_INNER]]],
+                    ]);
+                }
+                // Divisor vertical acento entre A (label) y B (valor)
+                $ws->getStyle('A6:A14')->applyFromArray([
+                    'borders' => ['right' => ['borderStyle' => Border::BORDER_MEDIUM, 'color' => ['rgb' => self::ROSE_DIVIDER]]],
+                ]);
+
+                // ── Columna E: separador visual ───────────────────────
+                $ws->getStyle('E6:E14')->applyFromArray([
+                    'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => 'F0EBF0']],
+                ]);
+
+                // ── Panel info derecho (F6:J14) ───────────────────────
+                // Base blanco
+                $ws->getStyle('F6:J14')->applyFromArray([
+                    'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => self::WHITE]],
+                ]);
+
+                // Row 6: label "Formulario" + valor
+                $ws->getStyle('F6')->applyFromArray([
+                    'font'      => ['bold' => true, 'size' => 9, 'color' => ['rgb' => self::MAROON_700]],
+                    'fill'      => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => self::MAROON_100]],
+                    'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
+                ]);
+                $ws->getStyle('G6:J6')->applyFromArray([
+                    'font'      => ['bold' => true, 'size' => 9, 'color' => ['rgb' => self::MAROON_900]],
+                    'alignment' => ['horizontal' => Alignment::HORIZONTAL_LEFT, 'indent' => 1],
+                ]);
+
+                // Rows 7-8: sin contenido en el panel derecho
+                $ws->getStyle('F7:J8')->applyFromArray([
+                    'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => 'FAFAFA']],
+                ]);
+
+                // Row 9: cabecera SIMBOLOGÍA (merge F9:J9)
+                $ws->getStyle('F9:J9')->applyFromArray([
+                    'font'      => ['bold' => true, 'size' => 9, 'color' => ['rgb' => self::WHITE]],
+                    'fill'      => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => self::MAROON_500]],
+                    'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
+                ]);
+
+                // Rows 10-13: código (F) + descripción (G:J)
+                foreach ([10, 11, 12, 13] as $r) {
+                    $ws->getStyle("F{$r}")->applyFromArray([
+                        'font'      => ['bold' => true, 'size' => 9, 'color' => ['rgb' => self::MAROON_700]],
+                        'fill'      => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => self::MAROON_100]],
+                        'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
+                    ]);
+                    $ws->getStyle("G{$r}:J{$r}")->applyFromArray([
+                        'font'      => ['size' => 9, 'color' => ['rgb' => self::TEXT_BODY]],
+                        'alignment' => ['horizontal' => Alignment::HORIZONTAL_LEFT, 'indent' => 1],
+                    ]);
+                }
+
+                // Row 14: lado derecho vacío
+                $ws->getStyle('F14:J14')->applyFromArray([
+                    'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => 'FAFAFA']],
+                ]);
+
+                // Bordes panel derecho (espejo del izquierdo)
+                $ws->getStyle('F6:J14')->applyFromArray([
+                    'borders' => ['outline' => ['borderStyle' => Border::BORDER_MEDIUM, 'color' => ['rgb' => self::MAROON_700]]],
+                ]);
+                foreach (range(7, 14) as $r) {
+                    $ws->getStyle("F{$r}:J{$r}")->applyFromArray([
+                        'borders' => ['top' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => self::RULE_INNER]]],
+                    ]);
+                }
+                // Divisor vertical entre código (F) y descripción (G:J)
+                $ws->getStyle('F6:F14')->applyFromArray([
+                    'borders' => ['right' => ['borderStyle' => Border::BORDER_MEDIUM, 'color' => ['rgb' => self::ROSE_DIVIDER]]],
+                ]);
+
+                // ── Filas spacer (15–20) ──────────────────────────────
+                $ws->getStyle('A15:J20')->applyFromArray([
+                    'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => self::MAROON_050]],
+                ]);
+
+                // ── Bloque tabla ──────────────────────────────────────
+                // Borde marco general
+                $ws->getStyle("A22:J{$lastDataRow}")->applyFromArray([
+                    'borders' => ['outline' => ['borderStyle' => Border::BORDER_MEDIUM, 'color' => ['rgb' => self::MAROON_700]]],
+                ]);
+                // Separador cabecera/datos más grueso
+                $ws->getStyle('A22:J22')->applyFromArray([
+                    'borders' => ['bottom' => ['borderStyle' => Border::BORDER_MEDIUM, 'color' => ['rgb' => self::MAROON_900]]],
+                ]);
+
+                // Filas de datos: color alternado + líneas horizontales
+                for ($r = 23; $r <= $lastDataRow; $r++) {
+                    $bg = ($r % 2 !== 0) ? self::ROW_ALT : self::WHITE;
+                    $ws->getStyle("A{$r}:J{$r}")->applyFromArray([
+                        'fill'    => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => $bg]],
+                        'borders' => ['bottom' => ['borderStyle' => Border::BORDER_HAIR, 'color' => ['rgb' => self::RULE_INNER]]],
+                    ]);
+                }
+
+                // Divisores verticales entre columnas de datos
+                $ws->getStyle("A23:J{$lastDataRow}")->applyFromArray([
+                    'borders' => ['vertical' => ['borderStyle' => Border::BORDER_HAIR, 'color' => ['rgb' => 'E5D5DB']]],
+                ]);
+
+                // Alineación en datos
+                $ws->getStyle("A23:D{$lastDataRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
+                $ws->getStyle("E23:J{$lastDataRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+                // ── Estado vacío ──────────────────────────────────────
+                $first = $this->collection()->first();
+                $emptyMessages = [
+                    'Todos han hecho examen parcial',
+                    'No hay secciones asignadas para este periodo.',
+                ];
+
+                if (is_array($first) && in_array($first[0] ?? '', $emptyMessages, true)) {
+                    $ws->mergeCells('A23:J23');
+                    $ws->getStyle('A23:J23')->applyFromArray([
+                        'font'      => ['bold' => true, 'italic' => true, 'size' => 9, 'color' => ['rgb' => self::MAROON_500]],
+                        'fill'      => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => self::MAROON_100]],
+                        'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
+                    ]);
+                }
             },
         ];
     }
+
+    // ────────────────────────────────────────────────────────────────────────
+    // DIBUJOS
+    // ────────────────────────────────────────────────────────────────────────
 
     public function drawings(): array
     {
@@ -312,13 +489,19 @@ class ConsolidadoSeccionSheet implements FromCollection, WithHeadings, WithTitle
         $drawing->setName('Logo UTEC');
         $drawing->setDescription('Logo UTEC');
         $drawing->setPath($logoPath);
+        $drawing->setResizeProportional(false);
+        $drawing->setWidth(90);
         $drawing->setHeight(90);
-        $drawing->setCoordinates('I8');
-        $drawing->setOffsetX(5);
+        $drawing->setCoordinates('H1');
+        $drawing->setOffsetX(18);
         $drawing->setOffsetY(5);
 
         return [$drawing];
     }
+
+    // ────────────────────────────────────────────────────────────────────────
+    // HELPERS
+    // ────────────────────────────────────────────────────────────────────────
 
     private function fila(array $valores): array
     {
