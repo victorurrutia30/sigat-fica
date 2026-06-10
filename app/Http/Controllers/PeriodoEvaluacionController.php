@@ -9,6 +9,7 @@ use App\Services\PeriodoEvaluacionService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use Illuminate\Validation\ValidationException;
 
 class PeriodoEvaluacionController extends Controller
 {
@@ -68,7 +69,14 @@ class PeriodoEvaluacionController extends Controller
         PeriodoEvaluacionRequest $request,
         PeriodoEvaluacionService $periodoService
     ): RedirectResponse {
-        $resultado = $periodoService->crear($request->validated());
+        try {
+            $resultado = $periodoService->crear($request->validated());
+        } catch (ValidationException $exception) {
+            return back()
+                ->withInput()
+                ->withErrors($exception->errors())
+                ->with('error', collect($exception->errors())->flatten()->first());
+        }
 
         $redirect = redirect()
             ->route('periodos.index')
@@ -115,10 +123,17 @@ class PeriodoEvaluacionController extends Controller
         PeriodoEvaluacion $periodoEvaluacion,
         PeriodoEvaluacionService $periodoService
     ): RedirectResponse {
-        $resultado = $periodoService->actualizar(
-            periodo: $periodoEvaluacion,
-            datos: $request->validated()
-        );
+        try {
+            $resultado = $periodoService->actualizar(
+                periodo: $periodoEvaluacion,
+                datos: $request->validated()
+            );
+        } catch (ValidationException $exception) {
+            return back()
+                ->withInput()
+                ->withErrors($exception->errors())
+                ->with('error', collect($exception->errors())->flatten()->first());
+        }
 
         $redirect = redirect()
             ->route('periodos.index')
@@ -144,7 +159,14 @@ class PeriodoEvaluacionController extends Controller
                 ->with('error', 'El periodo ya se encuentra inactivo.');
         }
 
-        $periodoService->desactivar($periodoEvaluacion);
+        try {
+            $periodoService->desactivar($periodoEvaluacion);
+        } catch (ValidationException $exception) {
+            return redirect()
+                ->route('periodos.index')
+                ->withErrors($exception->errors())
+                ->with('error', collect($exception->errors())->flatten()->first());
+        }
 
         return redirect()
             ->route('periodos.index')
