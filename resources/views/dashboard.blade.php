@@ -94,13 +94,30 @@
                             Propuesta de asignación
                         </a>
 
-                        <a href="#"
-                            class="rounded-lg border border-utec-gray-medium p-4 text-sm font-medium text-utec-gray-dark opacity-60">
+                        <a href="{{ route('periodos.index') }}"
+                            class="rounded-lg border border-utec-gray-medium p-4 text-sm font-medium text-utec-gray-dark transition hover:border-utec-primary-light hover:bg-utec-primary-soft hover:text-utec-primary">
                             Periodos de evaluación
                             <span class="mt-1 block text-xs text-gray-500">
-                                Pendiente
+                                Gestionar periodos y fechas límite de consolidado.
                             </span>
                         </a>
+
+                        <a href="{{ route('causas.index') }}"
+                            class="rounded-lg border border-utec-gray-medium p-4 text-sm font-medium text-utec-gray-dark transition hover:border-utec-primary-light hover:bg-utec-primary-soft hover:text-utec-primary">
+                            Catálogo de causas
+                            <span class="mt-1 block text-xs text-gray-500">
+                                Gestionar causas para casos de seguimiento.
+                            </span>
+                        </a>
+
+                        <a href="{{ route('consolidados.index') }}"
+                            class="rounded-lg border border-utec-gray-medium p-4 text-sm font-medium text-utec-gray-dark transition hover:border-utec-primary-light hover:bg-utec-primary-soft hover:text-utec-primary">
+                            Consolidados
+                            <span class="mt-1 block text-xs text-gray-500">
+                                Revisar entregas, observaciones y cumplimiento por tutor.
+                            </span>
+                        </a>
+
                     </div>
                 </div>
             </div>

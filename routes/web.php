@@ -3,11 +3,16 @@
 use App\Http\Controllers\CargaAcademicaController;
 use App\Http\Controllers\CicloController;
 use App\Http\Controllers\MateriaController;
+use App\Http\Controllers\MisAsignacionesController;
+use App\Http\Controllers\PeriodoEvaluacionController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PropuestaAsignacionController;
 use App\Http\Controllers\TutorController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\MisAsignacionesController;
+use App\Http\Controllers\CausaController;
+use App\Http\Controllers\CasoSeguimientoController;
+use App\Http\Controllers\GestionCasoController;
+use App\Http\Controllers\ConsolidadoController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -24,6 +29,24 @@ Route::middleware(['auth', 'verified', 'rol:coordinacion'])->group(function () {
 
     Route::resource('tutores', TutorController::class)
         ->parameters(['tutores' => 'tutor']);
+
+    Route::resource('causas', CausaController::class)
+        ->parameters(['causas' => 'causa']);
+
+    Route::resource('periodos', PeriodoEvaluacionController::class)
+        ->parameters(['periodos' => 'periodoEvaluacion']);
+
+    Route::get('consolidados', [ConsolidadoController::class, 'coordinacionIndex'])
+        ->name('consolidados.index');
+
+    Route::get('consolidados/periodos/{periodoEvaluacion}/exportar-institucional', [ConsolidadoController::class, 'exportarPeriodoInstitucional'])
+        ->name('consolidados.periodos.exportar-institucional');
+
+    Route::get('consolidados/{consolidado}', [ConsolidadoController::class, 'coordinacionShow'])
+        ->name('consolidados.show');
+
+    Route::patch('consolidados/{consolidado}/observacion', [ConsolidadoController::class, 'guardarObservacion'])
+        ->name('consolidados.observacion');
 
     Route::get('carga-academica/importar', [CargaAcademicaController::class, 'create'])
         ->name('carga-academica.create');
@@ -59,5 +82,34 @@ Route::middleware('auth')->group(function () {
 Route::get('/mis-asignaciones', [MisAsignacionesController::class, 'index'])
     ->middleware(['auth', 'rol:tutor'])
     ->name('mis-asignaciones');
+
+Route::resource('casos', CasoSeguimientoController::class)
+    ->only(['index', 'create', 'store', 'show'])
+    ->parameters(['casos' => 'casoSeguimiento'])
+    ->middleware(['auth', 'rol:tutor']);
+
+Route::get('casos/{casoSeguimiento}/cierre', [CasoSeguimientoController::class, 'cierre'])
+    ->middleware(['auth', 'rol:tutor'])
+    ->name('casos.cierre');
+
+Route::patch('casos/{casoSeguimiento}/cerrar', [CasoSeguimientoController::class, 'cerrar'])
+    ->middleware(['auth', 'rol:tutor'])
+    ->name('casos.cerrar');
+
+Route::get('casos/{casoSeguimiento}/gestiones/create', [GestionCasoController::class, 'create'])
+    ->middleware(['auth', 'rol:tutor'])
+    ->name('gestiones.create');
+
+Route::post('casos/{casoSeguimiento}/gestiones', [GestionCasoController::class, 'store'])
+    ->middleware(['auth', 'rol:tutor'])
+    ->name('gestiones.store');
+
+Route::get('consolidado', [ConsolidadoController::class, 'index'])
+    ->middleware(['auth', 'rol:tutor'])
+    ->name('consolidado.index');
+
+Route::patch('consolidado/entregar', [ConsolidadoController::class, 'entregar'])
+    ->middleware(['auth', 'rol:tutor'])
+    ->name('consolidado.entregar');
 
 require __DIR__ . '/auth.php';

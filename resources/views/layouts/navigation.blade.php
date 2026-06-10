@@ -40,10 +40,18 @@
                         Propuestas
                     </x-nav-link>
 
-                    {{-- Ruta pendiente de implementar --}}
-                    <x-nav-link href="#" :active="false">
+                    <x-nav-link :href="route('periodos.index')" :active="request()->routeIs('periodos.*')">
                         Periodos
                     </x-nav-link>
+
+                    <x-nav-link :href="route('causas.index')" :active="request()->routeIs('causas.*')">
+                        Causas
+                    </x-nav-link>
+
+                    <x-nav-link :href="route('consolidados.index')" :active="request()->routeIs('consolidados.*')">
+                        Consolidados
+                    </x-nav-link>
+
                     @endif
 
                     @if (auth()->user()->rol === 'tutor')
@@ -51,15 +59,15 @@
                         Mis asignaciones
                     </x-nav-link>
 
-                    {{-- Ruta pendiente de implementar --}}
-                    <x-nav-link href="#" :active="false">
+                    <x-nav-link :href="route('consolidado.index')" :active="request()->routeIs('consolidado.*')">
+                        Consolidado
+                    </x-nav-link>
+
+                    <x-nav-link :href="route('casos.index')" :active="request()->routeIs('casos.*')">
                         Casos
                     </x-nav-link>
 
-                    {{-- Ruta pendiente de implementar --}}
-                    <x-nav-link href="#" :active="false">
-                        Consolidado
-                    </x-nav-link>
+
                     @endif
                 </div>
             </div>
@@ -141,10 +149,19 @@
                 Propuestas
             </x-responsive-nav-link>
 
-            {{-- Ruta pendiente de implementar --}}
-            <x-responsive-nav-link href="#" :active="false">
+            <x-responsive-nav-link :href="route('periodos.index')" :active="request()->routeIs('periodos.*')">
                 Periodos
             </x-responsive-nav-link>
+
+            <x-responsive-nav-link :href="route('causas.index')" :active="request()->routeIs('causas.*')">
+                Causas
+            </x-responsive-nav-link>
+
+            <x-responsive-nav-link :href="route('consolidados.index')" :active="request()->routeIs('consolidados.*')">
+                Consolidados
+            </x-responsive-nav-link>
+
+
             @endif
 
             @if (auth()->user()->rol === 'tutor')
@@ -152,15 +169,15 @@
                 Mis asignaciones
             </x-responsive-nav-link>
 
-            {{-- Ruta pendiente de implementar --}}
-            <x-responsive-nav-link href="#" :active="false">
+            <x-responsive-nav-link :href="route('consolidado.index')" :active="request()->routeIs('consolidado.*')">
+                Consolidado
+            </x-responsive-nav-link>
+
+            <x-responsive-nav-link :href="route('casos.index')" :active="request()->routeIs('casos.*')">
                 Casos
             </x-responsive-nav-link>
 
-            {{-- Ruta pendiente de implementar --}}
-            <x-responsive-nav-link href="#" :active="false">
-                Consolidado
-            </x-responsive-nav-link>
+
             @endif
         </div>
 
