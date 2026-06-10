@@ -15,6 +15,7 @@ use App\Http\Controllers\GestionCasoController;
 use App\Http\Controllers\ConsolidadoController;
 use App\Http\Controllers\TableroCumplimientoController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\NotificacionController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -83,6 +84,15 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    Route::get('notificaciones', [NotificacionController::class, 'index'])
+        ->name('notificaciones.index');
+
+    Route::patch('notificaciones/leer-todas', [NotificacionController::class, 'marcarTodasLeidas'])
+        ->name('notificaciones.marcar-todas-leidas');
+
+    Route::patch('notificaciones/{notificacion}/leer', [NotificacionController::class, 'marcarLeida'])
+        ->name('notificaciones.marcar-leida');
 });
 
 Route::get('/mis-asignaciones', [MisAsignacionesController::class, 'index'])

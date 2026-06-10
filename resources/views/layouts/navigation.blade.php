@@ -32,6 +32,16 @@
                         Consolidados
                     </x-nav-link>
 
+                    <x-nav-link :href="route('notificaciones.index')" :active="request()->routeIs('notificaciones.*')">
+                        <span>Notificaciones</span>
+
+                        @if(($totalNotificacionesNoLeidas ?? 0) > 0)
+                        <span class="ml-2 inline-flex min-w-5 items-center justify-center rounded-full bg-orange-100 px-2 py-0.5 text-xs font-semibold text-orange-800">
+                            {{ $totalNotificacionesNoLeidas }}
+                        </span>
+                        @endif
+                    </x-nav-link>
+
                     <div class="hidden sm:flex sm:items-center">
                         <x-dropdown align="left" width="48">
                             <x-slot name="trigger">
@@ -87,6 +97,15 @@
                         Casos
                     </x-nav-link>
 
+                    <x-nav-link :href="route('notificaciones.index')" :active="request()->routeIs('notificaciones.*')">
+                        <span>Notificaciones</span>
+
+                        @if(($totalNotificacionesNoLeidas ?? 0) > 0)
+                        <span class="ml-2 inline-flex min-w-5 items-center justify-center rounded-full bg-orange-100 px-2 py-0.5 text-xs font-semibold text-orange-800">
+                            {{ $totalNotificacionesNoLeidas }}
+                        </span>
+                        @endif
+                    </x-nav-link>
 
                     @endif
                 </div>
@@ -185,6 +204,16 @@
                 Tablero
             </x-responsive-nav-link>
 
+            <x-responsive-nav-link :href="route('notificaciones.index')" :active="request()->routeIs('notificaciones.*')">
+                Notificaciones
+
+                @if(($totalNotificacionesNoLeidas ?? 0) > 0)
+                <span class="ml-2 inline-flex min-w-5 items-center justify-center rounded-full bg-orange-100 px-2 py-0.5 text-xs font-semibold text-orange-800">
+                    {{ $totalNotificacionesNoLeidas }}
+                </span>
+                @endif
+            </x-responsive-nav-link>
+
 
             @endif
 
@@ -199,6 +228,16 @@
 
             <x-responsive-nav-link :href="route('casos.index')" :active="request()->routeIs('casos.*')">
                 Casos
+            </x-responsive-nav-link>
+
+            <x-responsive-nav-link :href="route('notificaciones.index')" :active="request()->routeIs('notificaciones.*')">
+                Notificaciones
+
+                @if(($totalNotificacionesNoLeidas ?? 0) > 0)
+                <span class="ml-2 inline-flex min-w-5 items-center justify-center rounded-full bg-orange-100 px-2 py-0.5 text-xs font-semibold text-orange-800">
+                    {{ $totalNotificacionesNoLeidas }}
+                </span>
+                @endif
             </x-responsive-nav-link>
 
 
