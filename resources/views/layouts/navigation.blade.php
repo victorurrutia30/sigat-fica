@@ -72,6 +72,10 @@
                                     Usuarios
                                 </x-dropdown-link>
 
+                                <x-dropdown-link :href="route('docentes-detectados.index')">
+                                    Docentes detectados
+                                </x-dropdown-link>
+
                                 <x-dropdown-link :href="route('carga-academica.create')">
                                     Carga académica
                                 </x-dropdown-link>
@@ -180,6 +184,10 @@
 
             <x-responsive-nav-link :href="route('tutores.index')" :active="request()->routeIs('tutores.*')">
                 Tutores
+            </x-responsive-nav-link>
+
+            <x-responsive-nav-link :href="route('docentes-detectados.index')" :active="request()->routeIs('docentes-detectados.*')">
+                Docentes detectados
             </x-responsive-nav-link>
 
             <x-responsive-nav-link :href="route('materias.index')" :active="request()->routeIs('materias.*')">
