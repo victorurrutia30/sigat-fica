@@ -81,7 +81,11 @@ class PropuestaAsignacionService
     {
         return Tutor::query()
             ->where('activo', true)
-            ->where('tiempo_completo', true)
+            ->where('habilitado_para_tutorias', true)
+            ->where(function ($query) {
+                $query->where('tiempo_completo', true)
+                    ->orWhere('es_excepcion_tutoria', true);
+            })
             ->orderBy('nombre_completo')
             ->get();
     }
@@ -350,9 +354,9 @@ class PropuestaAsignacionService
     {
         $tutor = Tutor::query()->findOrFail($tutorId);
 
-        if (! $tutor->activo || ! $tutor->tiempo_completo) {
+        if (! $tutor->puedeAsignarseComoTutor()) {
             throw ValidationException::withMessages([
-                'tutor_id' => 'Solo se pueden asignar tutores DTC activos.',
+                'tutor_id' => 'Solo se pueden asignar tutores activos, habilitados por Coordinación y que sean DTC o excepción autorizada.',
             ]);
         }
 

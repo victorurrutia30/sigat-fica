@@ -1,14 +1,14 @@
 @csrf
 
 <div class="mb-5 rounded-md border border-utec-gray-medium bg-utec-primary-soft px-4 py-3 text-sm text-utec-gray-dark">
-    Solo se registran tutores que sean <span class="font-semibold">Docentes de Tiempo Completo</span>.
-    La cuenta de usuario es opcional y puede vincularse después.
+    Antes de crear un tutor, busca primero por código o nombre en el catálogo.
+    Si ya existe, edita el registro existente. Por regla general los tutores deben ser <span class="font-semibold">DTC</span>; si no lo son, debe registrarse una excepción autorizada con motivo.
 </div>
 
 <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
     <div>
         <label for="codigo_empleado" class="form-label">
-            Código de empleado <span class="text-red-500">*</span>
+            Código de empleado / docente <span class="text-red-500">*</span>
         </label>
         <input
             type="text"
@@ -17,11 +17,14 @@
             value="{{ old('codigo_empleado', $tutor->codigo_empleado ?? '') }}"
             class="input-field uppercase"
             maxlength="30"
-            placeholder="Ej. DTC-006"
+            placeholder="Ej. 12345"
             required>
         @error('codigo_empleado')
         <p class="form-error">{{ $message }}</p>
         @enderror
+        <p class="form-hint">
+            Si viene de carga académica, usa el mismo código docente para poder validar choques con sus clases.
+        </p>
     </div>
 
     <div>
@@ -62,7 +65,7 @@
 
     <div>
         <label for="departamento" class="form-label">
-            Departamento
+            Departamento / área
         </label>
         <input
             type="text"
@@ -75,6 +78,26 @@
         @error('departamento')
         <p class="form-error">{{ $message }}</p>
         @enderror
+    </div>
+
+    <div>
+        <label for="categoria_docente" class="form-label">
+            Categoría docente
+        </label>
+        <input
+            type="text"
+            name="categoria_docente"
+            id="categoria_docente"
+            value="{{ old('categoria_docente', $tutor->categoria_docente ?? '') }}"
+            class="input-field uppercase"
+            maxlength="30"
+            placeholder="Ej. DTC, DHC, COO, TEC">
+        @error('categoria_docente')
+        <p class="form-error">{{ $message }}</p>
+        @enderror
+        <p class="form-hint">
+            Dato usado para diferenciar DTC de excepciones autorizadas.
+        </p>
     </div>
 
     <div>
@@ -126,17 +149,88 @@
         </label>
     </div>
 
-    <div class="flex items-end">
-        <div>
-            <input type="hidden" name="tiempo_completo" value="1">
-            <span class="badge-success">DTC confirmado</span>
-            <p class="form-hint mt-2">
-                RN-01: solo Docentes de Tiempo Completo pueden ser tutores.
-            </p>
-            @error('tiempo_completo')
+    <div class="md:col-span-2 rounded-md border border-utec-gray-medium bg-gray-50 p-4">
+        <p class="text-sm font-semibold text-utec-gray-dark">
+            Habilitación para propuesta
+        </p>
+
+        <div class="mt-4 grid gap-4 md:grid-cols-3">
+            <label class="inline-flex items-start gap-2">
+                <input type="hidden" name="tiempo_completo" value="0">
+                <input
+                    type="checkbox"
+                    name="tiempo_completo"
+                    value="1"
+                    class="mt-1 rounded border-utec-gray-medium text-utec-primary focus:ring-utec-primary-light"
+                    @checked((bool) old('tiempo_completo', $tutor->tiempo_completo ?? true))
+                >
+                <span>
+                    <span class="block text-sm font-medium text-utec-gray-dark">Docente de Tiempo Completo</span>
+                    <span class="block text-xs text-gray-500">Regla principal para asignación.</span>
+                </span>
+            </label>
+
+            <label class="inline-flex items-start gap-2">
+                <input type="hidden" name="habilitado_para_tutorias" value="0">
+                <input
+                    type="checkbox"
+                    name="habilitado_para_tutorias"
+                    value="1"
+                    class="mt-1 rounded border-utec-gray-medium text-utec-primary focus:ring-utec-primary-light"
+                    @checked((bool) old('habilitado_para_tutorias', $tutor->habilitado_para_tutorias ?? true))
+                >
+                <span>
+                    <span class="block text-sm font-medium text-utec-gray-dark">Habilitado para tutorías</span>
+                    <span class="block text-xs text-gray-500">Si está desmarcado, no aparecerá en propuesta.</span>
+                </span>
+            </label>
+
+            <label class="inline-flex items-start gap-2">
+                <input type="hidden" name="es_excepcion_tutoria" value="0">
+                <input
+                    type="checkbox"
+                    name="es_excepcion_tutoria"
+                    value="1"
+                    class="mt-1 rounded border-utec-gray-medium text-utec-primary focus:ring-utec-primary-light"
+                    @checked((bool) old('es_excepcion_tutoria', $tutor->es_excepcion_tutoria ?? false))
+                >
+                <span>
+                    <span class="block text-sm font-medium text-utec-gray-dark">Excepción autorizada</span>
+                    <span class="block text-xs text-gray-500">Usar solo si no es DTC.</span>
+                </span>
+            </label>
+        </div>
+
+        <div class="mt-4">
+            <label for="motivo_excepcion_tutoria" class="form-label">
+                Motivo de excepción
+            </label>
+            <textarea
+                name="motivo_excepcion_tutoria"
+                id="motivo_excepcion_tutoria"
+                rows="3"
+                class="input-field"
+                maxlength="1000"
+                placeholder="Ej. Coordinación autorizó apoyo temporal por disponibilidad de especialistas.">{{ old('motivo_excepcion_tutoria', $tutor->motivo_excepcion_tutoria ?? '') }}</textarea>
+            @error('motivo_excepcion_tutoria')
             <p class="form-error">{{ $message }}</p>
             @enderror
+            <p class="form-hint">
+                Obligatorio si el tutor no es DTC y se marca como excepción autorizada.
+            </p>
         </div>
+
+        @error('tiempo_completo')
+        <p class="form-error mt-2">{{ $message }}</p>
+        @enderror
+
+        @error('habilitado_para_tutorias')
+        <p class="form-error mt-2">{{ $message }}</p>
+        @enderror
+
+        @error('es_excepcion_tutoria')
+        <p class="form-error mt-2">{{ $message }}</p>
+        @enderror
     </div>
 </div>
 

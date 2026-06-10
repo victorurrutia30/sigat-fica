@@ -3,7 +3,7 @@
         <div class="flex items-center justify-between">
             <div>
                 <h2 class="text-xl font-bold text-utec-primary">Tutores</h2>
-                <p class="text-sm text-gray-500">Catálogo de Docentes de Tiempo Completo asignables como tutores.</p>
+                <p class="text-sm text-gray-500">Catálogo de personas habilitadas por Coordinación para asignaciones de tutoría.</p>
             </div>
 
             <a href="{{ route('tutores.create') }}" class="btn-primary">
@@ -37,7 +37,7 @@
                                 id="busqueda"
                                 value="{{ $busqueda }}"
                                 class="input-field"
-                                placeholder="Código, nombre, correo o departamento">
+                                placeholder="Código, nombre, correo, departamento o categoría">
                         </div>
 
                         <div>
@@ -67,7 +67,7 @@
                                     <th class="th-utec">Código</th>
                                     <th class="th-utec">Tutor</th>
                                     <th class="th-utec">Correo</th>
-                                    <th class="th-utec">Departamento</th>
+                                    <th class="th-utec">Área / categoría</th>
                                     <th class="th-utec">Cuenta</th>
                                     <th class="th-utec">Estado</th>
                                     <th class="th-utec text-right">Acciones</th>
@@ -80,14 +80,37 @@
                                         {{ $tutor->codigo_empleado }}
                                     </td>
                                     <td class="td-utec">
-                                        {{ $tutor->nombre_completo }}
-                                        <span class="ml-2 badge-success">DTC</span>
+                                        <div class="font-semibold text-utec-gray-dark">
+                                            {{ $tutor->nombre_completo }}
+                                        </div>
+
+                                        <div class="mt-1 flex flex-wrap gap-1">
+                                            @if($tutor->tiempo_completo)
+                                            <span class="badge-success">DTC</span>
+                                            @elseif($tutor->es_excepcion_tutoria)
+                                            <span class="badge-warning">Excepción</span>
+                                            @else
+                                            <span class="badge-muted">No DTC</span>
+                                            @endif
+
+                                            @if($tutor->habilitado_para_tutorias)
+                                            <span class="badge-info">Habilitado</span>
+                                            @else
+                                            <span class="badge-muted">No habilitado</span>
+                                            @endif
+                                        </div>
                                     </td>
                                     <td class="td-utec">
                                         {{ $tutor->correo_institucional }}
                                     </td>
                                     <td class="td-utec">
-                                        {{ $tutor->departamento ?: 'No definido' }}
+                                        <div>{{ $tutor->departamento ?: 'No definido' }}</div>
+
+                                        @if($tutor->categoria_docente)
+                                        <div class="mt-1 text-xs text-gray-500">
+                                            CAT DOC: {{ $tutor->categoria_docente }}
+                                        </div>
+                                        @endif
                                     </td>
                                     <td class="td-utec">
                                         @if($tutor->usuario)
@@ -105,28 +128,41 @@
                                         @endif
                                     </td>
                                     <td class="td-utec">
-                                        <div class="flex justify-end gap-2">
+                                        <div class="flex flex-wrap items-center gap-2">
                                             @if(! $tutor->trashed())
                                             <a href="{{ route('tutores.show', $tutor) }}" class="link-utec">
                                                 Ver
                                             </a>
+                                            @endif
 
+                                            @if(! $tutor->trashed() && $tutor->activo)
                                             <a href="{{ route('tutores.edit', $tutor) }}" class="link-utec">
                                                 Editar
                                             </a>
 
-                                            <form method="POST" action="{{ route('tutores.destroy', $tutor) }}">
+                                            <form
+                                                action="{{ route('tutores.destroy', $tutor) }}"
+                                                method="POST"
+                                                onsubmit="return confirm('¿Deseas desactivar este tutor? No se eliminará físicamente.');">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button
-                                                    type="submit"
-                                                    class="text-sm font-medium text-red-700 hover:text-red-900"
-                                                    onclick="return confirm('¿Seguro que deseas desactivar este tutor?')">
+
+                                                <button type="submit" class="text-sm font-medium text-red-700 hover:text-red-900">
                                                     Desactivar
                                                 </button>
                                             </form>
                                             @else
-                                            <span class="text-sm text-gray-400">Sin acciones</span>
+                                            <form
+                                                action="{{ route('tutores.reactivar', $tutor->id) }}"
+                                                method="POST"
+                                                onsubmit="return confirm('¿Deseas reactivar este tutor?');">
+                                                @csrf
+                                                @method('PATCH')
+
+                                                <button type="submit" class="text-sm font-medium text-utec-primary hover:text-utec-primary-dark">
+                                                    Reactivar
+                                                </button>
+                                            </form>
                                             @endif
                                         </div>
                                     </td>

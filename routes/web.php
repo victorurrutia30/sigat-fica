@@ -35,6 +35,10 @@ Route::middleware(['auth', 'verified', 'rol:coordinacion'])->group(function () {
 
     Route::resource('materias', MateriaController::class);
 
+    Route::patch('tutores/{tutor}/reactivar', [TutorController::class, 'reactivar'])
+        ->withTrashed()
+        ->name('tutores.reactivar');
+
     Route::resource('tutores', TutorController::class)
         ->parameters(['tutores' => 'tutor']);
 

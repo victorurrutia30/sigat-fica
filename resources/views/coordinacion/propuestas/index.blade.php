@@ -6,7 +6,7 @@
                     Propuesta de asignación
                 </h2>
                 <p class="text-sm text-gray-500">
-                    Asigna tutores DTC a secciones gestionadas por Coordinación para el ciclo activo.
+                    Asigna tutores habilitados por Coordinación a secciones gestionadas para el ciclo activo.
                 </p>
             </div>
 
@@ -112,7 +112,7 @@
                                 Secciones candidatas
                             </h3>
                             <p class="mt-1 text-sm text-gray-500">
-                                Se muestran materias gestionadas por Coordinación y secciones que requieren tutor.
+                                Se muestran materias gestionadas por Coordinación y secciones que requieren tutor. Solo pueden asignarse tutores activos, DTC o con excepción autorizada.
                             </p>
                         </div>
                     </div>
@@ -240,6 +240,9 @@
                                                         <option value="{{ $tutor->id }}"
                                                             @selected((string) old('tutor_id', $item?->tutor_id) === (string) $tutor->id)>
                                                             {{ $tutor->nombre_completo }}
+                                                            @if(! $tutor->tiempo_completo && $tutor->es_excepcion_tutoria)
+                                                            — Excepción
+                                                            @endif{{ $tutor->nombre_completo }}
                                                         </option>
                                                         @endforeach
                                                     </select>

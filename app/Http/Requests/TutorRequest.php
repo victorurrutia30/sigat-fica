@@ -2,8 +2,11 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Tutor;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Validator;
+
 
 class TutorRequest extends FormRequest
 {
@@ -38,9 +41,17 @@ class TutorRequest extends FormRequest
             ]);
         }
 
-        $this->merge([
-            'tiempo_completo' => true,
-        ]);
+        if ($this->filled('categoria_docente')) {
+            $this->merge([
+                'categoria_docente' => strtoupper(trim($this->input('categoria_docente'))),
+            ]);
+        }
+
+        if ($this->filled('motivo_excepcion_tutoria')) {
+            $this->merge([
+                'motivo_excepcion_tutoria' => trim($this->input('motivo_excepcion_tutoria')),
+            ]);
+        }
     }
 
     public function rules(): array
@@ -78,18 +89,88 @@ class TutorRequest extends FormRequest
                 'string',
                 'max:100',
             ],
+            'categoria_docente' => [
+                'nullable',
+                'string',
+                'max:30',
+            ],
             'fecha_contratacion' => [
                 'nullable',
                 'date',
             ],
             'tiempo_completo' => [
-                'accepted',
+                'nullable',
+                'boolean',
+            ],
+            'habilitado_para_tutorias' => [
+                'nullable',
+                'boolean',
+            ],
+            'es_excepcion_tutoria' => [
+                'nullable',
+                'boolean',
+            ],
+            'motivo_excepcion_tutoria' => [
+                'nullable',
+                'string',
+                'max:1000',
             ],
             'activo' => [
                 'nullable',
                 'boolean',
             ],
         ];
+    }
+
+    public function withValidator(Validator $validator): void
+    {
+        $validator->after(function (Validator $validator) {
+
+            $tutorActual = $this->route('tutor');
+            $codigoEmpleado = trim((string) $this->input('codigo_empleado'));
+
+            if ($codigoEmpleado !== '') {
+                $codigoYaExiste = Tutor::withTrashed()
+                    ->where('codigo_empleado', $codigoEmpleado)
+                    ->when($tutorActual, function ($query) use ($tutorActual) {
+                        $query->whereKeyNot($tutorActual->id);
+                    })
+                    ->exists();
+
+                if ($codigoYaExiste) {
+                    $validator->errors()->add(
+                        'codigo_empleado',
+                        'Ya existe un tutor con este código de empleado/docente. Busca el registro existente y edítalo.'
+                    );
+                }
+            }
+
+            $tiempoCompleto = $this->boolean('tiempo_completo');
+            $habilitado = $this->boolean('habilitado_para_tutorias');
+            $esExcepcion = $this->boolean('es_excepcion_tutoria');
+            $motivo = trim((string) $this->input('motivo_excepcion_tutoria'));
+
+            if ($habilitado && ! $tiempoCompleto && ! $esExcepcion) {
+                $validator->errors()->add(
+                    'habilitado_para_tutorias',
+                    'Para habilitar a un tutor que no es DTC, debes marcar excepción autorizada.'
+                );
+            }
+
+            if ($esExcepcion && $tiempoCompleto) {
+                $validator->errors()->add(
+                    'es_excepcion_tutoria',
+                    'Un DTC no necesita marcarse como excepción.'
+                );
+            }
+
+            if ($esExcepcion && $motivo === '') {
+                $validator->errors()->add(
+                    'motivo_excepcion_tutoria',
+                    'El motivo de excepción es obligatorio cuando el tutor no es DTC.'
+                );
+            }
+        });
     }
 
     public function messages(): array
@@ -116,9 +197,16 @@ class TutorRequest extends FormRequest
             'departamento.string' => 'El departamento debe ser texto.',
             'departamento.max' => 'El departamento no debe superar los 100 caracteres.',
 
+            'categoria_docente.string' => 'La categoría docente debe ser texto.',
+            'categoria_docente.max' => 'La categoría docente no debe superar los 30 caracteres.',
+
             'fecha_contratacion.date' => 'La fecha de contratación no tiene un formato válido.',
 
-            'tiempo_completo.accepted' => 'Solo los Docentes de Tiempo Completo pueden registrarse como tutores.',
+            'tiempo_completo.boolean' => 'El valor de DTC no tiene un formato válido.',
+            'habilitado_para_tutorias.boolean' => 'El valor de habilitación para tutorías no tiene un formato válido.',
+            'es_excepcion_tutoria.boolean' => 'El valor de excepción no tiene un formato válido.',
+            'motivo_excepcion_tutoria.string' => 'El motivo de excepción debe ser texto.',
+            'motivo_excepcion_tutoria.max' => 'El motivo de excepción no debe superar los 1000 caracteres.',
 
             'activo.boolean' => 'El estado activo no tiene un valor válido.',
         ];
@@ -132,8 +220,12 @@ class TutorRequest extends FormRequest
             'nombre_completo' => 'nombre completo',
             'correo_institucional' => 'correo institucional',
             'departamento' => 'departamento',
+            'categoria_docente' => 'categoría docente',
             'fecha_contratacion' => 'fecha de contratación',
             'tiempo_completo' => 'docente de tiempo completo',
+            'habilitado_para_tutorias' => 'habilitado para tutorías',
+            'es_excepcion_tutoria' => 'excepción autorizada',
+            'motivo_excepcion_tutoria' => 'motivo de excepción',
             'activo' => 'activo',
         ];
     }
