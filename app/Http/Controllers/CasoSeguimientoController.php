@@ -47,6 +47,7 @@ class CasoSeguimientoController extends Controller
         try {
             $periodo = $casoService->obtenerPeriodoActivo();
             $tutor = $casoService->obtenerTutorDelUsuario($request->user());
+            $casoService->validarConsolidadoEditable($tutor, $periodo);
             $secciones = $casoService->seccionesAsignadasParaTutor($tutor, $periodo);
         } catch (ValidationException $exception) {
             return redirect()
@@ -109,6 +110,11 @@ class CasoSeguimientoController extends Controller
         CasoSeguimientoService $casoService
     ): View|RedirectResponse {
         $casoService->validarAccesoTutor($casoSeguimiento, $request->user());
+
+        $casoSeguimiento->loadMissing('periodoEvaluacion');
+
+        $tutor = $casoService->obtenerTutorDelUsuario($request->user());
+        $casoService->validarConsolidadoEditable($tutor, $casoSeguimiento->periodoEvaluacion);
 
         $casoSeguimiento->load([
             'periodoEvaluacion.ciclo',

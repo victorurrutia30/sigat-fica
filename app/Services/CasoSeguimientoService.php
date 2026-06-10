@@ -13,6 +13,7 @@ use App\Models\User;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
+use App\Models\Consolidado;
 
 
 class CasoSeguimientoService
@@ -105,6 +106,7 @@ class CasoSeguimientoService
         return DB::transaction(function () use ($usuario, $datos) {
             $periodo = $this->obtenerPeriodoActivo();
             $tutor = $this->obtenerTutorDelUsuario($usuario);
+            $this->validarConsolidadoEditable($tutor, $periodo);
 
             $seccionesAsignadas = $this->seccionesAsignadasParaTutor($tutor, $periodo);
             $seccionId = (int) $datos['seccion_id'];
@@ -176,6 +178,11 @@ class CasoSeguimientoService
         return DB::transaction(function () use ($caso, $usuario, $datos) {
             $this->validarAccesoTutor($caso, $usuario);
 
+            $caso->loadMissing('periodoEvaluacion');
+
+            $tutor = $this->obtenerTutorDelUsuario($usuario);
+            $this->validarConsolidadoEditable($tutor, $caso->periodoEvaluacion);
+
             if ($caso->cerrado) {
                 throw ValidationException::withMessages([
                     'caso' => 'Este caso ya se encuentra cerrado.',
@@ -235,6 +242,24 @@ class CasoSeguimientoService
 
         if ((int) $caso->tutor_id !== (int) $tutor->id) {
             abort(403, 'No tienes permiso para acceder a este caso.');
+        }
+    }
+
+    public function validarConsolidadoEditable(Tutor $tutor, PeriodoEvaluacion $periodo): void
+    {
+        $consolidado = Consolidado::query()
+            ->where('periodo_evaluacion_id', $periodo->id)
+            ->where('tutor_id', $tutor->id)
+            ->first();
+
+        if (! $consolidado) {
+            return;
+        }
+
+        if ($consolidado->estado_entrega === 'entregado') {
+            throw ValidationException::withMessages([
+                'consolidado' => 'No se pueden modificar casos porque el consolidado ya fue entregado. Solicita a Coordinación devolverlo con observaciones.',
+            ]);
         }
     }
 }

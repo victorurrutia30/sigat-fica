@@ -19,6 +19,11 @@ class GestionCasoController extends Controller
     ): View {
         $casoService->validarAccesoTutor($casoSeguimiento, $request->user());
 
+        $casoSeguimiento->loadMissing('periodoEvaluacion');
+
+        $tutor = $casoService->obtenerTutorDelUsuario($request->user());
+        $casoService->validarConsolidadoEditable($tutor, $casoSeguimiento->periodoEvaluacion);
+
         if ($casoSeguimiento->cerrado) {
             abort(403, 'No se pueden agregar gestiones a un caso cerrado.');
         }
@@ -43,6 +48,18 @@ class GestionCasoController extends Controller
         CasoSeguimientoService $casoService
     ): RedirectResponse {
         $casoService->validarAccesoTutor($casoSeguimiento, $request->user());
+
+        $casoSeguimiento->loadMissing('periodoEvaluacion');
+
+        $tutor = $casoService->obtenerTutorDelUsuario($request->user());
+
+        try {
+            $casoService->validarConsolidadoEditable($tutor, $casoSeguimiento->periodoEvaluacion);
+        } catch (\Illuminate\Validation\ValidationException $exception) {
+            return redirect()
+                ->route('casos.show', $casoSeguimiento)
+                ->with('error', collect($exception->errors())->flatten()->first());
+        }
 
         if ($casoSeguimiento->cerrado) {
             return redirect()
