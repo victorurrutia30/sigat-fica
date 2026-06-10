@@ -95,7 +95,6 @@
                                     <th class="th-utec">Horario</th>
                                     <th class="th-utec">Aula</th>
                                     <th class="th-utec">Docente titular</th>
-                                    <th class="th-utec">Observaciones</th>
                                 </tr>
                             </thead>
 
@@ -115,11 +114,7 @@
                                             {{ $materia?->codigo ?? 'Sin código' }}
                                         </div>
 
-                                        @if($asignacion->prioridad)
-                                        <div class="mt-2">
-                                            <span class="badge-warning">Prioritaria</span>
-                                        </div>
-                                        @endif
+
                                     </td>
 
                                     <td class="td-utec align-top">
@@ -194,9 +189,7 @@
                                         @endif
                                     </td>
 
-                                    <td class="td-utec align-top">
-                                        {{ $asignacion->observaciones ?: 'Sin observaciones' }}
-                                    </td>
+
                                 </tr>
                                 @endforeach
                             </tbody>

@@ -214,7 +214,7 @@ return [
 
         'V' => [
             'modalidad' => 'virtual',
-            'requiere_tutor' => false,
+            'requiere_tutor' => true,
             'importar' => true,
             'requiere_horario' => false,
         ],

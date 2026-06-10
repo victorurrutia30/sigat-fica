@@ -4,8 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\CicloRequest;
 use App\Models\Ciclo;
+use App\Services\CicloService;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
 class CicloController extends Controller
@@ -33,18 +34,16 @@ class CicloController extends Controller
         return view('coordinacion.ciclos.create');
     }
 
-    public function store(CicloRequest $request): RedirectResponse
+    public function store(CicloRequest $request, CicloService $cicloService): RedirectResponse
     {
-        DB::transaction(function () use ($request) {
-            $datos = $request->validated();
-            $datos['activo'] = $request->boolean('activo');
-
-            if ($datos['activo']) {
-                Ciclo::query()->update(['activo' => false]);
-            }
-
-            Ciclo::create($datos);
-        });
+        try {
+            $cicloService->crear($request->validated());
+        } catch (ValidationException $exception) {
+            return back()
+                ->withInput()
+                ->withErrors($exception->errors())
+                ->with('error', collect($exception->errors())->flatten()->first());
+        }
 
         return redirect()
             ->route('ciclos.index')
@@ -67,35 +66,38 @@ class CicloController extends Controller
         return view('coordinacion.ciclos.edit', compact('ciclo'));
     }
 
-    public function update(CicloRequest $request, Ciclo $ciclo): RedirectResponse
-    {
-        DB::transaction(function () use ($request, $ciclo) {
-            $datos = $request->validated();
-            $datos['activo'] = $request->boolean('activo');
-
-            if ($datos['activo']) {
-                Ciclo::query()
-                    ->whereKeyNot($ciclo->id)
-                    ->update(['activo' => false]);
-            }
-
-            $ciclo->update($datos);
-        });
+    public function update(
+        CicloRequest $request,
+        Ciclo $ciclo,
+        CicloService $cicloService
+    ): RedirectResponse {
+        try {
+            $cicloService->actualizar(
+                ciclo: $ciclo,
+                datos: $request->validated()
+            );
+        } catch (ValidationException $exception) {
+            return back()
+                ->withInput()
+                ->withErrors($exception->errors())
+                ->with('error', collect($exception->errors())->flatten()->first());
+        }
 
         return redirect()
             ->route('ciclos.index')
             ->with('success', 'Ciclo académico actualizado correctamente.');
     }
 
-    public function destroy(Ciclo $ciclo): RedirectResponse
+    public function destroy(Ciclo $ciclo, CicloService $cicloService): RedirectResponse
     {
-        if (! $ciclo->activo) {
+        try {
+            $cicloService->desactivar($ciclo);
+        } catch (ValidationException $exception) {
             return redirect()
                 ->route('ciclos.index')
-                ->with('error', 'El ciclo ya se encuentra inactivo.');
+                ->withErrors($exception->errors())
+                ->with('error', collect($exception->errors())->flatten()->first());
         }
-
-        $ciclo->update(['activo' => false]);
 
         return redirect()
             ->route('ciclos.index')

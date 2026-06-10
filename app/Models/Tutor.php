@@ -20,8 +20,13 @@ class Tutor extends Model
         'nombre_completo',
         'correo_institucional',
         'departamento',
+        'categoria_docente',
         'fecha_contratacion',
         'tiempo_completo',
+        'habilitado_para_tutorias',
+        'es_excepcion_tutoria',
+        'motivo_excepcion_tutoria',
+        'origen_registro',
         'activo',
     ];
 
@@ -30,6 +35,8 @@ class Tutor extends Model
         return [
             'fecha_contratacion' => 'date',
             'tiempo_completo' => 'boolean',
+            'habilitado_para_tutorias' => 'boolean',
+            'es_excepcion_tutoria' => 'boolean',
             'activo' => 'boolean',
         ];
     }
@@ -52,5 +59,25 @@ class Tutor extends Model
     public function consolidados(): HasMany
     {
         return $this->hasMany(Consolidado::class, 'tutor_id');
+    }
+
+    public function puedeAsignarseComoTutor(): bool
+    {
+        return $this->activo
+            && $this->habilitado_para_tutorias
+            && ($this->tiempo_completo || $this->es_excepcion_tutoria);
+    }
+
+    public function tipoHabilitacion(): string
+    {
+        if ($this->tiempo_completo) {
+            return 'DTC';
+        }
+
+        if ($this->es_excepcion_tutoria) {
+            return 'Excepción autorizada';
+        }
+
+        return 'No habilitado';
     }
 }

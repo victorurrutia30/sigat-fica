@@ -2,8 +2,11 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Ciclo;
+use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Validator;
 
 class CicloRequest extends FormRequest
 {
@@ -27,6 +30,7 @@ class CicloRequest extends FormRequest
     public function rules(): array
     {
         $ciclo = $this->route('ciclo');
+        $anioActual = now()->year;
 
         return [
             'nombre' => [
@@ -38,8 +42,8 @@ class CicloRequest extends FormRequest
             'anio' => [
                 'required',
                 'integer',
-                'min:2020',
-                'max:2035',
+                'min:' . ($anioActual - 1),
+                'max:' . ($anioActual + 1),
             ],
             'periodo' => [
                 'required',
@@ -62,6 +66,54 @@ class CicloRequest extends FormRequest
         ];
     }
 
+    public function withValidator(Validator $validator): void
+    {
+        $validator->after(function (Validator $validator) {
+            if ($validator->errors()->isNotEmpty()) {
+                return;
+            }
+
+            $ciclo = $this->route('ciclo');
+            $anio = (int) $this->input('anio');
+
+            $fechaInicio = $this->fechaValida($this->input('fecha_inicio'));
+            $fechaFin = $this->fechaValida($this->input('fecha_fin'));
+
+            if (! $fechaInicio || ! $fechaFin) {
+                return;
+            }
+
+            if ((int) $fechaInicio->year !== $anio) {
+                $validator->errors()->add(
+                    'fecha_inicio',
+                    'La fecha de inicio debe pertenecer al mismo año académico seleccionado.'
+                );
+            }
+
+            if ((int) $fechaFin->year !== $anio) {
+                $validator->errors()->add(
+                    'fecha_fin',
+                    'La fecha de fin debe pertenecer al mismo año académico seleccionado.'
+                );
+            }
+
+            $existeTraslape = Ciclo::query()
+                ->when($ciclo, function ($query) use ($ciclo) {
+                    $query->whereKeyNot($ciclo->id);
+                })
+                ->whereDate('fecha_inicio', '<=', $fechaFin->toDateString())
+                ->whereDate('fecha_fin', '>=', $fechaInicio->toDateString())
+                ->exists();
+
+            if ($existeTraslape) {
+                $validator->errors()->add(
+                    'fecha_inicio',
+                    'Las fechas del ciclo académico se traslapan con otro ciclo existente.'
+                );
+            }
+        });
+    }
+
     public function messages(): array
     {
         return [
@@ -72,8 +124,8 @@ class CicloRequest extends FormRequest
 
             'anio.required' => 'El año del ciclo es obligatorio.',
             'anio.integer' => 'El año debe ser un número entero.',
-            'anio.min' => 'El año no puede ser menor que 2020.',
-            'anio.max' => 'El año no puede ser mayor que 2035.',
+            'anio.min' => 'Solo se pueden crear ciclos desde el año anterior al actual.',
+            'anio.max' => 'Solo se pueden crear ciclos hasta el año siguiente al actual.',
 
             'periodo.required' => 'El ciclo es obligatorio.',
             'periodo.integer' => 'El ciclo debe ser un número válido.',
@@ -105,5 +157,18 @@ class CicloRequest extends FormRequest
     private function construirNombreCiclo(int $anio, int $periodo): string
     {
         return sprintf('%d-%02d', $anio, $periodo);
+    }
+
+    private function fechaValida(?string $fecha): ?CarbonImmutable
+    {
+        if (blank($fecha)) {
+            return null;
+        }
+
+        try {
+            return CarbonImmutable::parse($fecha)->startOfDay();
+        } catch (\Throwable) {
+            return null;
+        }
     }
 }

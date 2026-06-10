@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Validator;
 
 class CasoSeguimientoRequest extends FormRequest
 {
@@ -13,43 +14,55 @@ class CasoSeguimientoRequest extends FormRequest
 
     protected function prepareForValidation(): void
     {
+        $carneNormalizado = null;
+        $correoNormalizado = null;
+
         if ($this->filled('carne')) {
-            $this->merge([
-                'carne' => strtoupper(trim($this->input('carne'))),
-            ]);
-        }
+            $digitosCarne = $this->digitosCarne((string) $this->input('carne'));
 
-        if ($this->filled('nombres')) {
-            $this->merge([
-                'nombres' => trim($this->input('nombres')),
-            ]);
-        }
-
-        if ($this->filled('apellidos')) {
-            $this->merge([
-                'apellidos' => trim($this->input('apellidos')),
-            ]);
-        }
-
-        $nombres = trim((string) $this->input('nombres'));
-        $apellidos = trim((string) $this->input('apellidos'));
-
-        if ($nombres !== '' || $apellidos !== '') {
-            $this->merge([
-                'nombre_completo' => trim($nombres . ' ' . $apellidos),
-            ]);
+            if (strlen($digitosCarne) === 10) {
+                $carneNormalizado = $this->formatearCarne($digitosCarne);
+                $correoNormalizado = $this->correoDesdeCarne($digitosCarne);
+            } else {
+                $carneNormalizado = strtoupper(trim((string) $this->input('carne')));
+            }
         }
 
         if ($this->filled('correo')) {
-            $this->merge([
-                'correo' => strtolower(trim($this->input('correo'))),
-            ]);
+            $correoNormalizado = strtolower(trim((string) $this->input('correo')));
+        }
+
+        $merge = [];
+
+        if ($carneNormalizado !== null) {
+            $merge['carne'] = $carneNormalizado;
+        }
+
+        if ($correoNormalizado !== null) {
+            $merge['correo'] = $correoNormalizado;
+        }
+
+        if ($this->filled('nombres')) {
+            $merge['nombres'] = trim((string) $this->input('nombres'));
+        }
+
+        if ($this->filled('apellidos')) {
+            $merge['apellidos'] = trim((string) $this->input('apellidos'));
+        }
+
+        $nombres = trim((string) ($merge['nombres'] ?? $this->input('nombres')));
+        $apellidos = trim((string) ($merge['apellidos'] ?? $this->input('apellidos')));
+
+        if ($nombres !== '' || $apellidos !== '') {
+            $merge['nombre_completo'] = trim($nombres . ' ' . $apellidos);
         }
 
         if ($this->filled('carrera')) {
-            $this->merge([
-                'carrera' => trim($this->input('carrera')),
-            ]);
+            $merge['carrera'] = trim((string) $this->input('carrera'));
+        }
+
+        if (! empty($merge)) {
+            $this->merge($merge);
         }
     }
 
@@ -82,7 +95,7 @@ class CasoSeguimientoRequest extends FormRequest
                 'max:200',
             ],
             'correo' => [
-                'nullable',
+                'required',
                 'email',
                 'max:191',
             ],
@@ -92,6 +105,42 @@ class CasoSeguimientoRequest extends FormRequest
                 'max:150',
             ],
         ];
+    }
+
+    public function withValidator(Validator $validator): void
+    {
+        $validator->after(function (Validator $validator) {
+            $digitosCarne = $this->digitosCarne((string) $this->input('carne'));
+
+            if (strlen($digitosCarne) !== 10) {
+                $validator->errors()->add(
+                    'carne',
+                    'El carné debe contener exactamente 10 dígitos. Ejemplo: 27-4855-2026.'
+                );
+
+                return;
+            }
+
+            $anioIngreso = (int) substr($digitosCarne, 6, 4);
+            $anioActual = now()->year;
+
+            if ($anioIngreso < 1990 || $anioIngreso > $anioActual) {
+                $validator->errors()->add(
+                    'carne',
+                    'El año de ingreso del carné no es válido.'
+                );
+            }
+
+            $correoEsperado = $this->correoDesdeCarne($digitosCarne);
+            $correoIngresado = strtolower(trim((string) $this->input('correo')));
+
+            if ($correoIngresado !== $correoEsperado) {
+                $validator->errors()->add(
+                    'correo',
+                    "El correo institucional debe ser {$correoEsperado}."
+                );
+            }
+        });
     }
 
     public function messages(): array
@@ -117,6 +166,7 @@ class CasoSeguimientoRequest extends FormRequest
             'nombre_completo.string' => 'El nombre completo debe ser texto.',
             'nombre_completo.max' => 'El nombre completo no debe superar los 200 caracteres.',
 
+            'correo.required' => 'El correo institucional del estudiante es obligatorio.',
             'correo.email' => 'El correo del estudiante debe tener un formato válido.',
             'correo.max' => 'El correo no debe superar los 191 caracteres.',
 
@@ -136,5 +186,24 @@ class CasoSeguimientoRequest extends FormRequest
             'correo' => 'correo',
             'carrera' => 'carrera',
         ];
+    }
+
+    private function digitosCarne(string $carne): string
+    {
+        return preg_replace('/\D+/', '', $carne) ?? '';
+    }
+
+    private function formatearCarne(string $digitos): string
+    {
+        return substr($digitos, 0, 2)
+            . '-'
+            . substr($digitos, 2, 4)
+            . '-'
+            . substr($digitos, 6, 4);
+    }
+
+    private function correoDesdeCarne(string $digitos): string
+    {
+        return $digitos . '@mail.utec.edu.sv';
     }
 }

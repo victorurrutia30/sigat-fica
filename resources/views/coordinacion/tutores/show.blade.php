@@ -3,7 +3,7 @@
         <div class="flex items-center justify-between">
             <div>
                 <h2 class="text-xl font-bold text-utec-primary">Detalle del tutor</h2>
-                <p class="text-sm text-gray-500">Información general del Docente de Tiempo Completo.</p>
+                <p class="text-sm text-gray-500">Información general del tutor habilitado por Coordinación.</p>
             </div>
 
             <div class="flex gap-2">
@@ -55,6 +55,11 @@
                         </div>
 
                         <div>
+                            <dt class="text-sm font-medium text-gray-500">Categoría docente</dt>
+                            <dd class="mt-1 text-sm text-utec-gray-dark">{{ $tutor->categoria_docente ?: 'No definida' }}</dd>
+                        </div>
+
+                        <div>
                             <dt class="text-sm font-medium text-gray-500">Fecha de contratación</dt>
                             <dd class="mt-1 text-sm text-utec-gray-dark">
                                 {{ $tutor->fecha_contratacion ? $tutor->fecha_contratacion->format('d/m/Y') : 'No definida' }}
@@ -62,13 +67,28 @@
                         </div>
 
                         <div>
-                            <dt class="text-sm font-medium text-gray-500">Tipo de docente</dt>
+                            <dt class="text-sm font-medium text-gray-500">Tipo de habilitación</dt>
                             <dd class="mt-1">
                                 @if($tutor->tiempo_completo)
                                 <span class="badge-success">Docente de Tiempo Completo</span>
+                                @elseif($tutor->es_excepcion_tutoria)
+                                <span class="badge-warning">Excepción autorizada</span>
                                 @else
-                                <span class="badge-muted">No DTC</span>
+                                <span class="badge-muted">No habilitado como DTC</span>
                                 @endif
+
+                                @if($tutor->habilitado_para_tutorias)
+                                <span class="ml-2 badge-info">Habilitado para tutorías</span>
+                                @else
+                                <span class="ml-2 badge-muted">No habilitado para tutorías</span>
+                                @endif
+                            </dd>
+                        </div>
+
+                        <div class="md:col-span-2">
+                            <dt class="text-sm font-medium text-gray-500">Motivo de excepción</dt>
+                            <dd class="mt-1 text-sm text-utec-gray-dark">
+                                {{ $tutor->motivo_excepcion_tutoria ?: 'No aplica' }}
                             </dd>
                         </div>
 

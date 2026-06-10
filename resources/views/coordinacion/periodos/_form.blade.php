@@ -17,8 +17,7 @@
             @foreach($ciclos as $ciclo)
             <option
                 value="{{ $ciclo->id }}"
-                @selected((string) old('ciclo_id', $periodo->ciclo_id ?? optional($ciclos->firstWhere('activo', true))->id) === (string) $ciclo->id)
-                >
+                @selected((string) old('ciclo_id', $periodo->ciclo_id ?? optional($ciclos->firstWhere('activo', true))->id) === (string) $ciclo->id)>
                 {{ $ciclo->nombre }} {{ $ciclo->activo ? '(Activo)' : '' }}
             </option>
             @endforeach
@@ -27,6 +26,10 @@
         @error('ciclo_id')
         <p class="form-error">{{ $message }}</p>
         @enderror
+
+        <p class="form-hint">
+            Para este prototipo solo se permite crear o editar periodos del ciclo activo.
+        </p>
     </div>
 
     <div>
@@ -103,27 +106,39 @@
         @enderror
 
         <p class="form-hint">
-            Debe ser igual o posterior a la fecha de fin del periodo.
+            Debe ser igual o posterior a la fecha de fin del periodo y estar dentro de las fechas del ciclo activo.
         </p>
     </div>
 
     <div class="flex items-end">
-        <label class="inline-flex items-center gap-2">
-            <input type="hidden" name="activo" value="0">
+        <div>
+            <label class="inline-flex items-center gap-2">
+                <input type="hidden" name="activo" value="0">
 
-            <input
-                type="checkbox"
-                name="activo"
-                value="1"
-                class="rounded border-utec-gray-medium text-utec-primary focus:ring-utec-primary-light"
-                @checked((bool) old('activo', $periodo->activo ?? false))
-            >
+                <input
+                    type="checkbox"
+                    name="activo"
+                    value="1"
+                    class="rounded border-utec-gray-medium text-utec-primary focus:ring-utec-primary-light"
+                    @checked((bool) old('activo', $periodo->activo ?? false))
+                >
 
-            <span class="text-sm font-medium text-utec-gray-dark">
-                Marcar como periodo activo
-            </span>
-        </label>
+                <span class="text-sm font-medium text-utec-gray-dark">
+                    Marcar como periodo activo
+                </span>
+            </label>
+
+            @error('activo')
+            <p class="form-error">{{ $message }}</p>
+            @enderror
+
+            @error('periodo')
+            <p class="form-error">{{ $message }}</p>
+            @enderror
+        </div>
     </div>
+
+
 </div>
 
 @if(isset($periodo))

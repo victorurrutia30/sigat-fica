@@ -61,6 +61,35 @@ class PropuestaAsignacionController extends Controller
             ->with('success', 'Asignación guardada correctamente.');
     }
 
+    public function generarSugerencias(
+        Request $request,
+        PropuestaAsignacionService $propuestaService
+    ): RedirectResponse {
+        if ($request->user()?->rol !== 'coordinacion') {
+            abort(403, 'No tienes permiso para acceder a esta sección.');
+        }
+
+        $propuesta = $propuestaService->obtenerOCrearParaCicloActivo($request->user()->id);
+
+        $resultado = $propuestaService->generarSugerencias(
+            propuesta: $propuesta,
+            usuarioId: $request->user()->id
+        );
+
+        if ($resultado['asignadas'] === 0) {
+            return redirect()
+                ->route('propuestas.index')
+                ->with('error', 'No se generaron sugerencias. Revisa disponibilidad de tutores, choques de horario o secciones ya asignadas.');
+        }
+
+        return redirect()
+            ->route('propuestas.index')
+            ->with(
+                'success',
+                "Sugerencias generadas: {$resultado['asignadas']} asignaciones. Secciones sin tutor disponible: {$resultado['sin_tutor']}."
+            );
+    }
+
     public function destroy(
         ItemPropuesta $itemPropuesta,
         Request $request,

@@ -2,8 +2,12 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Ciclo;
+use App\Models\PeriodoEvaluacion;
+use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Validator;
 
 class PeriodoEvaluacionRequest extends FormRequest
 {
@@ -61,6 +65,81 @@ class PeriodoEvaluacionRequest extends FormRequest
         ];
     }
 
+    public function withValidator(Validator $validator): void
+    {
+        $validator->after(function (Validator $validator) {
+            if ($validator->errors()->isNotEmpty()) {
+                return;
+            }
+
+            $periodo = $this->route('periodoEvaluacion');
+            $cicloId = (int) $this->input('ciclo_id');
+
+            $ciclo = Ciclo::query()->find($cicloId);
+
+            if (! $ciclo) {
+                return;
+            }
+
+            if (! $ciclo->activo) {
+                $validator->errors()->add(
+                    'ciclo_id',
+                    'Solo se pueden crear o editar periodos del ciclo académico activo.'
+                );
+
+                return;
+            }
+
+            $fechaInicio = $this->fechaValida($this->input('fecha_inicio'));
+            $fechaFin = $this->fechaValida($this->input('fecha_fin'));
+            $fechaLimiteConsolidado = $this->fechaValida($this->input('fecha_limite_consolidado'));
+
+            if (! $fechaInicio || ! $fechaFin || ! $fechaLimiteConsolidado) {
+                return;
+            }
+
+            $inicioCiclo = CarbonImmutable::parse($ciclo->fecha_inicio->toDateString())->startOfDay();
+            $finCiclo = CarbonImmutable::parse($ciclo->fecha_fin->toDateString())->startOfDay();
+
+            if ($fechaInicio->lt($inicioCiclo) || $fechaInicio->gt($finCiclo)) {
+                $validator->errors()->add(
+                    'fecha_inicio',
+                    'La fecha de inicio del periodo debe estar dentro de las fechas del ciclo académico activo.'
+                );
+            }
+
+            if ($fechaFin->lt($inicioCiclo) || $fechaFin->gt($finCiclo)) {
+                $validator->errors()->add(
+                    'fecha_fin',
+                    'La fecha de fin del periodo debe estar dentro de las fechas del ciclo académico activo.'
+                );
+            }
+
+            if ($fechaLimiteConsolidado->lt($inicioCiclo) || $fechaLimiteConsolidado->gt($finCiclo)) {
+                $validator->errors()->add(
+                    'fecha_limite_consolidado',
+                    'La fecha límite de consolidado debe estar dentro de las fechas del ciclo académico activo.'
+                );
+            }
+
+            $existeTraslape = PeriodoEvaluacion::query()
+                ->where('ciclo_id', $ciclo->id)
+                ->when($periodo, function ($query) use ($periodo) {
+                    $query->whereKeyNot($periodo->id);
+                })
+                ->whereDate('fecha_inicio', '<=', $fechaFin->toDateString())
+                ->whereDate('fecha_fin', '>=', $fechaInicio->toDateString())
+                ->exists();
+
+            if ($existeTraslape) {
+                $validator->errors()->add(
+                    'fecha_inicio',
+                    'Las fechas del periodo de evaluación se traslapan con otro periodo del mismo ciclo.'
+                );
+            }
+        });
+    }
+
     public function messages(): array
     {
         return [
@@ -98,5 +177,18 @@ class PeriodoEvaluacionRequest extends FormRequest
             'fecha_limite_consolidado' => 'fecha límite de consolidado',
             'activo' => 'activo',
         ];
+    }
+
+    private function fechaValida(?string $fecha): ?CarbonImmutable
+    {
+        if (blank($fecha)) {
+            return null;
+        }
+
+        try {
+            return CarbonImmutable::parse($fecha)->startOfDay();
+        } catch (\Throwable) {
+            return null;
+        }
     }
 }

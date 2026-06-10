@@ -119,8 +119,21 @@ class MateriaController extends Controller
         $datos['ciclo_plan'] = $datos['ciclo_plan'] ?? null;
         $datos['activo'] = $request->boolean('activo');
         $datos['gestionada_por_coordinacion'] = $request->boolean('gestionada_por_coordinacion');
-        $datos['requiere_revision'] = $request->boolean('requiere_revision');
+
+        $datos['requiere_revision'] = $this->determinarRevision(
+            gestionadaPorCoordinacion: $datos['gestionada_por_coordinacion'],
+            cicloPlan: $datos['ciclo_plan'],
+        );
 
         return $datos;
+    }
+
+    private function determinarRevision(bool $gestionadaPorCoordinacion, ?int $cicloPlan): bool
+    {
+        if (! $gestionadaPorCoordinacion) {
+            return false;
+        }
+
+        return $cicloPlan === null;
     }
 }

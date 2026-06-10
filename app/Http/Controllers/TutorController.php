@@ -23,7 +23,8 @@ class TutorController extends Controller
                     $subquery->where('codigo_empleado', 'like', "%{$busqueda}%")
                         ->orWhere('nombre_completo', 'like', "%{$busqueda}%")
                         ->orWhere('correo_institucional', 'like', "%{$busqueda}%")
-                        ->orWhere('departamento', 'like', "%{$busqueda}%");
+                        ->orWhere('departamento', 'like', "%{$busqueda}%")
+                        ->orWhere('categoria_docente', 'like', "%{$busqueda}%");
                 });
             })
             ->when($estado === 'activos', function ($query) {
@@ -52,11 +53,7 @@ class TutorController extends Controller
 
     public function store(TutorRequest $request): RedirectResponse
     {
-        $datos = $request->validated();
-
-        $datos['usuario_id'] = $datos['usuario_id'] ?? null;
-        $datos['tiempo_completo'] = true;
-        $datos['activo'] = $request->boolean('activo');
+        $datos = $this->datosNormalizados($request);
 
         Tutor::create($datos);
 
@@ -86,11 +83,7 @@ class TutorController extends Controller
 
     public function update(TutorRequest $request, Tutor $tutor): RedirectResponse
     {
-        $datos = $request->validated();
-
-        $datos['usuario_id'] = $datos['usuario_id'] ?? null;
-        $datos['tiempo_completo'] = true;
-        $datos['activo'] = $request->boolean('activo');
+        $datos = $this->datosNormalizados($request);
 
         $tutor->update($datos);
 
@@ -113,6 +106,52 @@ class TutorController extends Controller
         return redirect()
             ->route('tutores.index')
             ->with('success', 'Tutor desactivado correctamente.');
+    }
+
+    public function reactivar(int $tutor): RedirectResponse
+    {
+        $tutor = Tutor::withTrashed()->findOrFail($tutor);
+
+        if (! $tutor->trashed() && $tutor->activo) {
+            return redirect()
+                ->route('tutores.index')
+                ->with('error', 'El tutor ya se encuentra activo.');
+        }
+
+        if ($tutor->trashed()) {
+            $tutor->restore();
+        }
+
+        $tutor->update([
+            'activo' => true,
+        ]);
+
+        return redirect()
+            ->route('tutores.index')
+            ->with('success', 'Tutor reactivado correctamente.');
+    }
+
+    private function datosNormalizados(TutorRequest $request): array
+    {
+        $datos = $request->validated();
+
+        $datos['usuario_id'] = $datos['usuario_id'] ?? null;
+        $datos['tiempo_completo'] = $request->boolean('tiempo_completo');
+        $datos['habilitado_para_tutorias'] = $request->boolean('habilitado_para_tutorias');
+        $datos['es_excepcion_tutoria'] = $request->boolean('es_excepcion_tutoria');
+        $datos['activo'] = $request->boolean('activo');
+        $datos['origen_registro'] = $datos['origen_registro'] ?? 'manual';
+
+        if ($datos['tiempo_completo']) {
+            $datos['es_excepcion_tutoria'] = false;
+            $datos['motivo_excepcion_tutoria'] = null;
+        }
+
+        if (! $datos['es_excepcion_tutoria']) {
+            $datos['motivo_excepcion_tutoria'] = null;
+        }
+
+        return $datos;
     }
 
     private function usuariosDisponibles(?Tutor $tutor = null): Collection

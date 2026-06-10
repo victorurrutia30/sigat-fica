@@ -256,7 +256,6 @@ class ConsolidadoSeccionSheet implements FromCollection, WithHeadings, WithTitle
                 $lastDataRow = self::ROW_HEADERS + $rowCount;
 
                 // ── Configuración hoja ────────────────────────────────
-                $ws->freezePane('A23');
                 $ws->setAutoFilter('A22:J' . $lastDataRow);
                 $ws->setShowGridLines(false);
                 $ws->setPrintGridlines(false);

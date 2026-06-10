@@ -17,12 +17,15 @@
             id="anio"
             value="{{ old('anio', $ciclo->anio ?? now()->year) }}"
             class="input-field"
-            min="2020"
-            max="2035"
+            min="{{ now()->year - 1 }}"
+            max="{{ now()->year + 1 }}"
             required>
         @error('anio')
         <p class="form-error">{{ $message }}</p>
         @enderror
+        <p class="form-hint">
+            Para QA solo se permite el año anterior, el año actual o el año siguiente.
+        </p>
     </div>
 
     <div>
@@ -70,17 +73,31 @@
     </div>
 
     <div class="flex items-end">
-        <label class="inline-flex items-center gap-2">
-            <input type="hidden" name="activo" value="0">
-            <input
-                type="checkbox"
-                name="activo"
-                value="1"
-                class="rounded border-utec-gray-medium text-utec-primary focus:ring-utec-primary-light"
-                @checked((bool) old('activo', $ciclo->activo ?? false))
-            >
-            <span class="text-sm font-medium text-utec-gray-dark">Marcar como ciclo activo</span>
-        </label>
+        <div>
+            <label class="inline-flex items-center gap-2">
+                <input type="hidden" name="activo" value="0">
+
+                <input
+                    type="checkbox"
+                    name="activo"
+                    value="1"
+                    class="rounded border-utec-gray-medium text-utec-primary focus:ring-utec-primary-light"
+                    @checked((bool) old('activo', $ciclo->activo ?? false))
+                >
+
+                <span class="text-sm font-medium text-utec-gray-dark">
+                    Marcar como ciclo activo
+                </span>
+            </label>
+
+            @error('activo')
+            <p class="form-error">{{ $message }}</p>
+            @enderror
+
+            @error('ciclo')
+            <p class="form-error">{{ $message }}</p>
+            @enderror
+        </div>
     </div>
 
     <div>
@@ -103,6 +120,7 @@
         <label for="fecha_fin" class="form-label">
             Fecha de fin <span class="text-red-500">*</span>
         </label>
+
         <input
             type="date"
             name="fecha_fin"
@@ -110,9 +128,14 @@
             value="{{ old('fecha_fin', isset($ciclo) ? $ciclo->fecha_fin->format('Y-m-d') : '') }}"
             class="input-field"
             required>
+
         @error('fecha_fin')
         <p class="form-error">{{ $message }}</p>
         @enderror
+
+        <p class="form-hint">
+            La fecha de inicio y fin deben pertenecer al año seleccionado y no traslaparse con otro ciclo.
+        </p>
     </div>
 </div>
 

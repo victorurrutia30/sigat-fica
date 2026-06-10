@@ -17,7 +17,7 @@
             value="{{ old('codigo', $materia->codigo ?? '') }}"
             class="input-field uppercase"
             maxlength="20"
-            placeholder="Ej. MAT101"
+            placeholder="Ej. MAT1-T"
             required>
         @error('codigo')
         <p class="form-error">{{ $message }}</p>
@@ -43,28 +43,8 @@
     </div>
 
     <div>
-        <label for="creditos" class="form-label">
-            Créditos
-        </label>
-        <input
-            type="number"
-            name="creditos"
-            id="creditos"
-            value="{{ old('creditos', $materia->creditos ?? 3) }}"
-            class="input-field"
-            min="1"
-            max="10">
-        @error('creditos')
-        <p class="form-error">{{ $message }}</p>
-        @enderror
-        <p class="form-hint">
-            Este dato no se usa para asignar tutores. Si se deja vacío, se guarda como 3.
-        </p>
-    </div>
-
-    <div>
         <label for="ciclo_plan" class="form-label">
-            Ciclo del plan
+            Ubicación en plan de estudios
         </label>
         <select name="ciclo_plan" id="ciclo_plan" class="input-field">
             <option value="">Pendiente de definir</option>
@@ -78,13 +58,13 @@
         <p class="form-error">{{ $message }}</p>
         @enderror
         <p class="form-hint">
-            Solo las materias de ciclo 1 y 2 se marcarán como prioritarias en la propuesta.
+            Indica en qué ciclo del plan de estudios se ubica la materia. No es el ciclo académico de importación.
         </p>
     </div>
 
     <div>
         <label for="departamento" class="form-label">
-            Departamento
+            Código de cátedra
         </label>
         <input
             type="text"
@@ -93,13 +73,16 @@
             value="{{ old('departamento', $materia->departamento ?? '') }}"
             class="input-field"
             maxlength="100"
-            placeholder="Ej. Ciencias Aplicadas">
+            placeholder="Ej. MAT">
         @error('departamento')
         <p class="form-error">{{ $message }}</p>
         @enderror
+        <p class="form-hint">
+            Corresponde al código de cátedra importado desde la carga académica.
+        </p>
     </div>
 
-    <div class="space-y-4 rounded-md border border-utec-gray-medium bg-gray-50 p-4">
+    <div class="space-y-4 rounded-md border border-utec-gray-medium bg-gray-50 p-4 md:col-span-2">
         <label class="flex items-start gap-2">
             <input type="hidden" name="gestionada_por_coordinacion" value="0">
             <input
@@ -133,7 +116,7 @@
                     Pendiente de revisión
                 </span>
                 <span class="block text-xs text-gray-500">
-                    Úsalo para materias creadas desde Excel que necesitan completar ciclo del plan u otros datos.
+                    Úsalo para materias creadas desde Excel que necesitan revisión de Coordinación.
                 </span>
             </span>
         </label>
@@ -152,7 +135,7 @@
                     Materia activa
                 </span>
                 <span class="block text-xs text-gray-500">
-                    Las materias inactivas no deben usarse en nuevas importaciones o propuestas.
+                    Las materias inactivas no deben usarse en nuevas propuestas.
                 </span>
             </span>
         </label>

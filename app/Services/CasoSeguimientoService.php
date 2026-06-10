@@ -13,6 +13,8 @@ use App\Models\User;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
+use App\Models\Consolidado;
+use App\Models\GestionCaso;
 
 
 class CasoSeguimientoService
@@ -105,6 +107,7 @@ class CasoSeguimientoService
         return DB::transaction(function () use ($usuario, $datos) {
             $periodo = $this->obtenerPeriodoActivo();
             $tutor = $this->obtenerTutorDelUsuario($usuario);
+            $this->validarConsolidadoEditable($tutor, $periodo);
 
             $seccionesAsignadas = $this->seccionesAsignadasParaTutor($tutor, $periodo);
             $seccionId = (int) $datos['seccion_id'];
@@ -176,6 +179,11 @@ class CasoSeguimientoService
         return DB::transaction(function () use ($caso, $usuario, $datos) {
             $this->validarAccesoTutor($caso, $usuario);
 
+            $caso->loadMissing('periodoEvaluacion');
+
+            $tutor = $this->obtenerTutorDelUsuario($usuario);
+            $this->validarConsolidadoEditable($tutor, $caso->periodoEvaluacion);
+
             if ($caso->cerrado) {
                 throw ValidationException::withMessages([
                     'caso' => 'Este caso ya se encuentra cerrado.',
@@ -236,5 +244,81 @@ class CasoSeguimientoService
         if ((int) $caso->tutor_id !== (int) $tutor->id) {
             abort(403, 'No tienes permiso para acceder a este caso.');
         }
+    }
+
+    public function validarConsolidadoEditable(Tutor $tutor, PeriodoEvaluacion $periodo): void
+    {
+        $consolidado = Consolidado::query()
+            ->where('periodo_evaluacion_id', $periodo->id)
+            ->where('tutor_id', $tutor->id)
+            ->first();
+
+        if (! $consolidado) {
+            return;
+        }
+
+        if ($consolidado->estado_entrega === 'entregado') {
+            throw ValidationException::withMessages([
+                'consolidado' => 'No se pueden modificar casos porque el consolidado ya fue entregado. Solicita a Coordinación devolverlo con observaciones.',
+            ]);
+        }
+    }
+
+    public function estadoConsolidadoParaCaso(CasoSeguimiento $caso, User $usuario): ?string
+    {
+        $this->validarAccesoTutor($caso, $usuario);
+
+        $caso->loadMissing('periodoEvaluacion');
+
+        $tutor = $this->obtenerTutorDelUsuario($usuario);
+
+        $consolidado = Consolidado::query()
+            ->where('periodo_evaluacion_id', $caso->periodoEvaluacion->id)
+            ->where('tutor_id', $tutor->id)
+            ->first();
+
+        return $consolidado?->estado_entrega;
+    }
+
+    public function reabrirCaso(CasoSeguimiento $caso, User $usuario): CasoSeguimiento
+    {
+        return DB::transaction(function () use ($caso, $usuario) {
+            $this->validarAccesoTutor($caso, $usuario);
+
+            $caso->loadMissing('periodoEvaluacion');
+
+            $tutor = $this->obtenerTutorDelUsuario($usuario);
+
+            $this->validarConsolidadoEditable($tutor, $caso->periodoEvaluacion);
+
+            if (! $caso->cerrado) {
+                throw ValidationException::withMessages([
+                    'caso' => 'Este caso ya se encuentra abierto.',
+                ]);
+            }
+
+            $caso->update([
+                'cerrado' => false,
+                'cerrado_en' => null,
+            ]);
+
+            GestionCaso::create([
+                'caso_seguimiento_id' => $caso->id,
+                'registrado_por' => $usuario->id,
+                'fecha_gestion' => now()->toDateString(),
+                'medio_contacto' => 'otro',
+                'accion_realizada' => 'Caso reabierto para corrección solicitada durante la revisión del consolidado.',
+                'resultado' => 'El tutor debe registrar la gestión correctiva y cerrar nuevamente el caso.',
+            ]);
+
+            return $caso->fresh([
+                'periodoEvaluacion.ciclo',
+                'seccion.materia',
+                'estudiante',
+                'tutor',
+                'causa',
+                'gestiones',
+            ]);
+        });
     }
 }

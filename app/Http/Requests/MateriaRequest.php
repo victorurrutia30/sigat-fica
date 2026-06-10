@@ -113,8 +113,8 @@ class MateriaRequest extends FormRequest
             'ciclo_plan.min' => 'El ciclo del plan debe estar entre 1 y 10.',
             'ciclo_plan.max' => 'El ciclo del plan debe estar entre 1 y 10.',
 
-            'departamento.string' => 'El departamento debe ser texto.',
-            'departamento.max' => 'El departamento no debe superar los 100 caracteres.',
+            'departamento.string' => 'El código de cátedra debe ser texto.',
+            'departamento.max' => 'El código de cátedra no debe superar los 100 caracteres.',
 
             'gestionada_por_coordinacion.boolean' => 'El indicador de gestión por Coordinación no tiene un valor válido.',
             'requiere_revision.boolean' => 'El indicador de revisión no tiene un valor válido.',
@@ -129,7 +129,7 @@ class MateriaRequest extends FormRequest
             'nombre' => 'nombre',
             'creditos' => 'créditos',
             'ciclo_plan' => 'ciclo del plan',
-            'departamento' => 'departamento',
+            'departamento' => 'código de cátedra',
             'gestionada_por_coordinacion' => 'gestionada por Coordinación',
             'requiere_revision' => 'requiere revisión',
             'activo' => 'activo',

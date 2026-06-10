@@ -12,6 +12,9 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use App\Models\Ciclo;
 use Illuminate\Pagination\LengthAwarePaginator;
+use App\Models\ConfirmacionSeccionConsolidado;
+use App\Models\ItemPropuesta;
+use Illuminate\Support\Collection;
 
 class ConsolidadoService
 {
@@ -88,6 +91,33 @@ class ConsolidadoService
             ->get();
     }
 
+    public function seccionesAsignadasParaTutor(
+        Tutor $tutor,
+        PeriodoEvaluacion $periodo
+    ): Collection {
+        return ItemPropuesta::query()
+            ->with([
+                'seccion.materia',
+                'seccion.horarios',
+            ])
+            ->where('tutor_id', $tutor->id)
+            ->whereHas('propuestaAsignacion', function ($query) use ($periodo) {
+                $query->where('ciclo_id', $periodo->ciclo_id)
+                    ->where('publicado', true);
+            })
+            ->get()
+            ->pluck('seccion')
+            ->filter()
+            ->sortBy(function ($seccion) {
+                return sprintf(
+                    '%s-%s',
+                    $seccion->materia?->nombre ?? '',
+                    str_pad((string) $seccion->numero_seccion, 5, '0', STR_PAD_LEFT)
+                );
+            })
+            ->values();
+    }
+
     public function diagnosticarCasos(EloquentCollection $casos): array
     {
         $detalleIncompletos = [];
@@ -132,6 +162,91 @@ class ConsolidadoService
         ];
     }
 
+    public function coberturaSecciones(
+        Collection $secciones,
+        EloquentCollection $casos,
+        Consolidado $consolidado
+    ): array {
+        $confirmaciones = ConfirmacionSeccionConsolidado::query()
+            ->where('consolidado_id', $consolidado->id)
+            ->get()
+            ->keyBy('seccion_id');
+
+        $filas = $secciones->map(function ($seccion) use ($casos, $confirmaciones) {
+            $casosSeccion = $casos->where('seccion_id', $seccion->id);
+            $confirmacion = $confirmaciones->get($seccion->id);
+
+            return [
+                'seccion' => $seccion,
+                'casos_total' => $casosSeccion->count(),
+                'casos_cerrados' => $casosSeccion->where('cerrado', true)->count(),
+                'confirmada_sin_casos' => (bool) $confirmacion,
+                'confirmacion' => $confirmacion,
+                'requiere_confirmacion' => $casosSeccion->count() === 0 && ! $confirmacion,
+            ];
+        })->values();
+
+        return [
+            'total_secciones' => $filas->count(),
+            'con_casos' => $filas->where('casos_total', '>', 0)->count(),
+            'sin_casos_confirmadas' => $filas
+                ->where('casos_total', 0)
+                ->where('confirmada_sin_casos', true)
+                ->count(),
+            'pendientes_confirmacion' => $filas
+                ->where('requiere_confirmacion', true)
+                ->count(),
+            'detalle' => $filas,
+        ];
+    }
+
+    private function registrarConfirmacionesSinCasos(
+        Consolidado $consolidado,
+        User $usuario,
+        Collection $secciones,
+        EloquentCollection $casos,
+        array $seccionesSinCasos
+    ): void {
+        $seccionIdsAsignadas = $secciones->pluck('id')->map(fn($id) => (int) $id);
+        $seccionIdsConCasos = $casos->pluck('seccion_id')->unique()->map(fn($id) => (int) $id);
+
+        $seccionesSinCasos = collect($seccionesSinCasos)
+            ->map(fn($id) => (int) $id)
+            ->unique()
+            ->values();
+
+        $seccionesInvalidas = $seccionesSinCasos
+            ->reject(fn($id) => $seccionIdsAsignadas->contains($id));
+
+        if ($seccionesInvalidas->isNotEmpty()) {
+            throw ValidationException::withMessages([
+                'secciones_sin_casos' => 'Una de las secciones confirmadas no pertenece a tus asignaciones publicadas.',
+            ]);
+        }
+
+        $seccionesConCasosSeleccionadas = $seccionesSinCasos
+            ->filter(fn($id) => $seccionIdsConCasos->contains($id));
+
+        if ($seccionesConCasosSeleccionadas->isNotEmpty()) {
+            throw ValidationException::withMessages([
+                'secciones_sin_casos' => 'No debes confirmar sin casos una sección que ya tiene casos registrados.',
+            ]);
+        }
+
+        foreach ($seccionesSinCasos as $seccionId) {
+            ConfirmacionSeccionConsolidado::updateOrCreate(
+                [
+                    'consolidado_id' => $consolidado->id,
+                    'seccion_id' => $seccionId,
+                ],
+                [
+                    'confirmado_por' => $usuario->id,
+                    'confirmado_en' => now(),
+                ]
+            );
+        }
+    }
+
     public function contextoParaTutor(User $usuario): array
     {
         $periodo = $this->obtenerPeriodoActivo();
@@ -139,6 +254,8 @@ class ConsolidadoService
         $consolidado = $this->obtenerOCrearConsolidado($periodo, $tutor);
         $casos = $this->casosDelTutorEnPeriodo($tutor, $periodo);
         $diagnostico = $this->diagnosticarCasos($casos);
+        $secciones = $this->seccionesAsignadasParaTutor($tutor, $periodo);
+        $coberturaSecciones = $this->coberturaSecciones($secciones, $casos, $consolidado);
 
         return [
             'periodo' => $periodo,
@@ -146,22 +263,34 @@ class ConsolidadoService
             'consolidado' => $consolidado,
             'casos' => $casos,
             'diagnostico' => $diagnostico,
+            'secciones' => $secciones,
+            'coberturaSecciones' => $coberturaSecciones,
         ];
     }
 
-    public function entregar(User $usuario, bool $confirmarSinCasos): Consolidado
-    {
-        return DB::transaction(function () use ($usuario, $confirmarSinCasos) {
+    public function entregar(
+        User $usuario,
+        bool $confirmarSinCasos,
+        array $seccionesSinCasos = []
+    ): Consolidado {
+        return DB::transaction(function () use ($usuario, $confirmarSinCasos, $seccionesSinCasos) {
             $periodo = $this->obtenerPeriodoActivo();
             $tutor = $this->obtenerTutorDelUsuario($usuario);
 
             $consolidado = $this->obtenerOCrearConsolidado($periodo, $tutor);
             $casos = $this->casosDelTutorEnPeriodo($tutor, $periodo);
             $diagnostico = $this->diagnosticarCasos($casos);
+            $secciones = $this->seccionesAsignadasParaTutor($tutor, $periodo);
 
             if ($consolidado->estado_entrega === 'entregado') {
                 throw ValidationException::withMessages([
                     'consolidado' => 'Este consolidado ya fue entregado.',
+                ]);
+            }
+
+            if ($secciones->isEmpty()) {
+                throw ValidationException::withMessages([
+                    'secciones' => 'No tienes secciones asignadas en una propuesta publicada del ciclo activo.',
                 ]);
             }
 
@@ -174,6 +303,22 @@ class ConsolidadoService
             if ($diagnostico['incompletos'] > 0) {
                 throw ValidationException::withMessages([
                     'casos' => 'No se puede entregar el consolidado porque existen casos incompletos.',
+                ]);
+            }
+
+            $this->registrarConfirmacionesSinCasos(
+                consolidado: $consolidado,
+                usuario: $usuario,
+                secciones: $secciones,
+                casos: $casos,
+                seccionesSinCasos: $seccionesSinCasos
+            );
+
+            $coberturaSecciones = $this->coberturaSecciones($secciones, $casos, $consolidado);
+
+            if ($coberturaSecciones['pendientes_confirmacion'] > 0) {
+                throw ValidationException::withMessages([
+                    'secciones_sin_casos' => 'Debes confirmar las secciones sin casos antes de entregar el consolidado.',
                 ]);
             }
 

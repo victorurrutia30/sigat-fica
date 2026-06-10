@@ -16,6 +16,8 @@ use App\Http\Controllers\ConsolidadoController;
 use App\Http\Controllers\TableroCumplimientoController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\NotificacionController;
+use App\Http\Controllers\UsuarioController;
+use App\Http\Controllers\DocenteDetectadoController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -34,8 +36,22 @@ Route::middleware(['auth', 'verified', 'rol:coordinacion'])->group(function () {
 
     Route::resource('materias', MateriaController::class);
 
+    Route::get('docentes-detectados', [DocenteDetectadoController::class, 'index'])
+        ->name('docentes-detectados.index');
+
+    Route::post('docentes-detectados/{codigoDocente}/crear-tutor', [DocenteDetectadoController::class, 'crearTutor'])
+        ->name('docentes-detectados.crear-tutor');
+
+    Route::patch('tutores/{tutor}/reactivar', [TutorController::class, 'reactivar'])
+        ->withTrashed()
+        ->name('tutores.reactivar');
+
     Route::resource('tutores', TutorController::class)
         ->parameters(['tutores' => 'tutor']);
+
+    Route::resource('usuarios', UsuarioController::class)
+        ->except(['show'])
+        ->parameters(['usuarios' => 'usuario']);
 
     Route::resource('causas', CausaController::class)
         ->parameters(['causas' => 'causa']);
@@ -60,6 +76,9 @@ Route::middleware(['auth', 'verified', 'rol:coordinacion'])->group(function () {
 
     Route::post('carga-academica/importar', [CargaAcademicaController::class, 'store'])
         ->name('carga-academica.store');
+
+    Route::post('propuestas/generar-sugerencias', [PropuestaAsignacionController::class, 'generarSugerencias'])
+        ->name('propuestas.generar-sugerencias');
 
     Route::get('propuestas', [PropuestaAsignacionController::class, 'index'])
         ->name('propuestas.index');
@@ -111,6 +130,10 @@ Route::get('casos/{casoSeguimiento}/cierre', [CasoSeguimientoController::class, 
 Route::patch('casos/{casoSeguimiento}/cerrar', [CasoSeguimientoController::class, 'cerrar'])
     ->middleware(['auth', 'rol:tutor'])
     ->name('casos.cerrar');
+
+Route::patch('casos/{casoSeguimiento}/reabrir', [CasoSeguimientoController::class, 'reabrir'])
+    ->middleware(['auth', 'rol:tutor'])
+    ->name('casos.reabrir');
 
 Route::get('casos/{casoSeguimiento}/gestiones/create', [GestionCasoController::class, 'create'])
     ->middleware(['auth', 'rol:tutor'])

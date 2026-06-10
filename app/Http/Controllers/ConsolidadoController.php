@@ -56,7 +56,8 @@ class ConsolidadoController extends Controller
         try {
             $consolidadoService->entregar(
                 usuario: $request->user(),
-                confirmarSinCasos: $request->boolean('confirmar_sin_casos')
+                confirmarSinCasos: $request->boolean('confirmar_sin_casos'),
+                seccionesSinCasos: $request->input('secciones_sin_casos', [])
             );
         } catch (ValidationException $exception) {
             return redirect()
