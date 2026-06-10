@@ -13,16 +13,22 @@ use App\Http\Controllers\CausaController;
 use App\Http\Controllers\CasoSeguimientoController;
 use App\Http\Controllers\GestionCasoController;
 use App\Http\Controllers\ConsolidadoController;
+use App\Http\Controllers\TableroCumplimientoController;
+use App\Http\Controllers\DashboardController;
 
 Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified', 'rol:coordinacion'])->name('dashboard');
+Route::get('/dashboard', [DashboardController::class, 'index'])
+    ->middleware(['auth', 'verified', 'rol:coordinacion'])
+    ->name('dashboard');
 
 Route::middleware(['auth', 'verified', 'rol:coordinacion'])->group(function () {
+
+    Route::get('tablero-cumplimiento', [TableroCumplimientoController::class, 'index'])
+        ->name('tablero.index');
+
     Route::resource('ciclos', CicloController::class);
 
     Route::resource('materias', MateriaController::class);

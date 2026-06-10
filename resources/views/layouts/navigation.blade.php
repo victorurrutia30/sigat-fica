@@ -15,43 +15,63 @@
                 </div>
 
                 <div class="hidden space-x-7 sm:-my-px sm:ms-10 sm:flex">
-                    @if (auth()->user()->rol === 'coordinacion')
+                    @if(auth()->user()?->rol === 'coordinacion')
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                         Dashboard
                     </x-nav-link>
 
-                    <x-nav-link :href="route('ciclos.index')" :active="request()->routeIs('ciclos.*')">
-                        Ciclos
-                    </x-nav-link>
-
-                    <x-nav-link :href="route('tutores.index')" :active="request()->routeIs('tutores.*')">
-                        Tutores
-                    </x-nav-link>
-
-                    <x-nav-link :href="route('materias.index')" :active="request()->routeIs('materias.*')">
-                        Materias
-                    </x-nav-link>
-
-                    <x-nav-link :href="route('carga-academica.create')" :active="request()->routeIs('carga-academica.*')">
-                        Carga académica
+                    <x-nav-link :href="route('tablero.index')" :active="request()->routeIs('tablero.*')">
+                        Tablero
                     </x-nav-link>
 
                     <x-nav-link :href="route('propuestas.index')" :active="request()->routeIs('propuestas.*')">
-                        Propuestas
-                    </x-nav-link>
-
-                    <x-nav-link :href="route('periodos.index')" :active="request()->routeIs('periodos.*')">
-                        Periodos
-                    </x-nav-link>
-
-                    <x-nav-link :href="route('causas.index')" :active="request()->routeIs('causas.*')">
-                        Causas
+                        Propuesta
                     </x-nav-link>
 
                     <x-nav-link :href="route('consolidados.index')" :active="request()->routeIs('consolidados.*')">
                         Consolidados
                     </x-nav-link>
 
+                    <div class="hidden sm:flex sm:items-center">
+                        <x-dropdown align="left" width="48">
+                            <x-slot name="trigger">
+                                <button class="inline-flex items-center border-b-2 border-transparent px-1 pt-1 text-sm font-medium leading-5 text-gray-500 transition duration-150 ease-in-out hover:border-gray-300 hover:text-gray-700 focus:border-gray-300 focus:text-gray-700 focus:outline-none">
+                                    <span>Más</span>
+
+                                    <svg class="ms-1 h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                        stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+                                    </svg>
+                                </button>
+                            </x-slot>
+
+                            <x-slot name="content">
+                                <x-dropdown-link :href="route('ciclos.index')">
+                                    Ciclos académicos
+                                </x-dropdown-link>
+
+                                <x-dropdown-link :href="route('materias.index')">
+                                    Materias
+                                </x-dropdown-link>
+
+                                <x-dropdown-link :href="route('tutores.index')">
+                                    Tutores
+                                </x-dropdown-link>
+
+                                <x-dropdown-link :href="route('carga-academica.create')">
+                                    Carga académica
+                                </x-dropdown-link>
+
+                                <x-dropdown-link :href="route('periodos.index')">
+                                    Periodos de evaluación
+                                </x-dropdown-link>
+
+                                <x-dropdown-link :href="route('causas.index')">
+                                    Catálogo de causas
+                                </x-dropdown-link>
+                            </x-slot>
+                        </x-dropdown>
+                    </div>
                     @endif
 
                     @if (auth()->user()->rol === 'tutor')
@@ -159,6 +179,10 @@
 
             <x-responsive-nav-link :href="route('consolidados.index')" :active="request()->routeIs('consolidados.*')">
                 Consolidados
+            </x-responsive-nav-link>
+
+            <x-responsive-nav-link :href="route('tablero.index')" :active="request()->routeIs('tablero.*')">
+                Tablero
             </x-responsive-nav-link>
 
 
