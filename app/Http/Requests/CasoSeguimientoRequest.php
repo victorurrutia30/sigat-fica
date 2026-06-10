@@ -19,9 +19,24 @@ class CasoSeguimientoRequest extends FormRequest
             ]);
         }
 
-        if ($this->filled('nombre_completo')) {
+        if ($this->filled('nombres')) {
             $this->merge([
-                'nombre_completo' => trim($this->input('nombre_completo')),
+                'nombres' => trim($this->input('nombres')),
+            ]);
+        }
+
+        if ($this->filled('apellidos')) {
+            $this->merge([
+                'apellidos' => trim($this->input('apellidos')),
+            ]);
+        }
+
+        $nombres = trim((string) $this->input('nombres'));
+        $apellidos = trim((string) $this->input('apellidos'));
+
+        if ($nombres !== '' || $apellidos !== '') {
+            $this->merge([
+                'nombre_completo' => trim($nombres . ' ' . $apellidos),
             ]);
         }
 
@@ -50,6 +65,16 @@ class CasoSeguimientoRequest extends FormRequest
                 'required',
                 'string',
                 'max:20',
+            ],
+            'nombres' => [
+                'required',
+                'string',
+                'max:100',
+            ],
+            'apellidos' => [
+                'required',
+                'string',
+                'max:100',
             ],
             'nombre_completo' => [
                 'required',
@@ -80,7 +105,15 @@ class CasoSeguimientoRequest extends FormRequest
             'carne.string' => 'El carné debe ser texto.',
             'carne.max' => 'El carné no debe superar los 20 caracteres.',
 
-            'nombre_completo.required' => 'El nombre completo del estudiante es obligatorio.',
+            'nombres.required' => 'Los nombres del estudiante son obligatorios.',
+            'nombres.string' => 'Los nombres deben ser texto.',
+            'nombres.max' => 'Los nombres no deben superar los 100 caracteres.',
+
+            'apellidos.required' => 'Los apellidos del estudiante son obligatorios.',
+            'apellidos.string' => 'Los apellidos deben ser texto.',
+            'apellidos.max' => 'Los apellidos no deben superar los 100 caracteres.',
+
+            'nombre_completo.required' => 'No se pudo construir el nombre completo del estudiante.',
             'nombre_completo.string' => 'El nombre completo debe ser texto.',
             'nombre_completo.max' => 'El nombre completo no debe superar los 200 caracteres.',
 
@@ -97,6 +130,8 @@ class CasoSeguimientoRequest extends FormRequest
         return [
             'seccion_id' => 'sección',
             'carne' => 'carné',
+            'nombres' => 'nombres',
+            'apellidos' => 'apellidos',
             'nombre_completo' => 'nombre completo',
             'correo' => 'correo',
             'carrera' => 'carrera',

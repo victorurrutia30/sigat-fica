@@ -30,6 +30,12 @@ class CasoCierreRequest extends FormRequest
                 'cuota_cancelada' => trim($this->input('cuota_cancelada')),
             ]);
         }
+
+        if ($this->input('resultado_consolidado') === '') {
+            $this->merge([
+                'resultado_consolidado' => null,
+            ]);
+        }
     }
 
     public function rules(): array
@@ -46,7 +52,7 @@ class CasoCierreRequest extends FormRequest
                 'max:2000',
             ],
             'resultado_consolidado' => [
-                'required',
+                'nullable',
                 Rule::in([
                     'rc',
                     'rm',
@@ -78,7 +84,6 @@ class CasoCierreRequest extends FormRequest
             'detalle_inasistencia.string' => 'El detalle de inasistencia debe ser texto.',
             'detalle_inasistencia.max' => 'El detalle de inasistencia no debe superar los 2000 caracteres.',
 
-            'resultado_consolidado.required' => 'Debe seleccionar el resultado para el consolidado.',
             'resultado_consolidado.in' => 'El resultado para el consolidado seleccionado no es válido.',
 
             'matricula.required' => 'Debe indicar si el estudiante tiene matrícula.',

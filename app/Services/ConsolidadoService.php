@@ -103,14 +103,6 @@ class ConsolidadoService
                 $faltantes[] = 'causa';
             }
 
-            if (! $caso->resultado_final) {
-                $faltantes[] = 'resultado final';
-            }
-
-            if (! $caso->resultado_consolidado) {
-                $faltantes[] = 'resultado institucional';
-            }
-
             if (! $caso->detalle_inasistencia) {
                 $faltantes[] = 'detalle de inasistencia';
             }

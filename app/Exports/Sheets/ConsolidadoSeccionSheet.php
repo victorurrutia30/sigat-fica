@@ -98,8 +98,8 @@ class ConsolidadoSeccionSheet implements FromCollection, WithHeadings, WithTitle
 
         return $this->filas = $casos->values()->map(fn(CasoSeguimiento $caso) => [
             $caso->estudiante?->carne ?? '',
-            $caso->estudiante?->nombre_completo ?? '',
-            '',
+            $caso->estudiante?->nombres ?: ($caso->estudiante?->nombre_completo ?? ''),
+            $caso->estudiante?->apellidos ?? '',
             $caso->detalle_inasistencia ?: ($caso->causa?->nombre ?? ''),
             $caso->resultado_consolidado === 'rc'  ? 'X' : '',
             $caso->resultado_consolidado === 'rm'  ? 'X' : '',

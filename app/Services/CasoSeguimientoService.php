@@ -115,12 +115,18 @@ class CasoSeguimientoService
                 ]);
             }
 
+            $nombres = trim($datos['nombres']);
+            $apellidos = trim($datos['apellidos']);
+            $nombreCompleto = trim($nombres . ' ' . $apellidos);
+
             $estudiante = Estudiante::updateOrCreate(
                 [
                     'carne' => strtoupper(trim($datos['carne'])),
                 ],
                 [
-                    'nombre_completo' => trim($datos['nombre_completo']),
+                    'nombres' => $nombres,
+                    'apellidos' => $apellidos,
+                    'nombre_completo' => $nombreCompleto,
                     'correo' => $datos['correo'] ?? null,
                     'carrera' => $datos['carrera'] ?? null,
                 ]
@@ -195,16 +201,17 @@ class CasoSeguimientoService
                 ]);
             }
 
-            $resultadoFinal = match ($datos['resultado_consolidado']) {
+            $resultadoFinal = match ($datos['resultado_consolidado'] ?? null) {
                 'rc', 'rm' => 'retiro',
                 'abm', 'abc' => 'abandono',
+                default => null,
             };
 
             $caso->update([
                 'causa_id' => $datos['causa_id'],
                 'resultado_final' => $resultadoFinal,
                 'detalle_inasistencia' => $datos['detalle_inasistencia'],
-                'resultado_consolidado' => $datos['resultado_consolidado'],
+                'resultado_consolidado' => $datos['resultado_consolidado'] ?? null,
                 'matricula' => (bool) $datos['matricula'],
                 'cuota_cancelada' => $datos['cuota_cancelada'] ?? null,
                 'cerrado' => true,

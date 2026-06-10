@@ -113,11 +113,11 @@
 
                             <div>
                                 <label for="resultado_consolidado" class="form-label">
-                                    Resultado para consolidado <span class="text-red-500">*</span>
+                                    Resultado para consolidado
                                 </label>
 
-                                <select name="resultado_consolidado" id="resultado_consolidado" class="input-field" required>
-                                    <option value="">Seleccione...</option>
+                                <select name="resultado_consolidado" id="resultado_consolidado" class="input-field">
+                                    <option value="">No aplica / sin retiro o abandono</option>
 
                                     <option value="rc" @selected(old('resultado_consolidado', $caso->resultado_consolidado) === 'rc')>
                                         R/C — Retiro de ciclo
@@ -141,7 +141,7 @@
                                 @enderror
 
                                 <p class="form-hint">
-                                    Este valor marcará la columna institucional R/C, R/M, AB/M o AB/C.
+                                    Selecciona una opción solo si el caso terminó en retiro o abandono. Si no aplica, déjalo vacío.
                                 </p>
                             </div>
 
@@ -233,8 +233,8 @@
             </div>
 
             <div class="alert-info mt-6">
-                Al cerrar el caso, el sistema guardará el resultado institucional y también calculará el resultado interno:
-                R/C y R/M se guardan como retiro; AB/M y AB/C se guardan como abandono.
+                Al cerrar el caso, el sistema guardará la causa, el detalle de inasistencia, la matrícula y las gestiones registradas.
+                El resultado institucional R/C, R/M, AB/M o AB/C solo se marca si aplica.
             </div>
         </div>
     </div>

@@ -101,22 +101,42 @@
                                 <p class="form-error">{{ $message }}</p>
                                 @enderror
                             </div>
-
                             <div>
-                                <label for="nombre_completo" class="form-label">
-                                    Nombre completo <span class="text-red-500">*</span>
+                                <label for="nombres" class="form-label">
+                                    Nombres <span class="text-red-500">*</span>
                                 </label>
 
                                 <input
                                     type="text"
-                                    name="nombre_completo"
-                                    id="nombre_completo"
-                                    value="{{ old('nombre_completo') }}"
+                                    name="nombres"
+                                    id="nombres"
+                                    value="{{ old('nombres') }}"
                                     class="input-field"
-                                    maxlength="200"
+                                    maxlength="100"
+                                    placeholder="Ej. Juan Carlos"
                                     required>
 
-                                @error('nombre_completo')
+                                @error('nombres')
+                                <p class="form-error">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <div>
+                                <label for="apellidos" class="form-label">
+                                    Apellidos <span class="text-red-500">*</span>
+                                </label>
+
+                                <input
+                                    type="text"
+                                    name="apellidos"
+                                    id="apellidos"
+                                    value="{{ old('apellidos') }}"
+                                    class="input-field"
+                                    maxlength="100"
+                                    placeholder="Ej. Pérez López"
+                                    required>
+
+                                @error('apellidos')
                                 <p class="form-error">{{ $message }}</p>
                                 @enderror
                             </div>
