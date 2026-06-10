@@ -52,6 +52,10 @@
                         Consolidados
                     </x-nav-link>
 
+                    <x-nav-link :href="route('tablero.index')" :active="request()->routeIs('tablero.*')">
+                        Tablero
+                    </x-nav-link>
+
                     @endif
 
                     @if (auth()->user()->rol === 'tutor')
@@ -159,6 +163,10 @@
 
             <x-responsive-nav-link :href="route('consolidados.index')" :active="request()->routeIs('consolidados.*')">
                 Consolidados
+            </x-responsive-nav-link>
+
+            <x-responsive-nav-link :href="route('tablero.index')" :active="request()->routeIs('tablero.*')">
+                Tablero
             </x-responsive-nav-link>
 
 

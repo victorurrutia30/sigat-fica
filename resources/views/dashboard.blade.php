@@ -118,6 +118,14 @@
                             </span>
                         </a>
 
+                        <a href="{{ route('tablero.index') }}"
+                            class="rounded-lg border border-utec-gray-medium p-4 text-sm font-medium text-utec-gray-dark transition hover:border-utec-primary-light hover:bg-utec-primary-soft hover:text-utec-primary">
+                            Tablero de cumplimiento
+                            <span class="mt-1 block text-xs text-gray-500">
+                                Ver avance, atrasos y estado general por tutor.
+                            </span>
+                        </a>
+
                     </div>
                 </div>
             </div>
