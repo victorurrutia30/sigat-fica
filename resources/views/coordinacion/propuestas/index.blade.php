@@ -11,6 +11,18 @@
             </div>
 
             <div class="flex flex-wrap gap-2">
+
+                <form
+                    method="POST"
+                    action="{{ route('propuestas.generar-sugerencias') }}"
+                    onsubmit="return confirm('¿Deseas generar sugerencias automáticas? Se respetarán las asignaciones existentes.');">
+                    @csrf
+
+                    <button type="submit" class="btn-primary">
+                        Generar sugerencias
+                    </button>
+                </form>
+
                 <a href="{{ route('propuestas.exportar') }}"
                     class="btn-secondary {{ $propuesta->items->isEmpty() ? 'pointer-events-none cursor-not-allowed opacity-60' : '' }}"
                     @if($propuesta->items->isEmpty()) aria-disabled="true" @endif>

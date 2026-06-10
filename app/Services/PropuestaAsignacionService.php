@@ -212,6 +212,131 @@ class PropuestaAsignacionService
         });
     }
 
+    public function generarSugerencias(
+        PropuestaAsignacion $propuesta,
+        int $usuarioId
+    ): array {
+        return DB::transaction(function () use ($propuesta, $usuarioId) {
+            $propuesta->refresh();
+            $propuesta->loadMissing(['ciclo', 'items']);
+
+            $tutores = $this->tutoresElegibles();
+
+            if ($tutores->isEmpty()) {
+                return [
+                    'asignadas' => 0,
+                    'sin_tutor' => 0,
+                    'total_revisadas' => 0,
+                ];
+            }
+
+            $seccionesAsignadas = ItemPropuesta::query()
+                ->where('propuesta_asignacion_id', $propuesta->id)
+                ->pluck('seccion_id')
+                ->all();
+
+            $seccionesPendientes = $this->seccionesCandidatas($propuesta->ciclo)
+                ->reject(function (Seccion $seccion) use ($seccionesAsignadas) {
+                    return in_array($seccion->id, $seccionesAsignadas, true);
+                })
+                ->sortByDesc(function (Seccion $seccion) {
+                    return $this->calcularPrioridad($seccion);
+                })
+                ->values();
+
+            $cargaPorTutor = ItemPropuesta::query()
+                ->where('propuesta_asignacion_id', $propuesta->id)
+                ->whereNotNull('tutor_id')
+                ->select('tutor_id', DB::raw('COUNT(*) as total'))
+                ->groupBy('tutor_id')
+                ->pluck('total', 'tutor_id');
+
+            $itemsCreados = [];
+            $sinTutorDisponible = [];
+
+            foreach ($seccionesPendientes as $seccion) {
+                $tutorSeleccionado = null;
+
+                $tutoresOrdenados = $tutores
+                    ->sort(function (Tutor $tutorA, Tutor $tutorB) use ($cargaPorTutor) {
+                        $cargaA = (int) $cargaPorTutor->get($tutorA->id, 0);
+                        $cargaB = (int) $cargaPorTutor->get($tutorB->id, 0);
+
+                        if ($cargaA !== $cargaB) {
+                            return $cargaA <=> $cargaB;
+                        }
+
+                        return strcmp($tutorA->nombre_completo, $tutorB->nombre_completo);
+                    })
+                    ->values();
+
+                foreach ($tutoresOrdenados as $tutor) {
+                    if ($this->tutorEsTitularDeSeccion($tutor, $seccion)) {
+                        continue;
+                    }
+
+                    if ($this->tutorTieneChoqueConSeccion($tutor, $seccion, $propuesta)) {
+                        continue;
+                    }
+
+                    $tutorSeleccionado = $tutor;
+                    break;
+                }
+
+                if (! $tutorSeleccionado) {
+                    $sinTutorDisponible[] = [
+                        'seccion_id' => $seccion->id,
+                        'materia_codigo' => $seccion->materia?->codigo,
+                        'materia_nombre' => $seccion->materia?->nombre,
+                        'numero_seccion' => $seccion->numero_seccion,
+                    ];
+
+                    continue;
+                }
+
+                $item = ItemPropuesta::create([
+                    'propuesta_asignacion_id' => $propuesta->id,
+                    'tutor_id' => $tutorSeleccionado->id,
+                    'seccion_id' => $seccion->id,
+                    'prioridad' => $this->calcularPrioridad($seccion),
+                    'observaciones' => 'Sugerencia generada automáticamente por SIGAT-FICA.',
+                ]);
+
+                $itemsCreados[] = $this->snapshotItem($item);
+
+                $cargaPorTutor->put(
+                    $tutorSeleccionado->id,
+                    ((int) $cargaPorTutor->get($tutorSeleccionado->id, 0)) + 1
+                );
+            }
+
+            if (! empty($itemsCreados)) {
+                $this->reactivarAprobacionSiAplica($propuesta);
+
+                $this->registrarHistorial(
+                    propuesta: $propuesta,
+                    usuarioId: $usuarioId,
+                    tipoCambio: 'ajuste_coordinacion',
+                    descripcion: 'Se generaron sugerencias automáticas de asignación de tutores.',
+                    datosAnteriores: null,
+                    datosNuevos: [
+                        'tipo_operacion' => 'sugerencias_generadas',
+                        'total_asignadas' => count($itemsCreados),
+                        'total_sin_tutor_disponible' => count($sinTutorDisponible),
+                        'items' => $itemsCreados,
+                        'sin_tutor_disponible' => $sinTutorDisponible,
+                    ]
+                );
+            }
+
+            return [
+                'asignadas' => count($itemsCreados),
+                'sin_tutor' => count($sinTutorDisponible),
+                'total_revisadas' => $seccionesPendientes->count(),
+            ];
+        });
+    }
+
     public function quitarItem(
         ItemPropuesta $item,
         int $usuarioId
@@ -372,6 +497,37 @@ class PropuestaAsignacionService
         }
 
         return $tutor;
+    }
+
+    private function tutorTieneChoqueConSeccion(
+        Tutor $tutor,
+        Seccion $seccion,
+        PropuestaAsignacion $propuesta
+    ): bool {
+        $choquesTutorias = $this->horarioService->obtenerChoques(
+            tutorId: $tutor->id,
+            seccionId: $seccion->id,
+            propuestaId: $propuesta->id
+        );
+
+        if (! empty($choquesTutorias)) {
+            return true;
+        }
+
+        $choquesCargaDocente = $this->horarioService->obtenerChoquesCargaDocente(
+            tutor: $tutor,
+            seccionNueva: $seccion
+        );
+
+        return ! empty($choquesCargaDocente);
+    }
+
+    private function tutorEsTitularDeSeccion(Tutor $tutor, Seccion $seccion): bool
+    {
+        $codigoTutor = trim((string) $tutor->codigo_empleado);
+        $codigoTitular = trim((string) $seccion->codigo_docente_titular);
+
+        return $codigoTutor !== '' && $codigoTutor === $codigoTitular;
     }
 
     private function calcularPrioridad(Seccion $seccion): bool

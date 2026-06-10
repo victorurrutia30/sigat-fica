@@ -77,6 +77,9 @@ Route::middleware(['auth', 'verified', 'rol:coordinacion'])->group(function () {
     Route::post('carga-academica/importar', [CargaAcademicaController::class, 'store'])
         ->name('carga-academica.store');
 
+    Route::post('propuestas/generar-sugerencias', [PropuestaAsignacionController::class, 'generarSugerencias'])
+        ->name('propuestas.generar-sugerencias');
+
     Route::get('propuestas', [PropuestaAsignacionController::class, 'index'])
         ->name('propuestas.index');
 
