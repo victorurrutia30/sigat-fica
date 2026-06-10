@@ -10,6 +10,12 @@ use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 use App\Http\Requests\ConsolidadoObservacionRequest;
 use App\Models\Consolidado;
+use Illuminate\Support\Str;
+use Maatwebsite\Excel\Facades\Excel;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use App\Exports\ConsolidadoPeriodoInstitucionalExport;
+use App\Models\PeriodoEvaluacion;
+
 
 class ConsolidadoController extends Controller
 {
@@ -102,6 +108,56 @@ class ConsolidadoController extends Controller
         $contexto = $consolidadoService->detalleParaCoordinacion($consolidado);
 
         return view('coordinacion.consolidados.show', $contexto);
+    }
+
+    public function exportarInstitucional(
+        Request $request,
+        Consolidado $consolidado
+    ): BinaryFileResponse {
+        if ($request->user()?->rol !== 'coordinacion') {
+            abort(403, 'No tienes permiso para acceder a esta sección.');
+        }
+
+        $consolidado->load([
+            'periodoEvaluacion.ciclo',
+            'tutor',
+        ]);
+
+        $ciclo = Str::slug($consolidado->periodoEvaluacion?->ciclo?->nombre ?? 'ciclo');
+        $periodo = Str::slug($consolidado->periodoEvaluacion?->nombre ?? 'periodo');
+        $tutor = Str::slug($consolidado->tutor?->nombre_completo ?? 'tutor');
+
+        $nombreArchivo = "consolidado-institucional-{$ciclo}-{$periodo}-{$tutor}-"
+            . now()->format('Ymd-His')
+            . '.xlsx';
+
+        return Excel::download(
+            new ConsolidadoInstitucionalExport($consolidado),
+            $nombreArchivo
+        );
+    }
+
+    public function exportarPeriodoInstitucional(
+        Request $request,
+        PeriodoEvaluacion $periodoEvaluacion
+    ): BinaryFileResponse {
+        if ($request->user()?->rol !== 'coordinacion') {
+            abort(403, 'No tienes permiso para acceder a esta sección.');
+        }
+
+        $periodoEvaluacion->load('ciclo');
+
+        $ciclo = Str::slug($periodoEvaluacion->ciclo?->nombre ?? 'ciclo');
+        $periodo = Str::slug($periodoEvaluacion->nombre ?? 'periodo');
+
+        $nombreArchivo = "consolidado-institucional-{$ciclo}-{$periodo}-"
+            . now()->format('Ymd-His')
+            . '.xlsx';
+
+        return Excel::download(
+            new ConsolidadoPeriodoInstitucionalExport($periodoEvaluacion),
+            $nombreArchivo
+        );
     }
 
     public function guardarObservacion(

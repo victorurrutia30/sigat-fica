@@ -10,9 +10,15 @@
                 </p>
             </div>
 
-            <a href="{{ route('consolidados.index', ['periodo_id' => $consolidado->periodo_evaluacion_id]) }}" class="btn-secondary">
-                Volver
-            </a>
+            <div class="flex flex-wrap gap-2">
+                <a href="{{ route('consolidados.exportar-institucional', $consolidado) }}" class="btn-primary">
+                    Exportar Excel
+                </a>
+
+                <a href="{{ route('consolidados.index', ['periodo_id' => $consolidado->periodo_evaluacion_id]) }}" class="btn-secondary">
+                    Volver
+                </a>
+            </div>
         </div>
     </x-slot>
 

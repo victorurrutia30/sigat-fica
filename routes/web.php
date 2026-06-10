@@ -42,6 +42,9 @@ Route::middleware(['auth', 'verified', 'rol:coordinacion'])->group(function () {
     Route::get('consolidados/{consolidado}', [ConsolidadoController::class, 'coordinacionShow'])
         ->name('consolidados.show');
 
+    Route::get('consolidados/{consolidado}/exportar-institucional', [ConsolidadoController::class, 'exportarInstitucional'])
+        ->name('consolidados.exportar-institucional');
+
     Route::patch('consolidados/{consolidado}/observacion', [ConsolidadoController::class, 'guardarObservacion'])
         ->name('consolidados.observacion');
 
