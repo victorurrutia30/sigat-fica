@@ -131,6 +131,10 @@ Route::patch('casos/{casoSeguimiento}/cerrar', [CasoSeguimientoController::class
     ->middleware(['auth', 'rol:tutor'])
     ->name('casos.cerrar');
 
+Route::patch('casos/{casoSeguimiento}/reabrir', [CasoSeguimientoController::class, 'reabrir'])
+    ->middleware(['auth', 'rol:tutor'])
+    ->name('casos.reabrir');
+
 Route::get('casos/{casoSeguimiento}/gestiones/create', [GestionCasoController::class, 'create'])
     ->middleware(['auth', 'rol:tutor'])
     ->name('gestiones.create');

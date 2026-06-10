@@ -30,6 +30,7 @@
                 </a>
 
                 <div class="flex flex-wrap gap-2">
+                    @if($puedeModificarCaso ?? true)
                     @if(! $caso->cerrado)
                     <a href="{{ route('gestiones.create', $caso) }}" class="btn-secondary">
                         Agregar gestión
@@ -38,6 +39,23 @@
                     <a href="{{ route('casos.cierre', $caso) }}" class="btn-primary">
                         Cerrar caso
                     </a>
+                    @else
+                    <form
+                        method="POST"
+                        action="{{ route('casos.reabrir', $caso) }}"
+                        onsubmit="return confirm('¿Seguro que deseas reabrir este caso para corrección? Deberás registrar una gestión correctiva y cerrarlo nuevamente.')">
+                        @csrf
+                        @method('PATCH')
+
+                        <button type="submit" class="btn-secondary">
+                            Reabrir para corrección
+                        </button>
+                    </form>
+                    @endif
+                    @else
+                    <span class="badge-muted">
+                        Solo lectura: consolidado entregado
+                    </span>
                     @endif
                 </div>
             </div>

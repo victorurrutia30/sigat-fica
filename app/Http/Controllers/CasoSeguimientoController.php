@@ -99,8 +99,15 @@ class CasoSeguimientoController extends Controller
             'gestiones.registradoPor',
         ]);
 
+        $estadoConsolidado = $casoService->estadoConsolidadoParaCaso(
+            caso: $casoSeguimiento,
+            usuario: $request->user()
+        );
+
         return view('tutor.casos.show', [
             'caso' => $casoSeguimiento,
+            'estadoConsolidado' => $estadoConsolidado,
+            'puedeModificarCaso' => $estadoConsolidado !== 'entregado',
         ]);
     }
 
@@ -168,6 +175,28 @@ class CasoSeguimientoController extends Controller
         return redirect()
             ->route('casos.show', $casoSeguimiento)
             ->with('success', 'Caso cerrado correctamente.');
+    }
+
+
+    public function reabrir(
+        CasoSeguimiento $casoSeguimiento,
+        Request $request,
+        CasoSeguimientoService $casoService
+    ): RedirectResponse {
+        try {
+            $casoService->reabrirCaso(
+                caso: $casoSeguimiento,
+                usuario: $request->user()
+            );
+        } catch (ValidationException $exception) {
+            return redirect()
+                ->route('casos.show', $casoSeguimiento)
+                ->with('error', collect($exception->errors())->flatten()->first());
+        }
+
+        return redirect()
+            ->route('casos.show', $casoSeguimiento)
+            ->with('success', 'Caso reabierto correctamente. Registra la gestión correctiva y vuelve a cerrar el caso.');
     }
 
     public function edit(CasoSeguimiento $casoSeguimiento): RedirectResponse
