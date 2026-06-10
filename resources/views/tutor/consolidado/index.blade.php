@@ -1,317 +1,360 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
-            <div>
-                <h2 class="text-xl font-bold text-utec-primary">
-                    Mi consolidado
-                </h2>
-                <p class="text-sm text-gray-500">
-                    Revisión y entrega del consolidado del periodo activo.
-                </p>
-            </div>
-
-            <a href="{{ route('casos.index') }}" class="btn-secondary">
-                Ver casos
-            </a>
+        <div class="flex flex-col gap-1">
+            <h2 class="text-xl font-semibold leading-tight text-utec-gray-dark">
+                Mi consolidado
+            </h2>
+            <p class="text-sm text-gray-500">
+                Revisión y entrega del consolidado del periodo activo.
+            </p>
         </div>
     </x-slot>
 
-    <div class="py-6">
+    <div class="bg-utec-bg-light py-10">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             @if(session('success'))
-            <div class="alert-success mb-4">
+            <div class="alert-success mb-6">
                 {{ session('success') }}
             </div>
             @endif
 
             @if(session('error'))
-            <div class="alert-error mb-4">
+            <div class="alert-error mb-6">
                 {{ session('error') }}
             </div>
             @endif
 
+            @if($errors->any())
+            <div class="alert-error mb-6">
+                {{ $errors->first() }}
+            </div>
+            @endif
+
             @if($mensajeBloqueo)
-            <div class="alert-warning">
+            <div class="alert-error">
                 {{ $mensajeBloqueo }}
             </div>
             @else
             <div class="mb-6 grid gap-4 md:grid-cols-4">
                 <div class="card">
                     <div class="card-body">
-                        <p class="text-xs text-gray-500">Periodo activo</p>
-                        <p class="mt-2 text-lg font-bold text-utec-primary">
-                            {{ $periodo->nombre }}
-                        </p>
-                        <p class="mt-1 text-sm text-gray-500">
-                            Límite:
-                            {{ $periodo->fecha_limite_consolidado->format('d/m/Y') }}
+                        <p class="text-sm font-medium text-gray-500">Total de casos</p>
+                        <p class="mt-3 text-3xl font-bold text-utec-primary">
+                            {{ $diagnostico['total'] }}
                         </p>
                     </div>
                 </div>
 
                 <div class="card">
                     <div class="card-body">
-                        <p class="text-xs text-gray-500">Estado de entrega</p>
-                        <p class="mt-2">
-                            @if($consolidado->estado_entrega === 'entregado')
-                            <span class="badge-success">Entregado</span>
-                            @elseif($consolidado->estado_entrega === 'con_observaciones')
-                            <span class="badge-warning">Con observaciones</span>
-                            @else
-                            <span class="badge-muted">Pendiente</span>
-                            @endif
-                        </p>
-
-                        @if($consolidado->entregado_en)
-                        <p class="mt-2 text-sm text-gray-500">
-                            {{ $consolidado->entregado_en->format('d/m/Y H:i') }}
-                        </p>
-                        @endif
-                    </div>
-                </div>
-
-                <div class="card">
-                    <div class="card-body">
-                        <p class="text-xs text-gray-500">Casos cerrados</p>
-                        <p class="mt-2 text-3xl font-bold text-utec-primary">
+                        <p class="text-sm font-medium text-gray-500">Casos cerrados</p>
+                        <p class="mt-3 text-3xl font-bold text-utec-primary">
                             {{ $diagnostico['cerrados'] }}
                         </p>
-                        <p class="mt-1 text-sm text-gray-500">
-                            de {{ $diagnostico['total'] }} registrados
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-body">
+                        <p class="text-sm font-medium text-gray-500">Casos abiertos</p>
+                        <p class="mt-3 text-3xl font-bold text-utec-primary">
+                            {{ $diagnostico['abiertos'] }}
                         </p>
                     </div>
                 </div>
 
                 <div class="card">
                     <div class="card-body">
-                        <p class="text-xs text-gray-500">Casos incompletos</p>
-                        <p class="mt-2 text-3xl font-bold text-utec-primary">
+                        <p class="text-sm font-medium text-gray-500">Incompletos</p>
+                        <p class="mt-3 text-3xl font-bold text-utec-primary">
                             {{ $diagnostico['incompletos'] }}
-                        </p>
-                        <p class="mt-1 text-sm text-gray-500">
-                            Deben quedar en 0 para entregar.
                         </p>
                     </div>
                 </div>
             </div>
 
-            @if($consolidado->observaciones_coord)
-            <div class="alert-info mb-6">
-                <span class="font-semibold">Observaciones de Coordinación:</span>
-                {{ $consolidado->observaciones_coord }}
+            <div class="grid gap-6 lg:grid-cols-3">
+                <div class="card lg:col-span-2">
+                    <div class="card-header">
+                        <h3 class="text-base font-semibold text-utec-gray-dark">
+                            Información del periodo
+                        </h3>
+                    </div>
+
+                    <div class="card-body">
+                        <dl class="grid gap-4 md:grid-cols-2">
+                            <div>
+                                <dt class="text-sm font-medium text-gray-500">Periodo</dt>
+                                <dd class="mt-1 text-sm text-utec-gray-dark">
+                                    {{ $periodo?->nombre }}
+                                </dd>
+                            </div>
+
+                            <div>
+                                <dt class="text-sm font-medium text-gray-500">Ciclo</dt>
+                                <dd class="mt-1 text-sm text-utec-gray-dark">
+                                    {{ $periodo?->ciclo?->nombre }}
+                                </dd>
+                            </div>
+
+                            <div>
+                                <dt class="text-sm font-medium text-gray-500">Fecha límite</dt>
+                                <dd class="mt-1 text-sm text-utec-gray-dark">
+                                    {{ $periodo?->fecha_limite_consolidado?->format('d/m/Y') }}
+                                </dd>
+                            </div>
+
+                            <div>
+                                <dt class="text-sm font-medium text-gray-500">Tutor</dt>
+                                <dd class="mt-1 text-sm text-utec-gray-dark">
+                                    {{ $tutor?->nombre_completo }}
+                                </dd>
+                            </div>
+                        </dl>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="text-base font-semibold text-utec-gray-dark">
+                            Estado de entrega
+                        </h3>
+                    </div>
+
+                    <div class="card-body">
+                        @php
+                        $estado = $consolidado?->estado_entrega;
+                        @endphp
+
+                        @if($estado === 'entregado')
+                        <span class="badge-success">Entregado</span>
+                        @elseif($estado === 'con_observaciones')
+                        <span class="badge-warning">Con observaciones</span>
+                        @else
+                        <span class="badge-muted">Pendiente</span>
+                        @endif
+
+                        <p class="mt-3 text-sm text-gray-500">
+                            @if($consolidado?->entregado_en)
+                            Entregado el {{ $consolidado->entregado_en->format('d/m/Y H:i') }}.
+                            @else
+                            Aún no se ha entregado este consolidado.
+                            @endif
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            @if($consolidado?->observaciones_coord)
+            <div class="card mt-6">
+                <div class="card-header">
+                    <h3 class="text-base font-semibold text-utec-gray-dark">
+                        Observaciones de Coordinación
+                    </h3>
+                </div>
+
+                <div class="card-body">
+                    <p class="whitespace-pre-line text-sm text-utec-gray-dark">
+                        {{ $consolidado->observaciones_coord }}
+                    </p>
+                </div>
             </div>
             @endif
 
             @if($diagnostico['incompletos'] > 0)
-            <div class="alert-warning mb-6">
-                No puedes entregar todavía. Revisa los casos incompletos indicados abajo.
+            <div class="card mt-6">
+                <div class="card-header">
+                    <h3 class="text-base font-semibold text-utec-gray-dark">
+                        Casos incompletos
+                    </h3>
+                </div>
+
+                <div class="card-body">
+                    <p class="mb-4 text-sm text-gray-500">
+                        No se puede entregar el consolidado mientras existan casos con información pendiente.
+                    </p>
+
+                    <div class="space-y-3">
+                        @foreach($diagnostico['detalle_incompletos'] as $detalle)
+                        @php
+                        $casoIncompleto = $detalle['caso'];
+                        @endphp
+
+                        <div class="rounded-lg border border-red-200 bg-red-50 p-4">
+                            <p class="text-sm font-semibold text-red-800">
+                                {{ $casoIncompleto->estudiante?->nombre_completo }}
+                                <span class="font-normal">
+                                    — {{ $casoIncompleto->seccion?->materia?->nombre }}
+                                    / Sección {{ $casoIncompleto->seccion?->numero_seccion }}
+                                </span>
+                            </p>
+
+                            <p class="mt-2 text-sm text-red-700">
+                                Faltante:
+                                {{ implode(', ', $detalle['faltantes']) }}.
+                            </p>
+
+                            <a href="{{ route('casos.show', $casoIncompleto) }}" class="link-utec mt-2 inline-block">
+                                Ver caso
+                            </a>
+                        </div>
+                        @endforeach
+                    </div>
+                </div>
             </div>
             @endif
 
-            <div class="mb-6 grid gap-6 lg:grid-cols-3">
-                <div class="card lg:col-span-2">
-                    <div class="card-header">
-                        <h3 class="text-base font-semibold text-utec-gray-dark">
-                            Estado de casos
-                        </h3>
-                    </div>
+            <div class="card mt-6">
+                <div class="card-header">
+                    <h3 class="text-base font-semibold text-utec-gray-dark">
+                        Casos incluidos en el consolidado
+                    </h3>
+                </div>
 
+                <div class="card-body">
+                    @if($casos->isEmpty())
+                    <p class="text-sm text-gray-500">
+                        No hay casos registrados para este periodo.
+                    </p>
+                    @else
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-utec-gray-medium">
                             <thead>
                                 <tr>
                                     <th class="th-utec">Estudiante</th>
-                                    <th class="th-utec">Sección</th>
-                                    <th class="th-utec">Causa</th>
-                                    <th class="th-utec">Resultado</th>
-                                    <th class="th-utec">Gestiones</th>
+                                    <th class="th-utec">Materia / sección</th>
                                     <th class="th-utec">Estado</th>
+                                    <th class="th-utec">Resultado institucional</th>
+                                    <th class="th-utec">Matrícula</th>
+                                    <th class="th-utec">Cuota</th>
+                                    <th class="th-utec">Causa</th>
+                                    <th class="th-utec">Detalle inasistencia</th>
                                     <th class="th-utec text-right">Acciones</th>
                                 </tr>
                             </thead>
 
                             <tbody class="divide-y divide-utec-gray-medium bg-white">
-                                @forelse($casos as $caso)
-                                <tr class="hover:bg-utec-primary-soft">
+                                @foreach($casos as $caso)
+                                <tr>
                                     <td class="td-utec">
-                                        <div class="font-semibold">
+                                        <div class="font-medium text-utec-gray-dark">
                                             {{ $caso->estudiante?->nombre_completo }}
                                         </div>
                                         <div class="text-xs text-gray-500">
-                                            {{ $caso->estudiante?->carne }}
+                                            Carné: {{ $caso->estudiante?->carne }}
                                         </div>
                                     </td>
 
                                     <td class="td-utec">
-                                        <div class="font-semibold">
+                                        <div>
                                             {{ $caso->seccion?->materia?->codigo }}
                                             —
-                                            {{ $caso->seccion?->numero_seccion }}
-                                        </div>
-                                        <div class="text-xs text-gray-500">
                                             {{ $caso->seccion?->materia?->nombre }}
                                         </div>
-                                    </td>
-
-                                    <td class="td-utec">
-                                        @if($caso->causa)
-                                        {{ $caso->causa->nombre }}
-                                        @else
-                                        <span class="badge-warning">Falta</span>
-                                        @endif
-                                    </td>
-
-                                    <td class="td-utec">
-                                        @if($caso->resultado_final)
-                                        {{ ucfirst($caso->resultado_final) }}
-                                        @else
-                                        <span class="badge-warning">Falta</span>
-                                        @endif
-                                    </td>
-
-                                    <td class="td-utec">
-                                        @if($caso->gestiones->isNotEmpty())
-                                        {{ $caso->gestiones->count() }}
-                                        @else
-                                        <span class="badge-warning">Falta</span>
-                                        @endif
-                                    </td>
-
-                                    <td class="td-utec">
-                                        @if($caso->cerrado && $caso->causa_id && $caso->resultado_final && $caso->gestiones->isNotEmpty())
-                                        <span class="badge-success">Completo</span>
-                                        @else
-                                        <span class="badge-warning">Incompleto</span>
-                                        @endif
-                                    </td>
-
-                                    <td class="td-utec">
-                                        <div class="flex justify-end">
-                                            <a href="{{ route('casos.show', $caso) }}" class="link-utec">
-                                                Ver caso
-                                            </a>
+                                        <div class="text-xs text-gray-500">
+                                            Sección {{ $caso->seccion?->numero_seccion }}
                                         </div>
                                     </td>
-                                </tr>
-                                @empty
-                                <tr>
-                                    <td colspan="7" class="px-6 py-8 text-center text-sm text-gray-500">
-                                        No tienes casos registrados para este periodo.
+
+                                    <td class="td-utec">
+                                        @if($caso->cerrado)
+                                        <span class="badge-success">Cerrado</span>
+                                        @else
+                                        <span class="badge-warning">Abierto</span>
+                                        @endif
+                                    </td>
+
+                                    <td class="td-utec">
+                                        {{ $caso->resultadoConsolidadoTexto() }}
+                                    </td>
+
+                                    <td class="td-utec">
+                                        @if(is_null($caso->matricula))
+                                        Pendiente
+                                        @else
+                                        {{ $caso->matricula ? 'Sí' : 'No' }}
+                                        @endif
+                                    </td>
+
+                                    <td class="td-utec">
+                                        {{ $caso->cuota_cancelada ?: 'No registrada' }}
+                                    </td>
+
+                                    <td class="td-utec">
+                                        {{ $caso->causa?->nombre ?: 'Pendiente' }}
+                                    </td>
+
+                                    <td class="td-utec">
+                                        <span class="line-clamp-3">
+                                            {{ $caso->detalle_inasistencia ?: 'Pendiente' }}
+                                        </span>
+                                    </td>
+
+                                    <td class="td-utec text-right">
+                                        <a href="{{ route('casos.show', $caso) }}" class="link-utec">
+                                            Ver
+                                        </a>
                                     </td>
                                 </tr>
-                                @endforelse
+                                @endforeach
                             </tbody>
                         </table>
                     </div>
-                </div>
-
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="text-base font-semibold text-utec-gray-dark">
-                            Entrega del consolidado
-                        </h3>
-                    </div>
-
-                    <div class="card-body">
-                        @if($consolidado->estado_entrega === 'entregado')
-                        <div class="alert-success">
-                            El consolidado ya fue entregado.
-                        </div>
-
-                        <dl class="mt-5 space-y-3 text-sm">
-                            <div>
-                                <dt class="font-medium text-gray-500">Fecha de entrega</dt>
-                                <dd class="text-utec-gray-dark">
-                                    {{ $consolidado->entregado_en?->format('d/m/Y H:i') }}
-                                </dd>
-                            </div>
-
-                            <div>
-                                <dt class="font-medium text-gray-500">Constancia sin casos</dt>
-                                <dd class="text-utec-gray-dark">
-                                    {{ $consolidado->sin_casos ? 'Sí' : 'No' }}
-                                </dd>
-                            </div>
-                        </dl>
-                        @else
-                        <form method="POST" action="{{ route('consolidado.entregar') }}">
-                            @csrf
-                            @method('PATCH')
-
-                            @if($diagnostico['total'] === 0)
-                            <div class="mb-4 rounded-md border border-orange-200 bg-orange-50 p-4 text-sm text-orange-800">
-                                No hay casos registrados. Para entregar, debes confirmar expresamente que no hubo estudiantes no evaluados.
-                            </div>
-
-                            <label class="mb-4 flex items-start gap-2 text-sm text-utec-gray-dark">
-                                <input type="hidden" name="confirmar_sin_casos" value="0">
-                                <input
-                                    type="checkbox"
-                                    name="confirmar_sin_casos"
-                                    value="1"
-                                    class="mt-1 rounded border-utec-gray-medium text-utec-primary focus:ring-utec-primary-light"
-                                    @checked(old('confirmar_sin_casos'))>
-                                <span>
-                                    Confirmo que no hubo estudiantes no evaluados en mis secciones asignadas para este periodo.
-                                </span>
-                            </label>
-
-                            @error('confirmar_sin_casos')
-                            <p class="form-error mb-4">{{ $message }}</p>
-                            @enderror
-                            @else
-                            <input type="hidden" name="confirmar_sin_casos" value="0">
-                            @endif
-
-                            @if($diagnostico['incompletos'] > 0)
-                            <div class="mb-4 rounded-md border border-red-200 bg-red-50 p-4 text-sm text-red-800">
-                                Debes completar todos los casos antes de entregar.
-                            </div>
-                            @else
-                            <div class="mb-4 rounded-md border border-green-200 bg-green-50 p-4 text-sm text-green-800">
-                                El consolidado está listo para entrega.
-                            </div>
-                            @endif
-
-                            <button
-                                type="submit"
-                                class="btn-primary w-full"
-                                onclick="return confirm('¿Seguro que deseas entregar el consolidado?')">
-                                Entregar consolidado
-                            </button>
-                        </form>
-                        @endif
-                    </div>
+                    @endif
                 </div>
             </div>
 
-            @if($diagnostico['incompletos'] > 0)
-            <div class="card">
+            @if($consolidado?->estado_entrega !== 'entregado')
+            <div class="card mt-6">
                 <div class="card-header">
                     <h3 class="text-base font-semibold text-utec-gray-dark">
-                        Detalle de campos faltantes
+                        Entrega del consolidado
                     </h3>
                 </div>
 
                 <div class="card-body">
-                    <div class="space-y-3">
-                        @foreach($diagnostico['detalle_incompletos'] as $item)
-                        <div class="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-800">
-                            <div class="font-semibold">
-                                {{ $item['caso']->estudiante?->nombre_completo }}
-                                —
-                                {{ $item['caso']->seccion?->materia?->codigo }}
-                                /
-                                Sección {{ $item['caso']->seccion?->numero_seccion }}
-                            </div>
+                    <form method="POST" action="{{ route('consolidado.entregar') }}">
+                        @csrf
+                        @method('PATCH')
 
-                            <div class="mt-1">
-                                Falta:
-                                {{ implode(', ', $item['faltantes']) }}.
-                            </div>
+                        @if($diagnostico['total'] === 0)
+                        <div class="mb-5 rounded-lg border border-yellow-200 bg-yellow-50 p-4">
+                            <label class="flex items-start gap-3">
+                                <input
+                                    type="checkbox"
+                                    name="confirmar_sin_casos"
+                                    value="1"
+                                    class="mt-1 rounded border-gray-300 text-utec-primary shadow-sm focus:ring-utec-primary"
+                                    @checked(old('confirmar_sin_casos'))>
+
+                                <span class="text-sm text-yellow-800">
+                                    Confirmo que no hubo estudiantes no evaluados en mis secciones durante este periodo.
+                                </span>
+                            </label>
+
+                            @error('confirmar_sin_casos')
+                            <p class="form-error">{{ $message }}</p>
+                            @enderror
                         </div>
-                        @endforeach
-                    </div>
+                        @endif
+
+                        @if($diagnostico['incompletos'] > 0)
+                        <div class="alert-error mb-5">
+                            No se puede entregar porque existen casos incompletos.
+                        </div>
+                        @endif
+
+                        <div class="flex justify-end">
+                            <button
+                                type="submit"
+                                class="btn-primary"
+                                @disabled($diagnostico['incompletos']> 0)
+                                onclick="return confirm('¿Seguro que deseas entregar este consolidado?')"
+                                >
+                                Entregar consolidado
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
             @endif
