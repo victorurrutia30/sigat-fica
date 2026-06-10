@@ -68,6 +68,10 @@
                                     Tutores
                                 </x-dropdown-link>
 
+                                <x-dropdown-link :href="route('usuarios.index')">
+                                    Usuarios
+                                </x-dropdown-link>
+
                                 <x-dropdown-link :href="route('carga-academica.create')">
                                     Carga académica
                                 </x-dropdown-link>
@@ -79,6 +83,8 @@
                                 <x-dropdown-link :href="route('causas.index')">
                                     Catálogo de causas
                                 </x-dropdown-link>
+
+
                             </x-slot>
                         </x-dropdown>
                     </div>
@@ -202,6 +208,10 @@
 
             <x-responsive-nav-link :href="route('tablero.index')" :active="request()->routeIs('tablero.*')">
                 Tablero
+            </x-responsive-nav-link>
+
+            <x-responsive-nav-link :href="route('usuarios.index')" :active="request()->routeIs('usuarios.*')">
+                Usuarios
             </x-responsive-nav-link>
 
             <x-responsive-nav-link :href="route('notificaciones.index')" :active="request()->routeIs('notificaciones.*')">

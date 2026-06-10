@@ -16,6 +16,7 @@ use App\Http\Controllers\ConsolidadoController;
 use App\Http\Controllers\TableroCumplimientoController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\NotificacionController;
+use App\Http\Controllers\UsuarioController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -36,6 +37,10 @@ Route::middleware(['auth', 'verified', 'rol:coordinacion'])->group(function () {
 
     Route::resource('tutores', TutorController::class)
         ->parameters(['tutores' => 'tutor']);
+
+    Route::resource('usuarios', UsuarioController::class)
+        ->except(['show'])
+        ->parameters(['usuarios' => 'usuario']);
 
     Route::resource('causas', CausaController::class)
         ->parameters(['causas' => 'causa']);
