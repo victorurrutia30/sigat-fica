@@ -98,9 +98,9 @@
                 </div>
             </div>
 
-            @if($propuesta->publicado)
+            @if($propuesta->publicado || $propuesta->estado_aprobacion === 'aprobado')
             <div class="alert-warning">
-                Esta propuesta ya fue publicada. Si modificas asignaciones, el sistema debe volverla a estado pendiente y dejará de estar visible para tutores hasta nueva aprobación.
+                Esta propuesta ya fue aprobada o publicada. Si reemplazas un tutor, el sistema volverá la propuesta a estado pendiente, la dejará no publicada y requerirá una nueva aprobación del Decano.
             </div>
             @endif
 
@@ -273,13 +273,22 @@
 
                                                 <div>
                                                     <label for="observaciones_{{ $seccion->id }}" class="form-label">
-                                                        Observaciones
+                                                        {{ $item ? 'Motivo u observaciones del cambio' : 'Observaciones' }}
+                                                        @if($item)
+                                                        <span class="text-red-500">*</span>
+                                                        @endif
                                                     </label>
 
                                                     <textarea name="observaciones"
                                                         id="observaciones_{{ $seccion->id }}"
                                                         rows="2"
                                                         class="input-field">{{ old('observaciones', $item?->observaciones) }}</textarea>
+
+                                                    @if($item)
+                                                    <p class="form-hint">
+                                                        Si cambias el tutor, este texto se usará como motivo del reemplazo en el historial.
+                                                    </p>
+                                                    @endif
 
                                                     @if($hayErrorFila)
                                                     @error('observaciones')
@@ -290,7 +299,7 @@
 
                                                 <div class="flex flex-wrap items-center gap-2">
                                                     <button type="submit" class="btn-primary">
-                                                        {{ $item ? 'Actualizar' : 'Asignar' }}
+                                                        {{ $item ? 'Guardar cambio' : 'Asignar tutor' }}
                                                     </button>
 
                                                     @if($item)
@@ -299,6 +308,12 @@
                                                     <span class="badge-muted">Sin asignar</span>
                                                     @endif
                                                 </div>
+
+                                                @if($item && ($propuesta->publicado || $propuesta->estado_aprobacion === 'aprobado'))
+                                                <p class="form-hint">
+                                                    Cambiar el tutor de esta asignación reactivará la aprobación del Decano.
+                                                </p>
+                                                @endif
                                             </form>
 
                                             @if($item)

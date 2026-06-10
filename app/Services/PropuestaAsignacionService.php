@@ -135,6 +135,12 @@ class PropuestaAsignacionService
 
                 $cambioTutor = (int) $itemExistente->tutor_id !== (int) $tutor->id;
 
+                if ($cambioTutor && blank($observaciones)) {
+                    throw ValidationException::withMessages([
+                        'observaciones' => 'Debe registrar el motivo u observación del reemplazo de tutor.',
+                    ]);
+                }
+
                 $itemExistente->update([
                     'tutor_id' => $tutor->id,
                     'prioridad' => $prioridad,
