@@ -104,8 +104,8 @@
             </div>
             @endif
 
-            <div class="grid gap-6 lg:grid-cols-3">
-                <div class="card lg:col-span-2">
+            <div class="space-y-6">
+                <div class="card">
                     <div class="card-header">
                         <div>
                             <h3 class="text-base font-semibold text-utec-gray-dark">
@@ -140,6 +140,18 @@
                                     @php
                                     $item = $itemsPorSeccion->get($seccion->id);
                                     $hayErrorFila = (string) old('seccion_id') === (string) $seccion->id;
+
+                                    $valorTutor = $hayErrorFila
+                                    ? old('tutor_id', $item?->tutor_id)
+                                    : $item?->tutor_id;
+
+                                    $valorAula = $hayErrorFila
+                                    ? old('aula', $seccion->aula)
+                                    : $seccion->aula;
+
+                                    $valorObservaciones = $hayErrorFila
+                                    ? old('observaciones', $item?->observaciones)
+                                    : $item?->observaciones;
                                     @endphp
 
                                     <tr class="hover:bg-utec-primary-soft">
@@ -221,118 +233,148 @@
                                         </td>
 
                                         <td class="td-utec align-top">
-                                            <form method="POST" action="{{ route('propuestas.items.store') }}" class="space-y-2">
-                                                @csrf
+                                            <div class="min-w-[260px] space-y-2">
+                                                @if($item)
+                                                <div class="rounded-md border border-green-200 bg-green-50 px-3 py-2">
+                                                    <div class="flex flex-wrap items-center gap-2">
+                                                        <span class="badge-success">Asignada</span>
+                                                        <span class="text-sm font-semibold text-green-900">
+                                                            {{ $item->tutor?->nombre_completo ?? 'Tutor no disponible' }}
+                                                        </span>
+                                                    </div>
 
-                                                <input type="hidden" name="seccion_id" value="{{ $seccion->id }}">
-
-                                                <div>
-                                                    <label for="tutor_id_{{ $seccion->id }}" class="form-label">
-                                                        Tutor <span class="text-red-500">*</span>
-                                                    </label>
-
-                                                    <select name="tutor_id"
-                                                        id="tutor_id_{{ $seccion->id }}"
-                                                        class="input-field"
-                                                        required>
-                                                        <option value="">Seleccione tutor</option>
-                                                        @foreach($tutores as $tutor)
-                                                        <option value="{{ $tutor->id }}"
-                                                            @selected((string) old('tutor_id', $item?->tutor_id) === (string) $tutor->id)>
-                                                            {{ $tutor->nombre_completo }}
-                                                            @if(! $tutor->tiempo_completo && $tutor->es_excepcion_tutoria)
-                                                            — Excepción
-                                                            @endif{{ $tutor->nombre_completo }}
-                                                        </option>
-                                                        @endforeach
-                                                    </select>
-
-                                                    @if($hayErrorFila)
-                                                    @error('tutor_id')
-                                                    <p class="form-error">{{ $message }}</p>
-                                                    @enderror
-                                                    @endif
-                                                </div>
-
-                                                <div>
-                                                    <label for="aula_{{ $seccion->id }}" class="form-label">
-                                                        Aula
-                                                    </label>
-
-                                                    <input type="text"
-                                                        name="aula"
-                                                        id="aula_{{ $seccion->id }}"
-                                                        value="{{ old('aula', $seccion->aula) }}"
-                                                        class="input-field"
-                                                        maxlength="60"
-                                                        placeholder="{{ $seccion->modalidad === 'en_linea' ? 'EN LÍNEA' : 'Ej. A-301' }}">
-
-                                                    @if($hayErrorFila)
-                                                    @error('aula')
-                                                    <p class="form-error">{{ $message }}</p>
-                                                    @enderror
-                                                    @endif
-                                                </div>
-
-                                                <div>
-                                                    <label for="observaciones_{{ $seccion->id }}" class="form-label">
-                                                        {{ $item ? 'Motivo u observaciones del cambio' : 'Observaciones' }}
-                                                        @if($item)
-                                                        <span class="text-red-500">*</span>
-                                                        @endif
-                                                    </label>
-
-                                                    <textarea name="observaciones"
-                                                        id="observaciones_{{ $seccion->id }}"
-                                                        rows="2"
-                                                        class="input-field">{{ old('observaciones', $item?->observaciones) }}</textarea>
-
-                                                    @if($item)
-                                                    <p class="form-hint">
-                                                        Si cambias el tutor, este texto se usará como motivo del reemplazo en el historial.
+                                                    @if($item->observaciones)
+                                                    <p class="mt-1 text-xs text-green-800">
+                                                        {{ $item->observaciones }}
                                                     </p>
                                                     @endif
-
-                                                    @if($hayErrorFila)
-                                                    @error('observaciones')
-                                                    <p class="form-error">{{ $message }}</p>
-                                                    @enderror
-                                                    @endif
                                                 </div>
-
-                                                <div class="flex flex-wrap items-center gap-2">
-                                                    <button type="submit" class="btn-primary">
-                                                        {{ $item ? 'Guardar cambio' : 'Asignar tutor' }}
-                                                    </button>
-
-                                                    @if($item)
-                                                    <span class="badge-success">Asignada</span>
-                                                    @else
+                                                @else
+                                                <div class="rounded-md border border-gray-200 bg-gray-50 px-3 py-2">
                                                     <span class="badge-muted">Sin asignar</span>
-                                                    @endif
                                                 </div>
-
-                                                @if($item && ($propuesta->publicado || $propuesta->estado_aprobacion === 'aprobado'))
-                                                <p class="form-hint">
-                                                    Cambiar el tutor de esta asignación reactivará la aprobación del Decano.
-                                                </p>
                                                 @endif
-                                            </form>
 
-                                            @if($item)
-                                            <form method="POST"
-                                                action="{{ route('propuestas.items.destroy', $item) }}"
-                                                class="mt-2"
-                                                onsubmit="return confirm('¿Seguro que deseas quitar esta asignación?')">
-                                                @csrf
-                                                @method('DELETE')
+                                                <form method="POST" action="{{ route('propuestas.items.store') }}" class="space-y-3">
+                                                    @csrf
 
-                                                <button type="submit" class="btn-danger">
-                                                    Quitar tutor
-                                                </button>
-                                            </form>
-                                            @endif
+                                                    <input type="hidden" name="seccion_id" value="{{ $seccion->id }}">
+
+                                                    <div>
+                                                        <label for="tutor_id_{{ $seccion->id }}" class="form-label">
+                                                            Tutor <span class="text-red-500">*</span>
+                                                        </label>
+
+                                                        <select
+                                                            name="tutor_id"
+                                                            id="tutor_id_{{ $seccion->id }}"
+                                                            class="input-field"
+                                                            required>
+                                                            <option value="">Seleccione tutor</option>
+
+                                                            @foreach($tutores as $tutor)
+                                                            <option value="{{ $tutor->id }}" @selected((string) $valorTutor===(string) $tutor->id)>
+                                                                {{ $tutor->nombre_completo }}
+                                                                @if(! $tutor->tiempo_completo && $tutor->es_excepcion_tutoria)
+                                                                — Excepción
+                                                                @endif
+                                                            </option>
+                                                            @endforeach
+                                                        </select>
+
+                                                        @if($hayErrorFila)
+                                                        @error('tutor_id')
+                                                        <p class="form-error">{{ $message }}</p>
+                                                        @enderror
+                                                        @endif
+                                                    </div>
+
+                                                    <details class="rounded-md border border-gray-200 bg-white px-3 py-2">
+                                                        <summary class="cursor-pointer whitespace-nowrap text-sm font-semibold text-utec-primary">
+                                                            Detalles
+                                                        </summary>
+
+                                                        <div class="mt-3 space-y-3">
+                                                            <div>
+                                                                <label for="aula_{{ $seccion->id }}" class="form-label">
+                                                                    Aula
+                                                                </label>
+
+                                                                <input
+                                                                    type="text"
+                                                                    name="aula"
+                                                                    id="aula_{{ $seccion->id }}"
+                                                                    value="{{ $valorAula }}"
+                                                                    class="input-field"
+                                                                    maxlength="60"
+                                                                    placeholder="{{ $seccion->modalidad === 'en_linea' ? 'EN LÍNEA' : 'Ej. A-301' }}">
+
+                                                                @if($hayErrorFila)
+                                                                @error('aula')
+                                                                <p class="form-error">{{ $message }}</p>
+                                                                @enderror
+                                                                @endif
+                                                            </div>
+
+                                                            <div>
+                                                                <label for="observaciones_{{ $seccion->id }}" class="form-label">
+                                                                    {{ $item ? 'Motivo u observaciones del cambio' : 'Observaciones' }}
+                                                                    @if($item)
+                                                                    <span class="text-red-500">*</span>
+                                                                    @endif
+                                                                </label>
+
+                                                                <textarea
+                                                                    name="observaciones"
+                                                                    id="observaciones_{{ $seccion->id }}"
+                                                                    rows="2"
+                                                                    class="input-field">{{ $valorObservaciones }}</textarea>
+
+                                                                @if($item)
+                                                                <p class="form-hint">
+                                                                    Si cambias el tutor, este texto se usará como motivo del reemplazo en el historial.
+                                                                </p>
+                                                                @endif
+
+                                                                @if($hayErrorFila)
+                                                                @error('observaciones')
+                                                                <p class="form-error">{{ $message }}</p>
+                                                                @enderror
+                                                                @endif
+                                                            </div>
+                                                        </div>
+                                                    </details>
+
+                                                    <div class="flex flex-wrap items-center gap-2">
+                                                        <button type="submit" class="btn-primary">
+                                                            {{ $item ? 'Guardar cambio' : 'Asignar' }}
+                                                        </button>
+
+                                                        @if($item && ($propuesta->publicado || $propuesta->estado_aprobacion === 'aprobado'))
+                                                        <span class="text-xs text-orange-700">
+                                                            Reactiva aprobación
+                                                        </span>
+                                                        @endif
+                                                    </div>
+                                                </form>
+
+                                                @if($item)
+                                                <form
+                                                    method="POST"
+                                                    action="{{ route('propuestas.items.destroy', $item) }}"
+                                                    onsubmit="return confirm('¿Seguro que deseas quitar esta asignación?')">
+                                                    @csrf
+                                                    @method('DELETE')
+
+                                                    <button type="submit" class="text-sm font-medium text-red-700 hover:text-red-900">
+                                                        Quitar tutor
+                                                    </button>
+                                                </form>
+                                                @endif
+                                            </div>
                                         </td>
+
+
                                     </tr>
                                     @endforeach
                                 </tbody>
@@ -342,7 +384,7 @@
                     </div>
                 </div>
 
-                <div class="space-y-6">
+                <div class="grid gap-6 lg:grid-cols-3">
                     <div class="card">
                         <div class="card-header">
                             <h3 class="text-base font-semibold text-utec-gray-dark">
