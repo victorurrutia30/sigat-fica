@@ -46,7 +46,11 @@ class TableroCumplimientoService
                         ->orWhere('codigo_empleado', 'like', "%{$busqueda}%")
                         ->orWhere('correo_institucional', 'like', "%{$busqueda}%");
                 });
-            })
+            });
+
+        $this->aplicarFiltroEstado($registros, $estado);
+
+        $registros = $registros
             ->orderByRaw("
                 CASE estado_entrega
                     WHEN 'pendiente' THEN 1
@@ -60,14 +64,6 @@ class TableroCumplimientoService
             ->withQueryString();
 
         $this->agregarEstadoCumplimiento($registros->getCollection());
-
-        if ($estado) {
-            $filtrados = $registros->getCollection()
-                ->filter(fn($registro) => $registro->estado_cumplimiento === $estado)
-                ->values();
-
-            $registros->setCollection($filtrados);
-        }
 
         return $registros;
     }
@@ -148,6 +144,74 @@ class TableroCumplimientoService
                 'periodoEvaluacion.ciclo',
                 'tutor',
             ]);
+    }
+
+    private function aplicarFiltroEstado(Builder $query, ?string $estado): void
+    {
+        if (! $estado) {
+            return;
+        }
+
+        match ($estado) {
+            'pendiente' => $this->filtrarPendientes($query),
+            'en_progreso' => $this->filtrarEnProgreso($query),
+            'entregado' => $query->where('estado_entrega', 'entregado'),
+            'con_observaciones' => $this->filtrarConObservaciones($query),
+            'atrasado' => $this->filtrarAtrasados($query),
+            default => null,
+        };
+    }
+
+    private function filtrarPendientes(Builder $query): void
+    {
+        $this->filtrarNoAtrasados($query);
+
+        $query->whereNotIn('estado_entrega', ['entregado', 'con_observaciones'])
+            ->whereNotExists(function ($subquery) {
+                $subquery->selectRaw('1')
+                    ->from('casos_seguimiento')
+                    ->whereColumn('casos_seguimiento.periodo_evaluacion_id', 'consolidados.periodo_evaluacion_id')
+                    ->whereColumn('casos_seguimiento.tutor_id', 'consolidados.tutor_id');
+            });
+    }
+
+    private function filtrarEnProgreso(Builder $query): void
+    {
+        $this->filtrarNoAtrasados($query);
+
+        $query->whereNotIn('estado_entrega', ['entregado', 'con_observaciones'])
+            ->whereExists(function ($subquery) {
+                $subquery->selectRaw('1')
+                    ->from('casos_seguimiento')
+                    ->whereColumn('casos_seguimiento.periodo_evaluacion_id', 'consolidados.periodo_evaluacion_id')
+                    ->whereColumn('casos_seguimiento.tutor_id', 'consolidados.tutor_id');
+            });
+    }
+
+    private function filtrarConObservaciones(Builder $query): void
+    {
+        $this->filtrarNoAtrasados($query);
+
+        $query->where('estado_entrega', 'con_observaciones');
+    }
+
+    private function filtrarAtrasados(Builder $query): void
+    {
+        $hoy = now()->toDateString();
+
+        $query->where('estado_entrega', '!=', 'entregado')
+            ->whereHas('periodoEvaluacion', function ($periodoQuery) use ($hoy) {
+                $periodoQuery->whereDate('fecha_limite_consolidado', '<', $hoy);
+            });
+    }
+
+    private function filtrarNoAtrasados(Builder $query): void
+    {
+        $hoy = now()->toDateString();
+
+        $query->whereDoesntHave('periodoEvaluacion', function ($periodoQuery) use ($hoy) {
+            $periodoQuery->whereDate('fecha_limite_consolidado', '<', $hoy);
+        });
     }
 
     private function agregarEstadoCumplimiento(Collection $registros): void

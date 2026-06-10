@@ -156,7 +156,7 @@
 
                                 $badgeEstado = match ($estadoCumplimiento) {
                                 'entregado' => 'badge-success',
-                                'con_observaciones' => 'badge-info',
+                                'con_observaciones' => 'badge-warning',
                                 'atrasado' => 'badge-danger',
                                 'en_progreso' => 'badge-warning',
                                 default => 'badge-muted',
