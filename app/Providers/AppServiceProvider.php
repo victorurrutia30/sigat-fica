@@ -25,11 +25,7 @@ class AppServiceProvider extends ServiceProvider
             $totalNotificacionesNoLeidas = 0;
 
             if ($usuario) {
-                $notificacionService = app(NotificacionService::class);
-
-                $notificacionService->sincronizarCumplimiento();
-
-                $totalNotificacionesNoLeidas = $notificacionService
+                $totalNotificacionesNoLeidas = app(NotificacionService::class)
                     ->cantidadNoLeidas($usuario);
             }
 
