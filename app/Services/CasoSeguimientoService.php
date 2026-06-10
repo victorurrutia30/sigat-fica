@@ -195,9 +195,18 @@ class CasoSeguimientoService
                 ]);
             }
 
+            $resultadoFinal = match ($datos['resultado_consolidado']) {
+                'rc', 'rm' => 'retiro',
+                'abm', 'abc' => 'abandono',
+            };
+
             $caso->update([
                 'causa_id' => $datos['causa_id'],
-                'resultado_final' => $datos['resultado_final'],
+                'resultado_final' => $resultadoFinal,
+                'detalle_inasistencia' => $datos['detalle_inasistencia'],
+                'resultado_consolidado' => $datos['resultado_consolidado'],
+                'matricula' => (bool) $datos['matricula'],
+                'cuota_cancelada' => $datos['cuota_cancelada'] ?? null,
                 'cerrado' => true,
                 'cerrado_en' => now(),
             ]);

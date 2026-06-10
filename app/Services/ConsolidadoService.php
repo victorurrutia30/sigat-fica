@@ -107,6 +107,18 @@ class ConsolidadoService
                 $faltantes[] = 'resultado final';
             }
 
+            if (! $caso->resultado_consolidado) {
+                $faltantes[] = 'resultado institucional';
+            }
+
+            if (! $caso->detalle_inasistencia) {
+                $faltantes[] = 'detalle de inasistencia';
+            }
+
+            if (is_null($caso->matricula)) {
+                $faltantes[] = 'matrícula';
+            }
+
             if ($caso->gestiones->isEmpty()) {
                 $faltantes[] = 'gestión registrada';
             }

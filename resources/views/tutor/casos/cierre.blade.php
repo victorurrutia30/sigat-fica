@@ -1,75 +1,87 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
-            <div>
-                <h2 class="text-xl font-bold text-utec-primary">
-                    Cerrar caso de seguimiento
-                </h2>
-                <p class="text-sm text-gray-500">
-                    Selecciona la causa identificada y el resultado final del caso.
-                </p>
-            </div>
-
-            <a href="{{ route('casos.show', $caso) }}" class="btn-secondary">
-                Volver al caso
-            </a>
+        <div class="flex flex-col gap-1">
+            <h2 class="text-xl font-semibold leading-tight text-utec-gray-dark">
+                Cerrar caso de seguimiento
+            </h2>
+            <p class="text-sm text-gray-500">
+                Completa los datos requeridos para el consolidado institucional.
+            </p>
         </div>
     </x-slot>
 
-    <div class="py-6">
+    <div class="bg-utec-bg-light py-10">
         <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
-            <div class="mb-6 grid gap-4 md:grid-cols-3">
-                <div class="card">
-                    <div class="card-body">
-                        <p class="text-xs text-gray-500">Estudiante</p>
-                        <p class="mt-2 text-lg font-bold text-utec-primary">
-                            {{ $caso->estudiante?->nombre_completo }}
-                        </p>
-                        <p class="mt-1 text-sm text-gray-500">
-                            Carné: {{ $caso->estudiante?->carne }}
-                        </p>
-                    </div>
+            @if(session('error'))
+            <div class="alert-error mb-6">
+                {{ session('error') }}
+            </div>
+            @endif
+
+            @if($errors->any())
+            <div class="alert-error mb-6">
+                Revisa los campos marcados antes de cerrar el caso.
+            </div>
+            @endif
+
+            <div class="card mb-6">
+                <div class="card-header">
+                    <h3 class="text-base font-semibold text-utec-gray-dark">
+                        Datos del caso
+                    </h3>
                 </div>
 
-                <div class="card">
-                    <div class="card-body">
-                        <p class="text-xs text-gray-500">Sección</p>
-                        <p class="mt-2 text-lg font-bold text-utec-primary">
-                            {{ $caso->seccion?->materia?->codigo }}
-                            —
-                            {{ $caso->seccion?->numero_seccion }}
-                        </p>
-                        <p class="mt-1 text-sm text-gray-500">
-                            {{ $caso->seccion?->materia?->nombre }}
-                        </p>
-                    </div>
-                </div>
+                <div class="card-body">
+                    <dl class="grid gap-4 md:grid-cols-2">
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500">Estudiante</dt>
+                            <dd class="mt-1 text-sm text-utec-gray-dark">
+                                {{ $caso->estudiante?->nombre_completo }}
+                                <span class="block text-xs text-gray-500">
+                                    Carné: {{ $caso->estudiante?->carne }}
+                                </span>
+                            </dd>
+                        </div>
 
-                <div class="card">
-                    <div class="card-body">
-                        <p class="text-xs text-gray-500">Gestiones registradas</p>
-                        <p class="mt-2 text-3xl font-bold text-utec-primary">
-                            {{ $caso->gestiones->count() }}
-                        </p>
-                        <p class="mt-1 text-sm text-gray-500">
-                            Requisito mínimo cumplido.
-                        </p>
-                    </div>
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500">Sección</dt>
+                            <dd class="mt-1 text-sm text-utec-gray-dark">
+                                {{ $caso->seccion?->materia?->codigo }} —
+                                {{ $caso->seccion?->materia?->nombre }}
+                                <span class="block text-xs text-gray-500">
+                                    Sección {{ $caso->seccion?->numero_seccion }}
+                                </span>
+                            </dd>
+                        </div>
+
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500">Periodo</dt>
+                            <dd class="mt-1 text-sm text-utec-gray-dark">
+                                {{ $caso->periodoEvaluacion?->nombre }}
+                                <span class="block text-xs text-gray-500">
+                                    Ciclo {{ $caso->periodoEvaluacion?->ciclo?->nombre }}
+                                </span>
+                            </dd>
+                        </div>
+
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500">Gestiones registradas</dt>
+                            <dd class="mt-1 text-sm text-utec-gray-dark">
+                                {{ $caso->gestiones->count() }}
+                            </dd>
+                        </div>
+                    </dl>
                 </div>
             </div>
 
             <div class="card">
                 <div class="card-header">
                     <h3 class="text-base font-semibold text-utec-gray-dark">
-                        Datos de cierre
+                        Información de cierre
                     </h3>
                 </div>
 
                 <div class="card-body">
-                    <div class="mb-5 rounded-md border border-orange-200 bg-orange-50 p-4 text-sm text-orange-800">
-                        Al cerrar el caso, ya no se podrán agregar nuevas gestiones. Verifica que la información sea correcta.
-                    </div>
-
                     <form method="POST" action="{{ route('casos.cerrar', $caso) }}">
                         @csrf
                         @method('PATCH')
@@ -100,60 +112,111 @@
                             </div>
 
                             <div>
-                                <label for="resultado_final" class="form-label">
-                                    Resultado final <span class="text-red-500">*</span>
+                                <label for="resultado_consolidado" class="form-label">
+                                    Resultado para consolidado <span class="text-red-500">*</span>
                                 </label>
 
-                                <select name="resultado_final" id="resultado_final" class="input-field" required>
+                                <select name="resultado_consolidado" id="resultado_consolidado" class="input-field" required>
                                     <option value="">Seleccione...</option>
-                                    <option value="retiro" @selected(old('resultado_final', $caso->resultado_final) === 'retiro')>
-                                        Retiro
+
+                                    <option value="rc" @selected(old('resultado_consolidado', $caso->resultado_consolidado) === 'rc')>
+                                        R/C — Retiro de ciclo
                                     </option>
-                                    <option value="abandono" @selected(old('resultado_final', $caso->resultado_final) === 'abandono')>
-                                        Abandono
+
+                                    <option value="rm" @selected(old('resultado_consolidado', $caso->resultado_consolidado) === 'rm')>
+                                        R/M — Retiro de materia
+                                    </option>
+
+                                    <option value="abm" @selected(old('resultado_consolidado', $caso->resultado_consolidado) === 'abm')>
+                                        AB/M — Abandono de materia
+                                    </option>
+
+                                    <option value="abc" @selected(old('resultado_consolidado', $caso->resultado_consolidado) === 'abc')>
+                                        AB/C — Abandono del ciclo
                                     </option>
                                 </select>
 
-                                @error('resultado_final')
+                                @error('resultado_consolidado')
+                                <p class="form-error">{{ $message }}</p>
+                                @enderror
+
+                                <p class="form-hint">
+                                    Este valor marcará la columna institucional R/C, R/M, AB/M o AB/C.
+                                </p>
+                            </div>
+
+                            <div class="md:col-span-2">
+                                <label for="detalle_inasistencia" class="form-label">
+                                    Detalle de inasistencia a la evaluación <span class="text-red-500">*</span>
+                                </label>
+
+                                <textarea
+                                    name="detalle_inasistencia"
+                                    id="detalle_inasistencia"
+                                    rows="4"
+                                    maxlength="2000"
+                                    class="input-field"
+                                    required
+                                    placeholder="Ej. El estudiante no se presentó a la primera evaluación ordinaria. Se intentó contacto por WhatsApp y correo institucional.">{{ old('detalle_inasistencia', $caso->detalle_inasistencia) }}</textarea>
+
+                                @error('detalle_inasistencia')
+                                <p class="form-error">{{ $message }}</p>
+                                @enderror
+
+                                <p class="form-hint">
+                                    Este texto aparecerá en la columna “Detalle de inasistencia a primera evaluación”.
+                                </p>
+                            </div>
+
+                            <div>
+                                <label for="matricula" class="form-label">
+                                    Matrícula <span class="text-red-500">*</span>
+                                </label>
+
+                                <select name="matricula" id="matricula" class="input-field" required>
+                                    <option value="">Seleccione...</option>
+
+                                    <option value="1" @selected((string) old('matricula', is_null($caso->matricula) ? '' : (int) $caso->matricula) === '1')>
+                                        Sí
+                                    </option>
+
+                                    <option value="0" @selected((string) old('matricula', is_null($caso->matricula) ? '' : (int) $caso->matricula) === '0')>
+                                        No
+                                    </option>
+                                </select>
+
+                                @error('matricula')
                                 <p class="form-error">{{ $message }}</p>
                                 @enderror
                             </div>
-                        </div>
 
-                        <div class="mt-6 rounded-md border border-utec-gray-medium bg-gray-50 p-4">
-                            <h4 class="text-sm font-semibold text-utec-gray-dark">
-                                Resumen de gestiones
-                            </h4>
+                            <div>
+                                <label for="cuota_cancelada" class="form-label">
+                                    Nº cuota cancelada
+                                </label>
 
-                            <div class="mt-3 space-y-3">
-                                @foreach($caso->gestiones as $gestion)
-                                <div class="rounded-md border border-utec-gray-medium bg-white p-3 text-sm">
-                                    <div class="flex flex-col gap-1 md:flex-row md:items-center md:justify-between">
-                                        <span class="font-semibold text-utec-primary">
-                                            {{ ucfirst(str_replace('_', ' ', $gestion->medio_contacto)) }}
-                                        </span>
+                                <input
+                                    type="number"
+                                    name="cuota_cancelada"
+                                    id="cuota_cancelada"
+                                    value="{{ old('cuota_cancelada', $caso->cuota_cancelada) }}"
+                                    min="0"
+                                    max="99"
+                                    step="1"
+                                    class="input-field"
+                                    placeholder="Ej. 1, 2, 3">
 
-                                        <span class="text-xs text-gray-500">
-                                            {{ $gestion->fecha_gestion->format('d/m/Y') }}
-                                        </span>
-                                    </div>
+                                @error('cuota_cancelada')
+                                <p class="form-error">{{ $message }}</p>
+                                @enderror
 
-                                    <p class="mt-2 text-utec-gray-dark">
-                                        {{ $gestion->accion_realizada }}
-                                    </p>
-
-                                    @if($gestion->resultado)
-                                    <p class="mt-1 text-gray-600">
-                                        <span class="font-semibold">Resultado:</span>
-                                        {{ $gestion->resultado }}
-                                    </p>
-                                    @endif
-                                </div>
-                                @endforeach
+                                <p class="form-hint">
+                                    Campo opcional. Si no se conoce la cuota cancelada, déjalo vacío.
+                                </p>
                             </div>
                         </div>
 
-                        <div class="mt-6 flex justify-end gap-3">
+                        <div class="mt-6 flex flex-wrap justify-end gap-3">
                             <a href="{{ route('casos.show', $caso) }}" class="btn-secondary">
                                 Cancelar
                             </a>
@@ -161,12 +224,17 @@
                             <button
                                 type="submit"
                                 class="btn-primary"
-                                onclick="return confirm('¿Seguro que deseas cerrar este caso?')">
+                                onclick="return confirm('¿Seguro que deseas cerrar este caso? Después no podrás agregar más gestiones.')">
                                 Cerrar caso
                             </button>
                         </div>
                     </form>
                 </div>
+            </div>
+
+            <div class="alert-info mt-6">
+                Al cerrar el caso, el sistema guardará el resultado institucional y también calculará el resultado interno:
+                R/C y R/M se guardan como retiro; AB/M y AB/C se guardan como abandono.
             </div>
         </div>
     </div>

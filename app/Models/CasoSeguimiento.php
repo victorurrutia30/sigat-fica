@@ -20,6 +20,10 @@ class CasoSeguimiento extends Model
         'tutor_id',
         'causa_id',
         'resultado_final',
+        'detalle_inasistencia',
+        'resultado_consolidado',
+        'matricula',
+        'cuota_cancelada',
         'cerrado',
         'cerrado_en',
         'registrado_por',
@@ -28,6 +32,7 @@ class CasoSeguimiento extends Model
     protected function casts(): array
     {
         return [
+            'matricula' => 'boolean',
             'cerrado' => 'boolean',
             'cerrado_en' => 'datetime',
         ];
@@ -66,5 +71,36 @@ class CasoSeguimiento extends Model
     public function gestiones(): HasMany
     {
         return $this->hasMany(GestionCaso::class, 'caso_seguimiento_id');
+    }
+
+    public function resultadoFinalTexto(): string
+    {
+        return match ($this->resultado_final) {
+            'retiro' => 'Retiro',
+            'abandono' => 'Abandono',
+            default => 'Pendiente',
+        };
+    }
+
+    public function resultadoConsolidadoTexto(): string
+    {
+        return match ($this->resultado_consolidado) {
+            'rc' => 'R/C — Retiro de ciclo',
+            'rm' => 'R/M — Retiro de materia',
+            'abm' => 'AB/M — Abandono de materia',
+            'abc' => 'AB/C — Abandono del ciclo',
+            default => 'Pendiente',
+        };
+    }
+
+    public function resultadoConsolidadoMarca(): string
+    {
+        return match ($this->resultado_consolidado) {
+            'rc' => 'R/C',
+            'rm' => 'R/M',
+            'abm' => 'AB/M',
+            'abc' => 'AB/C',
+            default => '',
+        };
     }
 }
