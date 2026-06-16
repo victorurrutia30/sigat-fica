@@ -294,11 +294,7 @@ class ConsolidadoService
                 ]);
             }
 
-            if ($diagnostico['total'] === 0 && ! $confirmarSinCasos) {
-                throw ValidationException::withMessages([
-                    'confirmar_sin_casos' => 'Debe confirmar explícitamente que no hubo estudiantes no evaluados.',
-                ]);
-            }
+
 
             if ($diagnostico['incompletos'] > 0) {
                 throw ValidationException::withMessages([

@@ -63,8 +63,7 @@ class ConsolidadoController extends Controller
             return redirect()
                 ->route('consolidado.index')
                 ->withErrors($exception->errors())
-                ->withInput()
-                ->with('error', collect($exception->errors())->flatten()->first());
+                ->withInput();
         }
 
         return redirect()
