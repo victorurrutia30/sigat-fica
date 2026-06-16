@@ -142,7 +142,7 @@
 
                     <x-slot name="content">
                         <x-dropdown-link :href="route('profile.edit')">
-                            Perfil
+                            Mi cuenta
                         </x-dropdown-link>
 
                         <form method="POST" action="{{ route('logout') }}">
