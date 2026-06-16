@@ -1,7 +1,8 @@
 @csrf
 
 <div class="mb-5 rounded-md border border-utec-gray-medium bg-utec-primary-soft px-4 py-3 text-sm text-utec-gray-dark">
-    Los periodos de evaluación pertenecen a un ciclo académico. Solo puede existir un periodo activo por ciclo.
+    Los periodos de evaluación pertenecen al ciclo académico activo. Solo se permiten periodos de Primera a Quinta Evaluación.
+    Las fechas no pueden traslaparse con otro periodo del mismo ciclo y deben estar dentro del rango del ciclo académico.
     Al guardar, el sistema genera consolidados pendientes para tutores con asignaciones publicadas.
 </div>
 
@@ -37,19 +38,25 @@
             Nombre del periodo <span class="text-red-500">*</span>
         </label>
 
-        <input
-            type="text"
-            name="nombre"
-            id="nombre"
-            value="{{ old('nombre', $periodo->nombre ?? '') }}"
-            class="input-field"
-            maxlength="100"
-            placeholder="Ej. Primera Evaluación Ordinaria"
-            required>
+        <select name="nombre" id="nombre" class="input-field" required>
+            <option value="">Seleccione...</option>
+
+            @foreach($nombresPeriodo ?? \App\Models\PeriodoEvaluacion::nombresPermitidos() as $nombrePeriodo)
+            <option
+                value="{{ $nombrePeriodo }}"
+                @selected(old('nombre', $periodo->nombre ?? '') === $nombrePeriodo)>
+                {{ $nombrePeriodo }}
+            </option>
+            @endforeach
+        </select>
 
         @error('nombre')
         <p class="form-error">{{ $message }}</p>
         @enderror
+
+        <p class="form-hint">
+            Solo se permiten cinco periodos por ciclo: Primera a Quinta Evaluación.
+        </p>
     </div>
 
     <div>

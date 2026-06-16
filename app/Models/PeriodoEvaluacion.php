@@ -13,6 +13,19 @@ class PeriodoEvaluacion extends Model
 
     protected $table = 'periodos_evaluacion';
 
+    public const NOMBRES_PERMITIDOS = [
+        'Primera Evaluación',
+        'Segunda Evaluación',
+        'Tercera Evaluación',
+        'Cuarta Evaluación',
+        'Quinta Evaluación',
+    ];
+
+    public static function nombresPermitidos(): array
+    {
+        return self::NOMBRES_PERMITIDOS;
+    }
+
     protected $fillable = [
         'ciclo_id',
         'nombre',

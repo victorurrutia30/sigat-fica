@@ -40,6 +40,7 @@ class PeriodoEvaluacionRequest extends FormRequest
                 'required',
                 'string',
                 'max:100',
+                Rule::in(PeriodoEvaluacion::nombresPermitidos()),
                 Rule::unique('periodos_evaluacion', 'nombre')
                     ->where(fn($query) => $query->where('ciclo_id', $cicloId))
                     ->ignore($periodo?->id),
@@ -149,7 +150,7 @@ class PeriodoEvaluacionRequest extends FormRequest
 
             'nombre.required' => 'El nombre del periodo es obligatorio.',
             'nombre.string' => 'El nombre del periodo debe ser texto.',
-            'nombre.max' => 'El nombre del periodo no debe superar los 100 caracteres.',
+            'nombre.in' => 'Debe seleccionar un periodo válido: Primera Evaluación, Segunda Evaluación, Tercera Evaluación, Cuarta Evaluación o Quinta Evaluación.',
             'nombre.unique' => 'Ya existe un periodo con este nombre para el ciclo seleccionado.',
 
             'fecha_inicio.required' => 'La fecha de inicio es obligatoria.',
