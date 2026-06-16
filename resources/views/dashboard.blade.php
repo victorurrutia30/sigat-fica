@@ -160,87 +160,111 @@
             <div class="card">
                 <div class="card-body">
                     <h3 class="text-lg font-semibold text-utec-gray-dark">
-                        Módulos de Coordinación
+                        Accesos de Coordinación
                     </h3>
                     <p class="mt-1 text-sm text-gray-500">
-                        Accesos principales para administrar ciclos, catálogos, carga académica, propuesta y seguimiento.
+                        Accesos organizados según el uso operativo del ciclo: monitoreo, consolidados, periodos y administración.
                     </p>
 
-                    <div class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                        <a href="{{ route('tablero.index') }}"
-                            class="rounded-lg border border-utec-gray-medium p-4 text-sm font-medium text-utec-gray-dark transition hover:border-utec-primary-light hover:bg-utec-primary-soft hover:text-utec-primary">
-                            Tablero de cumplimiento
-                            <span class="mt-1 block text-xs text-gray-500">
-                                Ver avance, atrasos y estado general por tutor.
-                            </span>
-                        </a>
+                    <div class="mt-6">
+                        <h4 class="text-sm font-semibold uppercase tracking-wide text-gray-500">
+                            Operación y seguimiento
+                        </h4>
 
-                        <a href="{{ route('propuestas.index') }}"
-                            class="rounded-lg border border-utec-gray-medium p-4 text-sm font-medium text-utec-gray-dark transition hover:border-utec-primary-light hover:bg-utec-primary-soft hover:text-utec-primary">
-                            Propuesta de asignación
-                            <span class="mt-1 block text-xs text-gray-500">
-                                Asignar tutores, registrar respuesta del Decano y publicar.
-                            </span>
-                        </a>
+                        <div class="mt-3 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                            <a href="{{ route('tablero.index') }}"
+                                class="rounded-lg border border-utec-gray-medium p-4 text-sm font-medium text-utec-gray-dark transition hover:border-utec-primary-light hover:bg-utec-primary-soft hover:text-utec-primary">
+                                Tablero de cumplimiento
+                                <span class="mt-1 block text-xs text-gray-500">
+                                    Monitorear avance, atrasos y estado general por tutor.
+                                </span>
+                            </a>
 
-                        <a href="{{ route('consolidados.index') }}"
-                            class="rounded-lg border border-utec-gray-medium p-4 text-sm font-medium text-utec-gray-dark transition hover:border-utec-primary-light hover:bg-utec-primary-soft hover:text-utec-primary">
-                            Consolidados
-                            <span class="mt-1 block text-xs text-gray-500">
-                                Revisar entregas, observaciones y cumplimiento por tutor.
-                            </span>
-                        </a>
+                            <a href="{{ route('consolidados.index') }}"
+                                class="rounded-lg border border-utec-gray-medium p-4 text-sm font-medium text-utec-gray-dark transition hover:border-utec-primary-light hover:bg-utec-primary-soft hover:text-utec-primary">
+                                Consolidados
+                                <span class="mt-1 block text-xs text-gray-500">
+                                    Revisar entregas, observaciones y cumplimiento por tutor.
+                                </span>
+                            </a>
 
-                        <a href="{{ route('ciclos.index') }}"
-                            class="rounded-lg border border-utec-gray-medium p-4 text-sm font-medium text-utec-gray-dark transition hover:border-utec-primary-light hover:bg-utec-primary-soft hover:text-utec-primary">
-                            Ciclos
-                            <span class="mt-1 block text-xs text-gray-500">
-                                Administrar ciclos académicos del sistema.
-                            </span>
-                        </a>
+                            <a href="{{ route('periodos.index') }}"
+                                class="rounded-lg border border-utec-gray-medium p-4 text-sm font-medium text-utec-gray-dark transition hover:border-utec-primary-light hover:bg-utec-primary-soft hover:text-utec-primary">
+                                Periodos de evaluación
+                                <span class="mt-1 block text-xs text-gray-500">
+                                    Gestionar periodos, fechas límite y control de entregas.
+                                </span>
+                            </a>
 
-                        <a href="{{ route('tutores.index') }}"
-                            class="rounded-lg border border-utec-gray-medium p-4 text-sm font-medium text-utec-gray-dark transition hover:border-utec-primary-light hover:bg-utec-primary-soft hover:text-utec-primary">
-                            Tutores
-                            <span class="mt-1 block text-xs text-gray-500">
-                                Gestionar tutores DTC activos e inactivos.
-                            </span>
-                        </a>
+                            <a href="{{ route('propuestas.index') }}"
+                                class="rounded-lg border border-utec-gray-medium p-4 text-sm font-medium text-utec-gray-dark transition hover:border-utec-primary-light hover:bg-utec-primary-soft hover:text-utec-primary">
+                                Propuesta de asignación
+                                <span class="mt-1 block text-xs text-gray-500">
+                                    Asignar tutores, registrar respuesta del Decano y publicar.
+                                </span>
+                            </a>
+                        </div>
+                    </div>
 
-                        <a href="{{ route('materias.index') }}"
-                            class="rounded-lg border border-utec-gray-medium p-4 text-sm font-medium text-utec-gray-dark transition hover:border-utec-primary-light hover:bg-utec-primary-soft hover:text-utec-primary">
-                            Materias
-                            <span class="mt-1 block text-xs text-gray-500">
-                                Gestionar materias, prioridad y revisión.
-                            </span>
-                        </a>
+                    <div class="mt-8">
+                        <h4 class="text-sm font-semibold uppercase tracking-wide text-gray-500">
+                            Administración del ciclo
+                        </h4>
 
-                        <a href="{{ route('carga-academica.create') }}"
-                            class="rounded-lg border border-utec-gray-medium p-4 text-sm font-medium text-utec-gray-dark transition hover:border-utec-primary-light hover:bg-utec-primary-soft hover:text-utec-primary">
-                            Carga académica
-                            <span class="mt-1 block text-xs text-gray-500">
-                                Importar secciones, titulares y horarios desde Excel.
-                            </span>
-                        </a>
+                        <div class="mt-3 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                            <a href="{{ route('ciclos.index') }}"
+                                class="rounded-lg border border-utec-gray-medium p-4 text-sm font-medium text-utec-gray-dark transition hover:border-utec-primary-light hover:bg-utec-primary-soft hover:text-utec-primary">
+                                Ciclos académicos
+                                <span class="mt-1 block text-xs text-gray-500">
+                                    Crear y activar el ciclo académico correspondiente.
+                                </span>
+                            </a>
 
-                        <a href="{{ route('periodos.index') }}"
-                            class="rounded-lg border border-utec-gray-medium p-4 text-sm font-medium text-utec-gray-dark transition hover:border-utec-primary-light hover:bg-utec-primary-soft hover:text-utec-primary">
-                            Periodos de evaluación
-                            <span class="mt-1 block text-xs text-gray-500">
-                                Gestionar periodos y fechas límite de consolidado.
-                            </span>
-                        </a>
+                            <a href="{{ route('carga-academica.create') }}"
+                                class="rounded-lg border border-utec-gray-medium p-4 text-sm font-medium text-utec-gray-dark transition hover:border-utec-primary-light hover:bg-utec-primary-soft hover:text-utec-primary">
+                                Carga académica
+                                <span class="mt-1 block text-xs text-gray-500">
+                                    Importar secciones, titulares y horarios desde Excel institucional.
+                                </span>
+                            </a>
 
-                        <a href="{{ route('causas.index') }}"
-                            class="rounded-lg border border-utec-gray-medium p-4 text-sm font-medium text-utec-gray-dark transition hover:border-utec-primary-light hover:bg-utec-primary-soft hover:text-utec-primary">
-                            Catálogo de causas
-                            <span class="mt-1 block text-xs text-gray-500">
-                                Gestionar causas para casos de seguimiento.
-                            </span>
-                        </a>
+                            <a href="{{ route('materias.index') }}"
+                                class="rounded-lg border border-utec-gray-medium p-4 text-sm font-medium text-utec-gray-dark transition hover:border-utec-primary-light hover:bg-utec-primary-soft hover:text-utec-primary">
+                                Materias
+                                <span class="mt-1 block text-xs text-gray-500">
+                                    Revisar materias gestionadas, prioridad y observaciones de importación.
+                                </span>
+                            </a>
+
+                            <a href="{{ route('docentes-detectados.index') }}"
+                                class="rounded-lg border border-utec-gray-medium p-4 text-sm font-medium text-utec-gray-dark transition hover:border-utec-primary-light hover:bg-utec-primary-soft hover:text-utec-primary">
+                                Docentes detectados
+                                <span class="mt-1 block text-xs text-gray-500">
+                                    Revisar docentes titulares detectados desde la carga académica.
+                                </span>
+                            </a>
+
+                            <a href="{{ route('tutores.index') }}"
+                                class="rounded-lg border border-utec-gray-medium p-4 text-sm font-medium text-utec-gray-dark transition hover:border-utec-primary-light hover:bg-utec-primary-soft hover:text-utec-primary">
+                                Tutores
+                                <span class="mt-1 block text-xs text-gray-500">
+                                    Gestionar tutores DTC activos, inactivos y habilitación para tutorías.
+                                </span>
+                            </a>
+
+                            <a href="{{ route('causas.index') }}"
+                                class="rounded-lg border border-utec-gray-medium p-4 text-sm font-medium text-utec-gray-dark transition hover:border-utec-primary-light hover:bg-utec-primary-soft hover:text-utec-primary">
+                                Catálogo de causas
+                                <span class="mt-1 block text-xs text-gray-500">
+                                    Mantener causas usadas en casos de seguimiento.
+                                </span>
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
+
+
         </div>
     </div>
 </x-app-layout>

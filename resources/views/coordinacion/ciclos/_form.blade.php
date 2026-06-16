@@ -24,7 +24,7 @@
         <p class="form-error">{{ $message }}</p>
         @enderror
         <p class="form-hint">
-            Para QA solo se permite el año anterior, el año actual o el año siguiente.
+            Solo se permite el año anterior, el año actual o el año siguiente.
         </p>
     </div>
 
