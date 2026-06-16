@@ -17,95 +17,6 @@
                 Desde este panel puedes acceder a los módulos principales de Coordinación.
             </div>
 
-            <div class="card">
-                <div class="card-header">
-                    <div class="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
-                        <div>
-                            <h3 class="text-base font-semibold text-utec-gray-dark">
-                                Resumen de cumplimiento
-                            </h3>
-                            <p class="text-sm text-gray-500">
-                                Estado general de consolidados del periodo activo.
-                            </p>
-                        </div>
-
-                        <a href="{{ route('tablero.index') }}" class="btn-secondary">
-                            Ver tablero completo
-                        </a>
-                    </div>
-                </div>
-
-                <div class="card-body">
-                    @if($periodoActivo)
-                    <div class="mb-4 rounded-lg border border-utec-gray-medium bg-white px-4 py-3 text-sm text-gray-600">
-                        Periodo activo:
-                        <span class="font-semibold text-utec-primary">
-                            {{ $periodoActivo->ciclo?->nombre ?? 'Sin ciclo' }} — {{ $periodoActivo->nombre }}
-                        </span>
-                    </div>
-
-                    <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-6">
-                        <div class="rounded-lg border border-utec-gray-medium bg-white p-4">
-                            <p class="text-xs font-medium uppercase tracking-wide text-gray-500">
-                                Total
-                            </p>
-                            <p class="mt-2 text-3xl font-bold text-utec-primary">
-                                {{ $metricasCumplimiento['total'] }}
-                            </p>
-                        </div>
-
-                        <div class="rounded-lg border border-utec-gray-medium bg-white p-4">
-                            <p class="text-xs font-medium uppercase tracking-wide text-gray-500">
-                                Pendientes
-                            </p>
-                            <p class="mt-2 text-3xl font-bold text-orange-700">
-                                {{ $metricasCumplimiento['pendientes'] }}
-                            </p>
-                        </div>
-
-                        <div class="rounded-lg border border-utec-gray-medium bg-white p-4">
-                            <p class="text-xs font-medium uppercase tracking-wide text-gray-500">
-                                En progreso
-                            </p>
-                            <p class="mt-2 text-3xl font-bold text-blue-700">
-                                {{ $metricasCumplimiento['en_progreso'] }}
-                            </p>
-                        </div>
-
-                        <div class="rounded-lg border border-utec-gray-medium bg-white p-4">
-                            <p class="text-xs font-medium uppercase tracking-wide text-gray-500">
-                                Entregados
-                            </p>
-                            <p class="mt-2 text-3xl font-bold text-green-700">
-                                {{ $metricasCumplimiento['entregados'] }}
-                            </p>
-                        </div>
-
-                        <div class="rounded-lg border border-utec-gray-medium bg-white p-4">
-                            <p class="text-xs font-medium uppercase tracking-wide text-gray-500">
-                                Observaciones
-                            </p>
-                            <p class="mt-2 text-3xl font-bold text-orange-700">
-                                {{ $metricasCumplimiento['con_observaciones'] }}
-                            </p>
-                        </div>
-
-                        <div class="rounded-lg border border-utec-gray-medium bg-white p-4">
-                            <p class="text-xs font-medium uppercase tracking-wide text-gray-500">
-                                Atrasados
-                            </p>
-                            <p class="mt-2 text-3xl font-bold text-red-700">
-                                {{ $metricasCumplimiento['atrasados'] }}
-                            </p>
-                        </div>
-                    </div>
-                    @else
-                    <div class="alert-warning">
-                        No hay periodo de evaluación activo. El resumen de cumplimiento estará disponible cuando se active un periodo.
-                    </div>
-                    @endif
-                </div>
-            </div>
 
             <div class="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
                 <div class="card">
@@ -196,13 +107,7 @@
                                 </span>
                             </a>
 
-                            <a href="{{ route('propuestas.index') }}"
-                                class="rounded-lg border border-utec-gray-medium p-4 text-sm font-medium text-utec-gray-dark transition hover:border-utec-primary-light hover:bg-utec-primary-soft hover:text-utec-primary">
-                                Propuesta de asignación
-                                <span class="mt-1 block text-xs text-gray-500">
-                                    Asignar tutores, registrar respuesta del Decano y publicar.
-                                </span>
-                            </a>
+
                         </div>
                     </div>
 
@@ -249,6 +154,14 @@
                                 Tutores
                                 <span class="mt-1 block text-xs text-gray-500">
                                     Gestionar tutores DTC activos, inactivos y habilitación para tutorías.
+                                </span>
+                            </a>
+
+                            <a href="{{ route('propuestas.index') }}"
+                                class="rounded-lg border border-utec-gray-medium p-4 text-sm font-medium text-utec-gray-dark transition hover:border-utec-primary-light hover:bg-utec-primary-soft hover:text-utec-primary">
+                                Propuesta de asignación
+                                <span class="mt-1 block text-xs text-gray-500">
+                                    Generar asignación después de revisar carga académica, materias y tutores.
                                 </span>
                             </a>
 
