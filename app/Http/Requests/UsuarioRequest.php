@@ -64,7 +64,7 @@ class UsuarioRequest extends FormRequest
                 Rule::in(['coordinacion', 'tutor']),
             ],
             'password' => [
-                $usuario ? 'nullable' : 'required',
+                'nullable',
                 'string',
                 'min:8',
                 'confirmed',
@@ -184,7 +184,6 @@ class UsuarioRequest extends FormRequest
             'rol.required' => 'El rol del usuario es obligatorio.',
             'rol.in' => 'El rol seleccionado no es válido.',
 
-            'password.required' => 'La contraseña inicial es obligatoria.',
             'password.min' => 'La contraseña debe tener al menos 8 caracteres.',
             'password.confirmed' => 'La confirmación de contraseña no coincide.',
 

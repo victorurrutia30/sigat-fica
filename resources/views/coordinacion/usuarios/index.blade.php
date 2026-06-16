@@ -28,6 +28,12 @@
             </div>
             @endif
 
+            @if(session('warning'))
+            <div class="mb-4 rounded-md border-l-4 border-yellow-600 bg-yellow-50 p-4 text-sm text-yellow-800">
+                {{ session('warning') }}
+            </div>
+            @endif
+
             <div class="card">
                 <div class="card-body">
                     <form method="GET" action="{{ route('usuarios.index') }}" class="mb-5 grid grid-cols-1 gap-3 md:grid-cols-5 md:items-end">
