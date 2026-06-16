@@ -67,7 +67,8 @@
 
             <div class="card">
                 <div class="card-body">
-                    <form method="GET" action="{{ route('consolidados.index') }}" class="mb-5 grid gap-3 md:grid-cols-4 md:items-end">
+
+                    <form method="GET" action="{{ route('consolidados.index') }}" class="mb-5 grid gap-3 md:grid-cols-5 md:items-end">
                         <div>
                             <label for="periodo_id" class="form-label">
                                 Periodo
@@ -97,6 +98,19 @@
                                 <option value="pendiente" @selected($estado==='pendiente' )>Pendiente</option>
                                 <option value="entregado" @selected($estado==='entregado' )>Entregado</option>
                                 <option value="con_observaciones" @selected($estado==='con_observaciones' )>Con observaciones</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label for="atraso" class="form-label">
+                                Atraso
+                            </label>
+
+                            <select name="atraso" id="atraso" class="input-field">
+                                <option value="">Todos</option>
+                                <option value="1" @selected($atraso)>
+                                    Solo atrasados
+                                </option>
                             </select>
                         </div>
 

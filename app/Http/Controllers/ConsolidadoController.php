@@ -80,6 +80,7 @@ class ConsolidadoController extends Controller
         $periodoId = $request->integer('periodo_id') ?: $periodoActivo?->id;
         $estado = $request->string('estado')->toString();
         $busqueda = $request->string('busqueda')->toString();
+        $atraso = $request->boolean('atraso');
 
         $periodos = $consolidadoService->periodosParaFiltro();
 
@@ -87,6 +88,7 @@ class ConsolidadoController extends Controller
             'periodo_id' => $periodoId,
             'estado' => $estado ?: null,
             'busqueda' => $busqueda ?: null,
+            'atraso' => $atraso,
         ]);
 
         $metricas = $consolidadoService->metricasParaCoordinacion($periodoId);
@@ -96,6 +98,7 @@ class ConsolidadoController extends Controller
             'periodoId',
             'estado',
             'busqueda',
+            'atraso',
             'consolidados',
             'metricas'
         ));

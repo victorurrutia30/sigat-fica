@@ -2,20 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\TableroCumplimientoService;
+use App\Services\ConsolidadoService;
 use Illuminate\View\View;
 
 class DashboardController extends Controller
 {
-    public function index(TableroCumplimientoService $tableroService): View
+    public function index(ConsolidadoService $consolidadoService): View
     {
-        $periodoActivo = $tableroService->obtenerPeriodoActivoOpcional();
+        $periodoActivo = $consolidadoService->obtenerPeriodoActivoOpcional();
 
-        $metricasCumplimiento = $tableroService->metricas([
-            'periodo_id' => $periodoActivo?->id,
-            'estado' => null,
-            'busqueda' => null,
-        ]);
+        $metricasCumplimiento = $consolidadoService->metricasParaCoordinacion(
+            $periodoActivo?->id
+        );
 
         return view('dashboard', compact(
             'periodoActivo',

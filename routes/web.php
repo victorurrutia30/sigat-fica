@@ -13,7 +13,6 @@ use App\Http\Controllers\CausaController;
 use App\Http\Controllers\CasoSeguimientoController;
 use App\Http\Controllers\GestionCasoController;
 use App\Http\Controllers\ConsolidadoController;
-use App\Http\Controllers\TableroCumplimientoController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\NotificacionController;
 use App\Http\Controllers\UsuarioController;
@@ -29,7 +28,7 @@ Route::get('/dashboard', [DashboardController::class, 'index'])
 
 Route::middleware(['auth', 'verified', 'rol:coordinacion'])->group(function () {
 
-    Route::get('tablero-cumplimiento', [TableroCumplimientoController::class, 'index'])
+    Route::redirect('tablero-cumplimiento', '/dashboard')
         ->name('tablero.index');
 
     Route::resource('ciclos', CicloController::class);

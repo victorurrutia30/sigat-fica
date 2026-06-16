@@ -358,6 +358,7 @@ class ConsolidadoService
         $periodoId = $filtros['periodo_id'] ?? null;
         $estado = $filtros['estado'] ?? null;
         $busqueda = $filtros['busqueda'] ?? null;
+        $atraso = (bool) ($filtros['atraso'] ?? false);
 
         return Consolidado::query()
             ->select('consolidados.*')
@@ -397,6 +398,14 @@ class ConsolidadoService
                         ->orWhere('codigo_empleado', 'like', "%{$busqueda}%")
                         ->orWhere('correo_institucional', 'like', "%{$busqueda}%");
                 });
+            })
+            ->when($atraso, function ($query) {
+                $hoy = now()->toDateString();
+
+                $query->where('estado_entrega', '!=', 'entregado')
+                    ->whereHas('periodoEvaluacion', function ($periodoQuery) use ($hoy) {
+                        $periodoQuery->whereDate('fecha_limite_consolidado', '<', $hoy);
+                    });
             })
             ->orderByRaw("
             CASE estado_entrega

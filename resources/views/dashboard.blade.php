@@ -11,6 +11,18 @@
     </x-slot>
 
     <div class="bg-utec-bg-light py-10">
+
+        @php
+        $periodoActivoId = $periodoActivo?->id;
+
+        $urlConsolidados = function (array $filtros = []) use ($periodoActivoId) {
+        return route('consolidados.index', array_filter(
+        array_merge(['periodo_id' => $periodoActivoId], $filtros),
+        fn ($valor) => $valor !== null && $valor !== ''
+        ));
+        };
+        @endphp
+
         <div class="mx-auto max-w-7xl space-y-8 px-4 sm:px-6 lg:px-8">
             <div class="alert-sigat">
                 Bienvenido, <span class="font-semibold">{{ auth()->user()->nombre }}</span>.
@@ -18,7 +30,7 @@
             </div>
 
 
-            <div class="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+            <div class="grid gap-6 md:grid-cols-2">
                 <div class="card">
                     <div class="card-body">
                         <p class="text-sm font-medium text-gray-500">Ciclo activo</p>
@@ -26,7 +38,7 @@
                             {{ $periodoActivo?->ciclo?->nombre ?? 'No definido' }}
                         </p>
                         <p class="mt-2 text-sm text-gray-500">
-                            Ciclo asociado al periodo de evaluación activo.
+                            Ciclo académico usado para propuestas, seguimiento y consolidados.
                         </p>
                     </div>
                 </div>
@@ -38,33 +50,83 @@
                             {{ $periodoActivo?->nombre ?? 'No definido' }}
                         </p>
                         <p class="mt-2 text-sm text-gray-500">
-                            Periodo usado para casos, gestiones y consolidados.
+                            Periodo usado para casos, gestiones y entrega de consolidados.
                         </p>
                     </div>
                 </div>
+            </div>
 
-                <div class="card">
-                    <div class="card-body">
-                        <p class="text-sm font-medium text-gray-500">Consolidados</p>
-                        <p class="mt-3 text-2xl font-bold text-utec-primary">
-                            {{ $metricasCumplimiento['total'] ?? 0 }}
-                        </p>
-                        <p class="mt-2 text-sm text-gray-500">
-                            Total de consolidados generados para el periodo activo.
-                        </p>
+            <div class="card">
+                <div class="card-header">
+                    <div class="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+                        <div>
+                            <h3 class="text-base font-semibold text-utec-gray-dark">
+                                Estado de consolidados del periodo activo
+                            </h3>
+                            <p class="text-sm text-gray-500">
+                                Usa estas tarjetas para ir directamente al listado formal filtrado.
+                            </p>
+                        </div>
+
+                        <a href="{{ $urlConsolidados() }}" class="btn-secondary">
+                            Ver todos
+                        </a>
                     </div>
                 </div>
 
-                <div class="card">
-                    <div class="card-body">
-                        <p class="text-sm font-medium text-gray-500">Alertas</p>
-                        <p class="mt-3 text-2xl font-bold text-red-700">
-                            {{ $metricasCumplimiento['atrasados'] ?? 0 }}
-                        </p>
-                        <p class="mt-2 text-sm text-gray-500">
-                            Consolidados atrasados según fecha límite del periodo.
-                        </p>
+                <div class="card-body">
+                    @if($periodoActivo)
+                    <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+                        <a href="{{ $urlConsolidados() }}"
+                            class="rounded-lg border border-utec-gray-medium bg-white p-4 transition hover:border-utec-primary-light hover:bg-utec-primary-soft">
+                            <p class="text-xs font-medium uppercase tracking-wide text-gray-500">Total</p>
+                            <p class="mt-2 text-3xl font-bold text-utec-primary">
+                                {{ $metricasCumplimiento['total'] ?? 0 }}
+                            </p>
+                            <p class="mt-2 text-xs text-gray-500">Ver consolidados del periodo.</p>
+                        </a>
+
+                        <a href="{{ $urlConsolidados(['estado' => 'pendiente']) }}"
+                            class="rounded-lg border border-utec-gray-medium bg-white p-4 transition hover:border-utec-primary-light hover:bg-utec-primary-soft">
+                            <p class="text-xs font-medium uppercase tracking-wide text-gray-500">Pendientes</p>
+                            <p class="mt-2 text-3xl font-bold text-orange-700">
+                                {{ $metricasCumplimiento['pendientes'] ?? 0 }}
+                            </p>
+                            <p class="mt-2 text-xs text-gray-500">Revisar entregas pendientes.</p>
+                        </a>
+
+                        <a href="{{ $urlConsolidados(['estado' => 'entregado']) }}"
+                            class="rounded-lg border border-utec-gray-medium bg-white p-4 transition hover:border-utec-primary-light hover:bg-utec-primary-soft">
+                            <p class="text-xs font-medium uppercase tracking-wide text-gray-500">Entregados</p>
+                            <p class="mt-2 text-3xl font-bold text-green-700">
+                                {{ $metricasCumplimiento['entregados'] ?? 0 }}
+                            </p>
+                            <p class="mt-2 text-xs text-gray-500">Revisar entregas recibidas.</p>
+                        </a>
+
+                        <a href="{{ $urlConsolidados(['estado' => 'con_observaciones']) }}"
+                            class="rounded-lg border border-utec-gray-medium bg-white p-4 transition hover:border-utec-primary-light hover:bg-utec-primary-soft">
+                            <p class="text-xs font-medium uppercase tracking-wide text-gray-500">Observaciones</p>
+                            <p class="mt-2 text-3xl font-bold text-blue-700">
+                                {{ $metricasCumplimiento['con_observaciones'] ?? 0 }}
+                            </p>
+                            <p class="mt-2 text-xs text-gray-500">Seguimiento a devoluciones.</p>
+                        </a>
+
+                        <a href="{{ $urlConsolidados(['atraso' => 1]) }}"
+                            class="rounded-lg border border-red-200 bg-red-50 p-4 transition hover:border-red-400 hover:bg-red-100">
+                            <p class="text-xs font-medium uppercase tracking-wide text-red-700">Atrasados</p>
+                            <p class="mt-2 text-3xl font-bold text-red-700">
+                                {{ $metricasCumplimiento['atrasados'] ?? 0 }}
+                            </p>
+                            <p class="mt-2 text-xs text-red-700">Con fecha límite vencida.</p>
+                        </a>
                     </div>
+                    @else
+                    <div class="alert-warning">
+                        No hay periodo activo. Las métricas del dashboard estarán disponibles al activar un periodo de evaluación.
+                    </div>
+                    @endif
                 </div>
             </div>
 
@@ -83,13 +145,7 @@
                         </h4>
 
                         <div class="mt-3 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                            <a href="{{ route('tablero.index') }}"
-                                class="rounded-lg border border-utec-gray-medium p-4 text-sm font-medium text-utec-gray-dark transition hover:border-utec-primary-light hover:bg-utec-primary-soft hover:text-utec-primary">
-                                Tablero de cumplimiento
-                                <span class="mt-1 block text-xs text-gray-500">
-                                    Monitorear avance, atrasos y estado general por tutor.
-                                </span>
-                            </a>
+
 
                             <a href="{{ route('consolidados.index') }}"
                                 class="rounded-lg border border-utec-gray-medium p-4 text-sm font-medium text-utec-gray-dark transition hover:border-utec-primary-light hover:bg-utec-primary-soft hover:text-utec-primary">

@@ -18,9 +18,7 @@
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                         Dashboard
                     </x-nav-link>
-                    <x-nav-link :href="route('tablero.index')" :active="request()->routeIs('tablero.*')">
-                        Tablero
-                    </x-nav-link>
+
                     <x-nav-link :href="route('consolidados.index')" :active="request()->routeIs('consolidados.*')">
                         Consolidados
                     </x-nav-link>
@@ -153,9 +151,7 @@
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                 Dashboard
             </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('tablero.index')" :active="request()->routeIs('tablero.*')">
-                Tablero
-            </x-responsive-nav-link>
+
             <x-responsive-nav-link :href="route('consolidados.index')" :active="request()->routeIs('consolidados.*')">
                 Consolidados
             </x-responsive-nav-link>
