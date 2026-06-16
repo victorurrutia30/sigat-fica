@@ -1,7 +1,7 @@
 <nav x-data="{ open: false }" class="border-b border-utec-gray-medium bg-white">
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div class="flex h-16 justify-between">
-            <div class="flex">
+        <div class="flex h-16 items-center justify-between gap-4">
+            <div class="flex min-w-0 flex-1 items-center">
                 <div class="flex shrink-0 items-center">
                     <a href="{{ auth()->user()->rol === 'coordinacion' ? route('dashboard') : route('mis-asignaciones') }}">
                         <div class="flex items-center gap-3">
@@ -13,141 +13,115 @@
                         </div>
                     </a>
                 </div>
-
-                <div class="hidden space-x-7 sm:-my-px sm:ms-10 sm:flex">
+                <div class="hidden min-w-0 items-center gap-5 lg:ms-8 lg:flex">
                     @if(auth()->user()?->rol === 'coordinacion')
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                         Dashboard
                     </x-nav-link>
-
                     <x-nav-link :href="route('tablero.index')" :active="request()->routeIs('tablero.*')">
                         Tablero
                     </x-nav-link>
-
-                    <x-nav-link :href="route('propuestas.index')" :active="request()->routeIs('propuestas.*')">
-                        Propuesta
-                    </x-nav-link>
-
                     <x-nav-link :href="route('consolidados.index')" :active="request()->routeIs('consolidados.*')">
                         Consolidados
                     </x-nav-link>
-
-                    <x-nav-link :href="route('notificaciones.index')" :active="request()->routeIs('notificaciones.*')">
-                        <span>Notificaciones</span>
-
-                        @if(($totalNotificacionesNoLeidas ?? 0) > 0)
-                        <span class="ml-2 inline-flex min-w-5 items-center justify-center rounded-full bg-orange-100 px-2 py-0.5 text-xs font-semibold text-orange-800">
-                            {{ $totalNotificacionesNoLeidas }}
-                        </span>
-                        @endif
+                    <x-nav-link :href="route('periodos.index')" :active="request()->routeIs('periodos.*')">
+                        Periodos
                     </x-nav-link>
-
-                    <div class="hidden sm:flex sm:items-center">
-                        <x-dropdown align="left" width="48">
+                    <x-nav-link :href="route('propuestas.index')" :active="request()->routeIs('propuestas.*')">
+                        Propuestas
+                    </x-nav-link>
+                    <x-nav-link :href="route('notificaciones.index')" :active="request()->routeIs('notificaciones.*')">
+                        <span class="flex items-center gap-1.5">
+                            Notificaciones
+                            @if(($totalNotificacionesNoLeidas ?? 0) > 0)
+                            <span class="inline-flex min-w-5 items-center justify-center rounded-full bg-orange-100 px-2 py-0.5 text-xs font-semibold text-orange-800">
+                                {{ $totalNotificacionesNoLeidas }}
+                            </span>
+                            @endif
+                        </span>
+                    </x-nav-link>
+                    <div class="flex shrink-0 items-center">
+                        <x-dropdown align="left" width="56">
                             <x-slot name="trigger">
                                 <button class="inline-flex items-center border-b-2 border-transparent px-1 pt-1 text-sm font-medium leading-5 text-gray-500 transition duration-150 ease-in-out hover:border-gray-300 hover:text-gray-700 focus:border-gray-300 focus:text-gray-700 focus:outline-none">
-                                    <span>Más</span>
-
-                                    <svg class="ms-1 h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                                        stroke="currentColor">
+                                    <span>Admin</span>
+                                    <svg class="ms-1 h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
                                     </svg>
                                 </button>
                             </x-slot>
-
                             <x-slot name="content">
                                 <x-dropdown-link :href="route('ciclos.index')">
                                     Ciclos académicos
                                 </x-dropdown-link>
-
-                                <x-dropdown-link :href="route('materias.index')">
-                                    Materias
-                                </x-dropdown-link>
-
-                                <x-dropdown-link :href="route('tutores.index')">
-                                    Tutores
-                                </x-dropdown-link>
-
-                                <x-dropdown-link :href="route('usuarios.index')">
-                                    Usuarios
-                                </x-dropdown-link>
-
-                                <x-dropdown-link :href="route('docentes-detectados.index')">
-                                    Docentes detectados
-                                </x-dropdown-link>
-
                                 <x-dropdown-link :href="route('carga-academica.create')">
                                     Carga académica
                                 </x-dropdown-link>
-
-                                <x-dropdown-link :href="route('periodos.index')">
-                                    Periodos de evaluación
+                                <x-dropdown-link :href="route('materias.index')">
+                                    Materias
                                 </x-dropdown-link>
-
+                                <x-dropdown-link :href="route('docentes-detectados.index')">
+                                    Docentes detectados
+                                </x-dropdown-link>
+                                <x-dropdown-link :href="route('tutores.index')">
+                                    Tutores
+                                </x-dropdown-link>
+                                <x-dropdown-link :href="route('usuarios.index')">
+                                    Usuarios
+                                </x-dropdown-link>
                                 <x-dropdown-link :href="route('causas.index')">
                                     Catálogo de causas
                                 </x-dropdown-link>
-
-
                             </x-slot>
                         </x-dropdown>
                     </div>
                     @endif
-
                     @if (auth()->user()->rol === 'tutor')
                     <x-nav-link :href="route('mis-asignaciones')" :active="request()->routeIs('mis-asignaciones')">
                         Mis asignaciones
                     </x-nav-link>
-
-                    <x-nav-link :href="route('consolidado.index')" :active="request()->routeIs('consolidado.*')">
-                        Consolidado
-                    </x-nav-link>
-
                     <x-nav-link :href="route('casos.index')" :active="request()->routeIs('casos.*')">
                         Casos
                     </x-nav-link>
-
+                    <x-nav-link :href="route('consolidado.index')" :active="request()->routeIs('consolidado.*')">
+                        Consolidado
+                    </x-nav-link>
                     <x-nav-link :href="route('notificaciones.index')" :active="request()->routeIs('notificaciones.*')">
                         <span>Notificaciones</span>
-
                         @if(($totalNotificacionesNoLeidas ?? 0) > 0)
                         <span class="ml-2 inline-flex min-w-5 items-center justify-center rounded-full bg-orange-100 px-2 py-0.5 text-xs font-semibold text-orange-800">
                             {{ $totalNotificacionesNoLeidas }}
                         </span>
                         @endif
                     </x-nav-link>
-
                     @endif
                 </div>
             </div>
 
-            <div class="hidden sm:flex sm:items-center sm:ms-6">
+            {{-- User dropdown: desktop --}}
+            <div class="hidden shrink-0 lg:flex lg:items-center">
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
-                        <button class="inline-flex items-center rounded-md border border-transparent bg-white px-3 py-2 text-sm font-medium leading-4 text-gray-600 transition hover:text-utec-primary focus:outline-none">
-                            <div class="text-left">
-                                <div class="font-semibold">{{ auth()->user()->nombre }}</div>
+                        <button class="inline-flex max-w-56 items-center rounded-md border border-transparent bg-white px-3 py-2 text-sm font-medium leading-4 text-gray-600 transition hover:text-utec-primary focus:outline-none">
+                            <div class="min-w-0 text-left">
+                                <div class="truncate font-semibold">{{ auth()->user()->nombre }}</div>
                                 <div class="text-xs text-gray-400">
                                     {{ auth()->user()->rol === 'coordinacion' ? 'Coordinación' : 'Tutor' }}
                                 </div>
                             </div>
-
-                            <div class="ms-2">
+                            <div class="ms-2 shrink-0">
                                 <svg class="h-4 w-4 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
                                     <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
                                 </svg>
                             </div>
                         </button>
                     </x-slot>
-
                     <x-slot name="content">
                         <x-dropdown-link :href="route('profile.edit')">
                             Mi cuenta
                         </x-dropdown-link>
-
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
-
                             <x-dropdown-link
                                 :href="route('logout')"
                                 onclick="event.preventDefault(); this.closest('form').submit();">
@@ -158,7 +132,8 @@
                 </x-dropdown>
             </div>
 
-            <div class="-me-2 flex items-center sm:hidden">
+            {{-- Hamburger: mobile --}}
+            <div class="-me-2 flex shrink-0 items-center lg:hidden">
                 <button
                     @click="open = ! open"
                     class="inline-flex items-center justify-center rounded-md p-2 text-gray-400 transition hover:bg-utec-primary-soft hover:text-utec-primary focus:bg-utec-primary-soft focus:text-utec-primary focus:outline-none">
@@ -171,97 +146,78 @@
         </div>
     </div>
 
-    <div :class="{ 'block': open, 'hidden': ! open }" class="hidden sm:hidden">
+    {{-- Mobile menu panel --}}
+    <div :class="{ 'block': open, 'hidden': ! open }" class="hidden lg:hidden">
         <div class="space-y-1 pb-3 pt-2">
             @if (auth()->user()->rol === 'coordinacion')
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                 Dashboard
             </x-responsive-nav-link>
-
-            <x-responsive-nav-link :href="route('ciclos.index')" :active="request()->routeIs('ciclos.*')">
-                Ciclos
-            </x-responsive-nav-link>
-
-            <x-responsive-nav-link :href="route('tutores.index')" :active="request()->routeIs('tutores.*')">
-                Tutores
-            </x-responsive-nav-link>
-
-            <x-responsive-nav-link :href="route('docentes-detectados.index')" :active="request()->routeIs('docentes-detectados.*')">
-                Docentes detectados
-            </x-responsive-nav-link>
-
-            <x-responsive-nav-link :href="route('materias.index')" :active="request()->routeIs('materias.*')">
-                Materias
-            </x-responsive-nav-link>
-
-            <x-responsive-nav-link :href="route('carga-academica.create')" :active="request()->routeIs('carga-academica.*')">
-                Carga académica
-            </x-responsive-nav-link>
-
-            <x-responsive-nav-link :href="route('propuestas.index')" :active="request()->routeIs('propuestas.*')">
-                Propuestas
-            </x-responsive-nav-link>
-
-            <x-responsive-nav-link :href="route('periodos.index')" :active="request()->routeIs('periodos.*')">
-                Periodos
-            </x-responsive-nav-link>
-
-            <x-responsive-nav-link :href="route('causas.index')" :active="request()->routeIs('causas.*')">
-                Causas
-            </x-responsive-nav-link>
-
-            <x-responsive-nav-link :href="route('consolidados.index')" :active="request()->routeIs('consolidados.*')">
-                Consolidados
-            </x-responsive-nav-link>
-
             <x-responsive-nav-link :href="route('tablero.index')" :active="request()->routeIs('tablero.*')">
                 Tablero
             </x-responsive-nav-link>
-
-            <x-responsive-nav-link :href="route('usuarios.index')" :active="request()->routeIs('usuarios.*')">
-                Usuarios
+            <x-responsive-nav-link :href="route('consolidados.index')" :active="request()->routeIs('consolidados.*')">
+                Consolidados
             </x-responsive-nav-link>
-
+            <x-responsive-nav-link :href="route('periodos.index')" :active="request()->routeIs('periodos.*')">
+                Periodos
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('propuestas.index')" :active="request()->routeIs('propuestas.*')">
+                Propuesta
+            </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('notificaciones.index')" :active="request()->routeIs('notificaciones.*')">
                 Notificaciones
-
                 @if(($totalNotificacionesNoLeidas ?? 0) > 0)
                 <span class="ml-2 inline-flex min-w-5 items-center justify-center rounded-full bg-orange-100 px-2 py-0.5 text-xs font-semibold text-orange-800">
                     {{ $totalNotificacionesNoLeidas }}
                 </span>
                 @endif
             </x-responsive-nav-link>
-
-
+            <div class="px-4 pb-1 pt-3 text-xs font-semibold uppercase tracking-wide text-gray-400">
+                Administración
+            </div>
+            <x-responsive-nav-link :href="route('ciclos.index')" :active="request()->routeIs('ciclos.*')">
+                Ciclos académicos
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('carga-academica.create')" :active="request()->routeIs('carga-academica.*')">
+                Carga académica
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('materias.index')" :active="request()->routeIs('materias.*')">
+                Materias
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('docentes-detectados.index')" :active="request()->routeIs('docentes-detectados.*')">
+                Docentes detectados
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('tutores.index')" :active="request()->routeIs('tutores.*')">
+                Tutores
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('usuarios.index')" :active="request()->routeIs('usuarios.*')">
+                Usuarios
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('causas.index')" :active="request()->routeIs('causas.*')">
+                Catálogo de causas
+            </x-responsive-nav-link>
             @endif
-
             @if (auth()->user()->rol === 'tutor')
             <x-responsive-nav-link :href="route('mis-asignaciones')" :active="request()->routeIs('mis-asignaciones')">
                 Mis asignaciones
             </x-responsive-nav-link>
-
-            <x-responsive-nav-link :href="route('consolidado.index')" :active="request()->routeIs('consolidado.*')">
-                Consolidado
-            </x-responsive-nav-link>
-
             <x-responsive-nav-link :href="route('casos.index')" :active="request()->routeIs('casos.*')">
                 Casos
             </x-responsive-nav-link>
-
+            <x-responsive-nav-link :href="route('consolidado.index')" :active="request()->routeIs('consolidado.*')">
+                Consolidado
+            </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('notificaciones.index')" :active="request()->routeIs('notificaciones.*')">
                 Notificaciones
-
                 @if(($totalNotificacionesNoLeidas ?? 0) > 0)
                 <span class="ml-2 inline-flex min-w-5 items-center justify-center rounded-full bg-orange-100 px-2 py-0.5 text-xs font-semibold text-orange-800">
                     {{ $totalNotificacionesNoLeidas }}
                 </span>
                 @endif
             </x-responsive-nav-link>
-
-
             @endif
         </div>
-
         <div class="border-t border-utec-gray-medium pb-1 pt-4">
             <div class="px-4">
                 <div class="text-base font-medium text-utec-gray-dark">{{ auth()->user()->nombre }}</div>
@@ -270,15 +226,12 @@
                     {{ auth()->user()->rol === 'coordinacion' ? 'Coordinación' : 'Tutor' }}
                 </div>
             </div>
-
             <div class="mt-3 space-y-1">
                 <x-responsive-nav-link :href="route('profile.edit')">
-                    Perfil
+                    Mi cuenta
                 </x-responsive-nav-link>
-
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
-
                     <x-responsive-nav-link
                         :href="route('logout')"
                         onclick="event.preventDefault(); this.closest('form').submit();">
