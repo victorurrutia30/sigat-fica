@@ -17,6 +17,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\NotificacionController;
 use App\Http\Controllers\UsuarioController;
 use App\Http\Controllers\DocenteDetectadoController;
+use App\Http\Controllers\SeccionController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -34,6 +35,9 @@ Route::middleware(['auth', 'verified', 'rol:coordinacion'])->group(function () {
     Route::resource('ciclos', CicloController::class);
 
     Route::resource('materias', MateriaController::class);
+
+    Route::get('materias/{materia}/secciones', [SeccionController::class, 'index'])
+        ->name('materias.secciones.index');
 
     Route::get('docentes-detectados', [DocenteDetectadoController::class, 'index'])
         ->name('docentes-detectados.index');

@@ -16,7 +16,9 @@ class MateriaController extends Controller
         $gestion = request('gestion');
         $revision = request('revision');
 
+
         $materias = Materia::query()
+            ->withCount('secciones')
             ->when($busqueda, function ($query) use ($busqueda) {
                 $query->where(function ($subquery) use ($busqueda) {
                     $subquery->where('codigo', 'like', "%{$busqueda}%")
@@ -82,6 +84,8 @@ class MateriaController extends Controller
 
     public function edit(Materia $materia): View
     {
+        $materia->loadCount('secciones');
+
         return view('coordinacion.materias.edit', compact('materia'));
     }
 

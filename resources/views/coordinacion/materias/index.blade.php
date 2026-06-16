@@ -86,6 +86,7 @@
                                 <tr>
                                     <th class="th-utec">Código</th>
                                     <th class="th-utec">Materia</th>
+                                    <th class="th-utec">Secciones</th>
                                     <th class="th-utec">Plan de estudios</th>
                                     <th class="th-utec">Código de cátedra</th>
                                     <th class="th-utec">Estado</th>
@@ -116,6 +117,12 @@
                                             <span class="badge-warning">Pendiente de revisión</span>
                                             @endif
                                         </div>
+                                    </td>
+
+                                    <td class="td-utec">
+                                        <a href="{{ route('materias.secciones.index', $materia) }}" class="link-utec">
+                                            {{ $materia->secciones_count }} sección(es)
+                                        </a>
                                     </td>
 
                                     <td class="td-utec">
@@ -161,7 +168,7 @@
                                 </tr>
                                 @empty
                                 <tr>
-                                    <td colspan="6" class="px-6 py-8 text-center text-sm text-gray-500">
+                                    <td colspan="7" class="px-6 py-8 text-center text-sm text-gray-500">
                                         No hay materias registradas.
                                     </td>
                                 </tr>
