@@ -5,7 +5,7 @@
                 <div class="flex shrink-0 items-center">
                     <a href="{{ auth()->user()->rol === 'coordinacion' ? route('dashboard') : route('mis-asignaciones') }}">
                         <div class="flex items-center gap-3">
-                            <x-application-logo class="block h-9 w-auto fill-current text-utec-primary" />
+                            <x-application-logo class="block h-9 w-auto object-contain" />
                             <div class="hidden leading-tight sm:block">
                                 <p class="text-sm font-bold text-utec-primary">SIGAT-FICA</p>
                                 <p class="text-xs text-gray-500">Programa de Tutores</p>

@@ -19,10 +19,21 @@
                 <div class="pointer-events-none absolute -bottom-12 -left-12 h-44 w-44 rounded-full bg-utec-primary-dark/60"></div>
 
                 <div class="relative z-10 max-w-xl">
-                    <div class="mb-7 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1.5">
-                        <span class="h-1.5 w-1.5 rounded-full bg-utec-primary-soft"></span>
-                        <span class="text-[10px] font-medium uppercase tracking-widest text-white/70">
-                            FICA · UTEC
+                    <div class="mb-8 inline-flex items-center gap-3 rounded-2xl border border-white/15 bg-white/10 px-4 py-3">
+                        <span class="flex h-12 w-12 items-center justify-center rounded-xl bg-white p-2">
+                            <img
+                                src="{{ asset('images/logo-utec.png') }}"
+                                alt="UTEC"
+                                class="max-h-9 w-auto object-contain">
+                        </span>
+
+                        <span>
+                            <span class="block text-[10px] font-medium uppercase tracking-widest text-white/60">
+                                FICA · UTEC
+                            </span>
+                            <span class="mt-1 block text-sm font-semibold text-white">
+                                SIGAT-FICA
+                            </span>
                         </span>
                     </div>
 
