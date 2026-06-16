@@ -10,21 +10,31 @@
         <label for="codigo_empleado" class="form-label">
             Código de empleado / docente <span class="text-red-500">*</span>
         </label>
+
         <input
             type="text"
             name="codigo_empleado"
             id="codigo_empleado"
-            value="{{ old('codigo_empleado', $tutor->codigo_empleado ?? '') }}"
-            class="input-field uppercase"
+            value="{{ ($codigoEmpleadoBloqueado ?? false) ? ($tutor->codigo_empleado ?? '') : old('codigo_empleado', $tutor->codigo_empleado ?? '') }}"
+            class="input-field uppercase {{ ($codigoEmpleadoBloqueado ?? false) ? 'cursor-not-allowed bg-gray-100 text-gray-600' : '' }}"
             maxlength="30"
             placeholder="Ej. 12345"
-            required>
+            required
+            @readonly($codigoEmpleadoBloqueado ?? false)>
+
         @error('codigo_empleado')
         <p class="form-error">{{ $message }}</p>
         @enderror
+
+        @if($codigoEmpleadoBloqueado ?? false)
+        <p class="form-hint text-orange-700">
+            Este código está bloqueado porque ya está vinculado a secciones importadas desde la carga académica.
+        </p>
+        @else
         <p class="form-hint">
             Si viene de carga académica, usa el mismo código docente para poder validar choques con sus clases.
         </p>
+        @endif
     </div>
 
     <div>
