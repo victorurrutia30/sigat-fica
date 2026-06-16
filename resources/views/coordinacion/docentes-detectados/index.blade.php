@@ -239,11 +239,7 @@ default => 'N/D',
                                                             Sec. {{ $seccionDocente->numero_seccion }}
                                                         </span>
 
-                                                        @if($seccionDocente->requiere_tutor)
-                                                        <span class="badge-warning">
-                                                            Requiere tutor
-                                                        </span>
-                                                        @endif
+
                                                     </div>
 
                                                     <div class="mt-1 text-xs text-gray-500">

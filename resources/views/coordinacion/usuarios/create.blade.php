@@ -64,7 +64,7 @@
                 <div class="card-body">
                     <form method="POST" action="{{ route('usuarios.store') }}">
                         @include('coordinacion.usuarios._form', [
-                        'textoBoton' => 'Crear usuario',
+                        'textoBoton' => 'Crear usuario y enviar invitación',
                         ])
                     </form>
                 </div>

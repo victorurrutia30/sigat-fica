@@ -1,0 +1,121 @@
+/* Tema de correo SIGAT-FICA / UTEC */
+
+body {
+    background-color: #f5f5f5;
+    color: #333333;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.wrapper {
+    background-color: #f5f5f5;
+}
+
+.content {
+    width: 100%;
+}
+
+.header {
+    padding: 28px 0;
+    text-align: center;
+    background-color: #5A1533;
+}
+
+.header a {
+    color: #ffffff;
+    font-size: 24px;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.logo {
+    max-height: 80px;
+}
+
+.body {
+    background-color: #f5f5f5;
+    border-bottom: 1px solid #e5e7eb;
+    border-top: 1px solid #e5e7eb;
+    width: 100%;
+}
+
+.inner-body {
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    margin: 0 auto;
+    width: 570px;
+}
+
+.content-cell {
+    padding: 36px;
+}
+
+h1 {
+    color: #5A1533;
+    font-size: 22px;
+    font-weight: bold;
+    margin-top: 0;
+    text-align: left;
+}
+
+p {
+    color: #374151;
+    font-size: 15px;
+    line-height: 1.6em;
+    margin-top: 0;
+    text-align: left;
+}
+
+a {
+    color: #5A1533;
+}
+
+.button {
+    border-radius: 8px;
+    box-shadow: none;
+    color: #ffffff;
+    display: inline-block;
+    overflow: hidden;
+    text-decoration: none;
+}
+
+.button-primary,
+.button-blue {
+    background-color: #5A1533;
+    border-bottom: 8px solid #5A1533;
+    border-left: 18px solid #5A1533;
+    border-right: 18px solid #5A1533;
+    border-top: 8px solid #5A1533;
+}
+
+.button-primary:hover,
+.button-blue:hover {
+    background-color: #3D0D22;
+    border-bottom-color: #3D0D22;
+    border-left-color: #3D0D22;
+    border-right-color: #3D0D22;
+    border-top-color: #3D0D22;
+}
+
+.panel {
+    border-left: 4px solid #5A1533;
+}
+
+.subcopy {
+    border-top: 1px solid #e5e7eb;
+    margin-top: 25px;
+    padding-top: 25px;
+}
+
+.footer {
+    margin: 0 auto;
+    padding: 24px 0;
+    text-align: center;
+    width: 570px;
+}
+
+.footer p {
+    color: #6b7280;
+    font-size: 12px;
+    text-align: center;
+}

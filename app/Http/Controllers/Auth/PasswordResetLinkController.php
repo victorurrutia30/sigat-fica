@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
+use App\Models\User;
 
 class PasswordResetLinkController extends Controller
 {
@@ -28,15 +29,33 @@ class PasswordResetLinkController extends Controller
     {
         $request->validate([
             'correo' => ['required', 'email'],
+        ], [
+            'correo.required' => 'El correo es obligatorio.',
+            'correo.email' => 'El correo debe tener un formato válido.',
         ]);
 
-        $status = Password::sendResetLink(
-            $request->only('correo')
-        );
+        $usuario = User::query()
+            ->where('correo', $request->input('correo'))
+            ->first();
 
-        return $status == Password::RESET_LINK_SENT
-            ? back()->with('status', __($status))
-            : back()->withInput($request->only('correo'))
-            ->withErrors(['correo' => __($status)]);
+        if (! $usuario || ! $usuario->activo) {
+            return back()
+                ->withInput($request->only('correo'))
+                ->withErrors([
+                    'correo' => 'No encontramos una cuenta activa con ese correo.',
+                ]);
+        }
+
+        $status = Password::sendResetLink([
+            'correo' => $usuario->correo,
+        ]);
+
+        return $status === Password::RESET_LINK_SENT
+            ? back()->with('status', 'Se envió un enlace para establecer o restablecer tu contraseña.')
+            : back()
+            ->withInput($request->only('correo'))
+            ->withErrors([
+                'correo' => 'No fue posible enviar el enlace. Verifica la configuración SMTP.',
+            ]);
     }
 }

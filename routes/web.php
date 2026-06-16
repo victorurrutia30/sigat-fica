@@ -13,11 +13,11 @@ use App\Http\Controllers\CausaController;
 use App\Http\Controllers\CasoSeguimientoController;
 use App\Http\Controllers\GestionCasoController;
 use App\Http\Controllers\ConsolidadoController;
-use App\Http\Controllers\TableroCumplimientoController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\NotificacionController;
 use App\Http\Controllers\UsuarioController;
 use App\Http\Controllers\DocenteDetectadoController;
+use App\Http\Controllers\SeccionController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -29,12 +29,27 @@ Route::get('/dashboard', [DashboardController::class, 'index'])
 
 Route::middleware(['auth', 'verified', 'rol:coordinacion'])->group(function () {
 
-    Route::get('tablero-cumplimiento', [TableroCumplimientoController::class, 'index'])
+    Route::redirect('tablero-cumplimiento', '/dashboard')
         ->name('tablero.index');
 
     Route::resource('ciclos', CicloController::class);
 
     Route::resource('materias', MateriaController::class);
+
+    Route::get('materias/{materia}/secciones', [SeccionController::class, 'index'])
+        ->name('materias.secciones.index');
+
+    Route::get('materias/{materia}/secciones/create', [SeccionController::class, 'create'])
+        ->name('materias.secciones.create');
+
+    Route::post('materias/{materia}/secciones', [SeccionController::class, 'store'])
+        ->name('materias.secciones.store');
+
+    Route::get('secciones/{seccion}/edit', [SeccionController::class, 'edit'])
+        ->name('secciones.edit');
+
+    Route::put('secciones/{seccion}', [SeccionController::class, 'update'])
+        ->name('secciones.update');
 
     Route::get('docentes-detectados', [DocenteDetectadoController::class, 'index'])
         ->name('docentes-detectados.index');
@@ -101,8 +116,6 @@ Route::middleware(['auth', 'verified', 'rol:coordinacion'])->group(function () {
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     Route::get('notificaciones', [NotificacionController::class, 'index'])
         ->name('notificaciones.index');

@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Collection;
 use Illuminate\View\View;
+use App\Models\Seccion;
 
 class TutorController extends Controller
 {
@@ -77,8 +78,13 @@ class TutorController extends Controller
     public function edit(Tutor $tutor): View
     {
         $usuariosDisponibles = $this->usuariosDisponibles($tutor);
+        $codigoEmpleadoBloqueado = $this->codigoEmpleadoUsadoEnCargaAcademica($tutor);
 
-        return view('coordinacion.tutores.edit', compact('tutor', 'usuariosDisponibles'));
+        return view('coordinacion.tutores.edit', compact(
+            'tutor',
+            'usuariosDisponibles',
+            'codigoEmpleadoBloqueado'
+        ));
     }
 
     public function update(TutorRequest $request, Tutor $tutor): RedirectResponse
@@ -169,5 +175,16 @@ class TutorController extends Controller
             ->whereNotIn('id', $usuariosOcupados)
             ->orderBy('nombre')
             ->get();
+    }
+
+    private function codigoEmpleadoUsadoEnCargaAcademica(Tutor $tutor): bool
+    {
+        if (! $tutor->codigo_empleado) {
+            return false;
+        }
+
+        return Seccion::query()
+            ->where('codigo_docente_titular', $tutor->codigo_empleado)
+            ->exists();
     }
 }

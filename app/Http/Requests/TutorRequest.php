@@ -6,6 +6,7 @@ use App\Models\Tutor;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Validator;
+use App\Models\Seccion;
 
 
 class TutorRequest extends FormRequest
@@ -128,6 +129,23 @@ class TutorRequest extends FormRequest
 
             $tutorActual = $this->route('tutor');
             $codigoEmpleado = trim((string) $this->input('codigo_empleado'));
+
+            if ($tutorActual && $codigoEmpleado !== '') {
+                $codigoActual = strtoupper(trim((string) $tutorActual->codigo_empleado));
+
+                if ($codigoEmpleado !== $codigoActual) {
+                    $codigoUsadoEnCargaAcademica = Seccion::query()
+                        ->where('codigo_docente_titular', $codigoActual)
+                        ->exists();
+
+                    if ($codigoUsadoEnCargaAcademica) {
+                        $validator->errors()->add(
+                            'codigo_empleado',
+                            'No puedes cambiar el código de empleado porque ya está vinculado a secciones importadas desde la carga académica.'
+                        );
+                    }
+                }
+            }
 
             if ($codigoEmpleado !== '') {
                 $codigoYaExiste = Tutor::withTrashed()

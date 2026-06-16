@@ -168,6 +168,7 @@ class ConsolidadoService
         Consolidado $consolidado
     ): array {
         $confirmaciones = ConfirmacionSeccionConsolidado::query()
+            ->with('confirmadoPor')
             ->where('consolidado_id', $consolidado->id)
             ->get()
             ->keyBy('seccion_id');
@@ -294,11 +295,7 @@ class ConsolidadoService
                 ]);
             }
 
-            if ($diagnostico['total'] === 0 && ! $confirmarSinCasos) {
-                throw ValidationException::withMessages([
-                    'confirmar_sin_casos' => 'Debe confirmar explícitamente que no hubo estudiantes no evaluados.',
-                ]);
-            }
+
 
             if ($diagnostico['incompletos'] > 0) {
                 throw ValidationException::withMessages([
@@ -361,6 +358,7 @@ class ConsolidadoService
         $periodoId = $filtros['periodo_id'] ?? null;
         $estado = $filtros['estado'] ?? null;
         $busqueda = $filtros['busqueda'] ?? null;
+        $atraso = (bool) ($filtros['atraso'] ?? false);
 
         return Consolidado::query()
             ->select('consolidados.*')
@@ -400,6 +398,14 @@ class ConsolidadoService
                         ->orWhere('codigo_empleado', 'like', "%{$busqueda}%")
                         ->orWhere('correo_institucional', 'like', "%{$busqueda}%");
                 });
+            })
+            ->when($atraso, function ($query) {
+                $hoy = now()->toDateString();
+
+                $query->where('estado_entrega', '!=', 'entregado')
+                    ->whereHas('periodoEvaluacion', function ($periodoQuery) use ($hoy) {
+                        $periodoQuery->whereDate('fecha_limite_consolidado', '<', $hoy);
+                    });
             })
             ->orderByRaw("
             CASE estado_entrega
@@ -464,10 +470,23 @@ class ConsolidadoService
 
         $diagnostico = $this->diagnosticarCasos($casos);
 
+        $secciones = $this->seccionesAsignadasParaTutor(
+            tutor: $consolidado->tutor,
+            periodo: $consolidado->periodoEvaluacion
+        );
+
+        $coberturaSecciones = $this->coberturaSecciones(
+            secciones: $secciones,
+            casos: $casos,
+            consolidado: $consolidado
+        );
+
         return [
             'consolidado' => $consolidado,
             'casos' => $casos,
             'diagnostico' => $diagnostico,
+            'secciones' => $secciones,
+            'coberturaSecciones' => $coberturaSecciones,
         ];
     }
 

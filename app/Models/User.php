@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use App\Notifications\RestablecerContrasenaSigat;
 
 class User extends Authenticatable
 {
@@ -53,6 +54,16 @@ class User extends Authenticatable
     public function getEmailForPasswordReset(): string
     {
         return $this->correo;
+    }
+
+    public function routeNotificationForMail($notification = null): string
+    {
+        return $this->correo;
+    }
+
+    public function sendPasswordResetNotification($token): void
+    {
+        $this->notify(new RestablecerContrasenaSigat($token));
     }
 
     public function tutor(): HasOne

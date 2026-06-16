@@ -10,6 +10,9 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 use Illuminate\Http\Request;
+use App\Services\UsuarioInvitacionService;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Str;
 
 
 class UsuarioController extends Controller
@@ -84,22 +87,38 @@ class UsuarioController extends Controller
         ));
     }
 
-    public function store(UsuarioRequest $request): RedirectResponse
+    public function store(UsuarioRequest $request, UsuarioInvitacionService $invitacionService): RedirectResponse
     {
         $datos = $this->datosNormalizados($request);
         $tutorId = $datos['tutor_id'];
 
         unset($datos['tutor_id']);
 
-        DB::transaction(function () use ($datos, $tutorId) {
+        $usuario = DB::transaction(function () use ($datos, $tutorId): User {
             $usuario = User::create($datos);
 
             $this->sincronizarTutor($usuario, $tutorId);
+
+            return $usuario;
         });
+
+        $estadoInvitacion = $invitacionService->enviar($usuario);
+
+        if ($estadoInvitacion === Password::RESET_LINK_SENT) {
+            return redirect()
+                ->route('usuarios.index')
+                ->with('success', 'Usuario creado correctamente. Se envió un correo de invitación para establecer contraseña.');
+        }
+
+        if ($estadoInvitacion === UsuarioInvitacionService::USUARIO_INACTIVO) {
+            return redirect()
+                ->route('usuarios.index')
+                ->with('success', 'Usuario creado correctamente como inactivo. No se envió invitación de acceso.');
+        }
 
         return redirect()
             ->route('usuarios.index')
-            ->with('success', 'Usuario creado correctamente.');
+            ->with('warning', 'Usuario creado correctamente, pero no se pudo enviar el correo de invitación. Verifica la configuración SMTP o usa recuperación de contraseña.');
     }
 
     public function edit(User $usuario): View
@@ -174,6 +193,10 @@ class UsuarioController extends Controller
 
         if ($esEdicion && blank($datos['password'] ?? null)) {
             unset($datos['password']);
+        }
+
+        if (! $esEdicion && blank($datos['password'] ?? null)) {
+            $datos['password'] = Str::random(40);
         }
 
         return $datos;

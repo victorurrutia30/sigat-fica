@@ -113,7 +113,9 @@ class GuardarCargaAcademicaService
         }
 
         $seccion->modalidad = $modalidadInterpretada['modalidad'];
-        $seccion->requiere_tutor = (bool) $modalidadInterpretada['requiere_tutor'];
+        $seccion->requiere_tutor = $materia->gestionada_por_coordinacion
+            ? (bool) $modalidadInterpretada['requiere_tutor']
+            : false;
         $seccion->aula = $this->normalizador->textoOpcional($datos['aula'] ?? null);
         $seccion->nombre_titular = $this->normalizador->texto((string) ($datos['docente_titular'] ?? ''));
         $seccion->correo_titular = $this->correoValido($datos['correo_institucional'] ?? null);

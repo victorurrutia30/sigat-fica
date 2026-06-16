@@ -11,7 +11,7 @@
     <span class="font-semibold">{{ $tutorPreseleccionado->nombre_completo }}</span>
     —
     {{ $tutorPreseleccionado->correo_institucional }}.
-    Define la contraseña inicial antes de crear la cuenta.
+    Al crear la cuenta se enviará un correo de invitación para que el usuario establezca su contraseña.
 </div>
 @endif
 
@@ -97,7 +97,7 @@
 
     <div x-data="{ mostrar: false }">
         <label for="password" class="form-label">
-            Contraseña {{ isset($usuario) ? '' : '*' }}
+            {{ isset($usuario) ? 'Nueva contraseña' : 'Contraseña temporal' }}
         </label>
 
         <div class="flex gap-2">
@@ -109,8 +109,7 @@
                 class="input-field"
                 minlength="8"
                 autocomplete="new-password"
-                placeholder="{{ isset($usuario) ? 'Dejar vacío para no cambiar' : 'Ej. Password123' }}"
-                @required(! isset($usuario))>
+                placeholder="{{ isset($usuario) ? 'Dejar vacío para no cambiar' : 'Opcional' }}">
 
             <button
                 type="button"
@@ -125,13 +124,16 @@
         @enderror
 
         <p class="form-hint">
-            Para QA/demo puedes usar Password123. En edición, deja este campo vacío si no deseas cambiar la contraseña.
+            {{ isset($usuario)
+                ? 'Deja este campo vacío si no deseas cambiar la contraseña.'
+                : 'Opcional. Si lo dejas vacío, el sistema enviará un enlace para que el usuario establezca su contraseña.'
+            }}
         </p>
     </div>
 
     <div x-data="{ mostrar: false }">
         <label for="password_confirmation" class="form-label">
-            Confirmar contraseña {{ isset($usuario) ? '' : '*' }}
+            Confirmar contraseña
         </label>
 
         <div class="flex gap-2">
@@ -143,8 +145,7 @@
                 class="input-field"
                 minlength="8"
                 autocomplete="new-password"
-                placeholder="{{ isset($usuario) ? 'Dejar vacío para no cambiar' : 'Ej. Password123' }}"
-                @required(! isset($usuario))>
+                placeholder="{{ isset($usuario) ? 'Dejar vacío para no cambiar' : 'Opcional' }}">
 
             <button
                 type="button"

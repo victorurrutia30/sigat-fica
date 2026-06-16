@@ -62,7 +62,12 @@ class PeriodoEvaluacionController extends Controller
             ->orderByDesc('periodo')
             ->get();
 
-        return view('coordinacion.periodos.create', compact('ciclos'));
+        $nombresPeriodo = PeriodoEvaluacion::nombresPermitidos();
+
+        return view('coordinacion.periodos.create', compact(
+            'ciclos',
+            'nombresPeriodo'
+        ));
     }
 
     public function store(
@@ -115,6 +120,7 @@ class PeriodoEvaluacionController extends Controller
         return view('coordinacion.periodos.edit', [
             'periodo' => $periodoEvaluacion,
             'ciclos' => $ciclos,
+            'nombresPeriodo' => PeriodoEvaluacion::nombresPermitidos(),
         ]);
     }
 

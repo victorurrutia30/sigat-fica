@@ -3,6 +3,8 @@
 namespace App\Exports\Sheets;
 
 use App\Models\CasoSeguimiento;
+use App\Models\ConfirmacionSeccionConsolidado;
+use App\Models\Consolidado;
 use App\Models\ItemPropuesta;
 use App\Models\PeriodoEvaluacion;
 use Illuminate\Support\Collection;
@@ -92,7 +94,7 @@ class ConsolidadoSeccionSheet implements FromCollection, WithHeadings, WithTitle
 
         if ($casos->isEmpty()) {
             return $this->filas = collect([
-                $this->fila(['Todos han hecho examen parcial']),
+                $this->fila([$this->mensajeSeccionSinCasos()]),
             ]);
         }
 
@@ -125,45 +127,163 @@ class ConsolidadoSeccionSheet implements FromCollection, WithHeadings, WithTitle
     // r13   Inscritos (general)  value           ·    ·    ·    AB/C            Abandono del ciclo
     // r14   Inscritos (nvo ing.) value           ·    ·    ·    —               —
     // ────────────────────────────────────────────────────────────────────────
-
     public function headings(): array
     {
         $this->periodo->loadMissing('ciclo');
 
         $seccion = $this->item?->seccion;
         $materia = $seccion?->materia;
-        $tutor   = $this->item?->tutor;
+        $tutor = $this->item?->tutor;
 
         return [
             // ── Bloque header ─────────────────────────────────────────
-            $this->fila(['UNIVERSIDAD TECNOLÓGICA DE EL SALVADOR']),                    // 1
-            $this->fila(['FACULTAD DE INFORMÁTICA Y CIENCIAS APLICADAS']),              // 2
-            $this->fila(['PROGRAMA DE TUTORES · DECANATO DE ESTUDIANTES']),             // 3
-            $this->fila([]),                                                             // 4 spacer delgado
-            $this->fila(['NÓMINA DE INASISTENCIA A PRIMERA EVALUACIÓN']),               // 5
+            $this->fila(['UNIVERSIDAD TECNOLÓGICA DE EL SALVADOR']),                  // 1
+            $this->fila(['FACULTAD DE INFORMÁTICA Y CIENCIAS APLICADAS']),            // 2
+            $this->fila(['PROGRAMA DE TUTORES · DECANATO DE ESTUDIANTES']),           // 3
+            $this->fila([]),                                                          // 4
+            $this->fila(['NÓMINA DE INASISTENCIA A ' . $this->nombrePeriodoMayusculas()]), // 5
 
             // ── Sección info ──────────────────────────────────────────
-            ['Facultad',               'Informática y Ciencias Aplicadas',       null, null, null, 'Formulario',  'Inasistencia a Primera Evaluación', null, null, null],  //  6
-            ['Ciclo',                  $this->periodo->ciclo?->nombre ?? '—',    null, null, null, null,          null,                                null, null, null],  //  7
-            ['Asignatura',             $materia?->nombre ?? '—',                 null, null, null, null,          null,                                null, null, null],  //  8
-            ['Sección',                $seccion?->numero_seccion ?? '—',         null, null, null, 'SIMBOLOGÍA',  null,                                null, null, null],  //  9
-            ['Docente',                $seccion?->nombre_titular ?? '—',         null, null, null, 'R/C',         'Retiro de ciclo',                   null, null, null],  // 10
-            ['Tutor(a)',               $tutor?->nombre_completo ?? '—',          null, null, null, 'R/M',         'Retiro de materia',                 null, null, null],  // 11
-            [null,                     null,                                       null, null, null, 'AB/M',        'Abandono de materia',               null, null, null],  // 12
-            ['Inscritos (general)',    $seccion?->capacidad ?? '—',              null, null, null, 'AB/C',        'Abandono del ciclo',                null, null, null],  // 13
-            ['Inscritos (nuevo ing.)', '',                                        null, null, null, null,          null,                                null, null, null],  // 14
+            [
+                'Facultad',
+                'Informática y Ciencias Aplicadas',
+                null,
+                null,
+                null,
+                'Formulario',
+                'Inasistencia a ' . $this->nombrePeriodo(),
+                null,
+                null,
+                null,
+            ], // 6
+
+            [
+                'Ciclo',
+                $this->periodo->ciclo?->nombre ?? '—',
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+            ], // 7
+
+            [
+                'Asignatura',
+                $materia?->nombre ?? '—',
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+            ], // 8
+
+            [
+                'Sección',
+                $seccion?->numero_seccion ?? '—',
+                null,
+                null,
+                null,
+                'SIMBOLOGÍA',
+                null,
+                null,
+                null,
+                null,
+            ], // 9
+
+            [
+                'Docente',
+                $seccion?->nombre_titular ?? '—',
+                null,
+                null,
+                null,
+                'R/C',
+                'Retiro de ciclo',
+                null,
+                null,
+                null,
+            ], // 10
+
+            [
+                'Tutor(a)',
+                $tutor?->nombre_completo ?? '—',
+                null,
+                null,
+                null,
+                'R/M',
+                'Retiro de materia',
+                null,
+                null,
+                null,
+            ], // 11
+
+            [
+                null,
+                null,
+                null,
+                null,
+                null,
+                'AB/M',
+                'Abandono de materia',
+                null,
+                null,
+                null,
+            ], // 12
+
+            [
+                'Inscritos (general)',
+                'No disponible',
+                null,
+                null,
+                null,
+                'AB/C',
+                'Abandono del ciclo',
+                null,
+                null,
+                null,
+            ], // 13
+
+            [
+                'Inscritos (nuevo ing.)',
+                'No disponible',
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+            ], // 14
 
             // ── Spacers ───────────────────────────────────────────────
-            $this->fila([]),  // 15
-            $this->fila([]),  // 16
-            $this->fila([]),  // 17
-            $this->fila([]),  // 18
-            $this->fila([]),  // 19
-            $this->fila([]),  // 20
+            $this->fila([]), // 15
+            $this->fila([]), // 16
+            $this->fila([]), // 17
+            $this->fila([]), // 18
+            $this->fila([]), // 19
+            $this->fila([]), // 20
 
             // ── Bloque tabla ──────────────────────────────────────────
-            $this->fila(['NÓMINA DE ALUMNOS QUE NO REALIZARON PRIMERA EVALUACIÓN']),   // 21
-            ['Carnet', 'Nombre del Alumno', 'Apellidos del Alumno', 'Detalle de inasistencia a primera evaluación', 'R/C', 'R/M', 'AB/M', 'AB/C', 'Matrícula', 'Nº/cuota cancelada'],  // 22
+            $this->fila(['NÓMINA DE ALUMNOS QUE NO REALIZARON ' . $this->nombrePeriodoMayusculas()]), // 21
+
+            [
+                'Carnet',
+                'Nombre del Alumno',
+                'Apellidos del Alumno',
+                $this->detalleInasistenciaPeriodo(),
+                'R/C',
+                'R/M',
+                'AB/M',
+                'AB/C',
+                'Matrícula',
+                'Nº/cuota cancelada',
+            ], // 22
         ];
     }
 
@@ -180,11 +300,16 @@ class ConsolidadoSeccionSheet implements FromCollection, WithHeadings, WithTitle
         $seccion = $this->item->seccion;
         $materia = $seccion?->materia;
 
-        $nombre = trim(sprintf('%s %s', $materia?->nombre ?? 'Materia', $seccion?->numero_seccion ?? ''));
+        $nombre = trim(sprintf(
+            '%s %s',
+            $materia?->nombre ?? 'Materia',
+            $seccion?->numero_seccion ?? ''
+        ));
+
         $nombre = preg_replace('/[\\\\\\/\\?\\*\\[\\]:]/', ' ', $nombre) ?? $nombre;
         $nombre = preg_replace('/\s+/', ' ', $nombre) ?? $nombre;
 
-        return Str::limit($this->indice . ' ' . $nombre, 31, '');
+        return Str::limit($nombre, 31, '');
     }
 
     public function columnWidths(): array
@@ -457,6 +582,9 @@ class ConsolidadoSeccionSheet implements FromCollection, WithHeadings, WithTitle
                 $first = $this->collection()->first();
                 $emptyMessages = [
                     'Todos han hecho examen parcial',
+                    'Pendiente de entrega del tutor',
+                    'Pendiente de confirmación del tutor',
+                    'Consolidado con observaciones',
                     'No hay secciones asignadas para este periodo.',
                 ];
 
@@ -501,6 +629,85 @@ class ConsolidadoSeccionSheet implements FromCollection, WithHeadings, WithTitle
     // ────────────────────────────────────────────────────────────────────────
     // HELPERS
     // ────────────────────────────────────────────────────────────────────────
+
+    private function inscritosGeneral(): string|int
+    {
+        $seccion = $this->item?->seccion;
+
+        if (! $seccion) {
+            return 'No disponible';
+        }
+
+        $totalNomina = $seccion->nominasSeccion()->count();
+
+        if ($totalNomina > 0) {
+            return $totalNomina;
+        }
+
+        return 'No disponible';
+    }
+
+    private function mensajeSeccionSinCasos(): string
+    {
+        $consolidado = $this->consolidadoDeLaSeccion();
+
+        if (! $consolidado) {
+            return 'Pendiente de entrega del tutor';
+        }
+
+        if ($consolidado->estado_entrega === 'con_observaciones') {
+            return 'Consolidado con observaciones';
+        }
+
+        if ($consolidado->estado_entrega !== 'entregado') {
+            return 'Pendiente de entrega del tutor';
+        }
+
+        if ($this->seccionConfirmadaSinCasos($consolidado)) {
+            return 'Todos han hecho examen parcial';
+        }
+
+        return 'Pendiente de confirmación del tutor';
+    }
+
+    private function consolidadoDeLaSeccion(): ?Consolidado
+    {
+        if (! $this->item) {
+            return null;
+        }
+
+        return Consolidado::query()
+            ->where('periodo_evaluacion_id', $this->periodo->id)
+            ->where('tutor_id', $this->item->tutor_id)
+            ->first();
+    }
+
+    private function seccionConfirmadaSinCasos(Consolidado $consolidado): bool
+    {
+        if (! $this->item) {
+            return false;
+        }
+
+        return ConfirmacionSeccionConsolidado::query()
+            ->where('consolidado_id', $consolidado->id)
+            ->where('seccion_id', $this->item->seccion_id)
+            ->exists();
+    }
+
+    private function nombrePeriodo(): string
+    {
+        return $this->periodo->nombre ?: 'Periodo de evaluación';
+    }
+
+    private function nombrePeriodoMayusculas(): string
+    {
+        return Str::upper($this->nombrePeriodo());
+    }
+
+    private function detalleInasistenciaPeriodo(): string
+    {
+        return 'Detalle de inasistencia a ' . Str::lower($this->nombrePeriodo());
+    }
 
     private function fila(array $valores): array
     {
