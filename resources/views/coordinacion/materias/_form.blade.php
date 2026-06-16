@@ -5,7 +5,12 @@
     Las materias creadas desde carga académica pueden quedar pendientes de revisión hasta completar sus datos.
 </div>
 
-<div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+<div
+    x-data="{
+        gestionada: @js((bool) old('gestionada_por_coordinacion', $materia->gestionada_por_coordinacion ?? false)),
+        requiereRevision: @js((bool) old('requiere_revision', $materia->requiere_revision ?? false))
+    }"
+    class="grid grid-cols-1 gap-4 md:grid-cols-2">
     <div>
         <label for="codigo" class="form-label">
             Código <span class="text-red-500">*</span>
@@ -90,8 +95,8 @@
                 name="gestionada_por_coordinacion"
                 value="1"
                 class="mt-1 rounded border-utec-gray-medium text-utec-primary focus:ring-utec-primary-light"
-                @checked((bool) old('gestionada_por_coordinacion', $materia->gestionada_por_coordinacion ?? false))
-            >
+                x-model="gestionada"
+                @change="if (gestionada) requiereRevision = false">
             <span>
                 <span class="block text-sm font-medium text-utec-gray-dark">
                     Gestionada por Coordinación
@@ -108,15 +113,15 @@
                 type="checkbox"
                 name="requiere_revision"
                 value="1"
-                class="mt-1 rounded border-utec-gray-medium text-utec-primary focus:ring-utec-primary-light"
-                @checked((bool) old('requiere_revision', $materia->requiere_revision ?? false))
-            >
+                class="mt-1 rounded border-utec-gray-medium text-utec-primary focus:ring-utec-primary-light disabled:cursor-not-allowed disabled:opacity-60"
+                x-model="requiereRevision"
+                :disabled="gestionada">
             <span>
                 <span class="block text-sm font-medium text-utec-gray-dark">
                     Pendiente de revisión
                 </span>
                 <span class="block text-xs text-gray-500">
-                    Úsalo para materias creadas desde Excel que necesitan revisión de Coordinación.
+                    Se usa para materias importadas que aún no han sido revisadas. Al marcar la materia como gestionada, este estado se desactiva automáticamente.
                 </span>
             </span>
         </label>
