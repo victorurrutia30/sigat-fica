@@ -2,8 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\SeccionRequest;
 use App\Models\Ciclo;
 use App\Models\Materia;
+use App\Models\Seccion;
+use App\Services\SeccionService;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -80,5 +84,40 @@ class SeccionController extends Controller
             'requiereTutor',
             'busqueda'
         ));
+    }
+
+    public function edit(Seccion $seccion): View
+    {
+        $seccion->load([
+            'materia',
+            'ciclo',
+            'horarios',
+            'itemsPropuesta.tutor',
+            'itemsPropuesta.propuestaAsignacion',
+        ]);
+
+        $seccion->loadCount([
+            'casosSeguimiento',
+            'itemsPropuesta',
+            'nominasSeccion',
+        ]);
+
+        return view('coordinacion.secciones.edit', compact('seccion'));
+    }
+
+    public function update(
+        SeccionRequest $request,
+        Seccion $seccion,
+        SeccionService $seccionService
+    ): RedirectResponse {
+        $seccionActualizada = $seccionService->actualizar(
+            seccion: $seccion,
+            datos: $request->validated(),
+            usuarioId: $request->user()->id
+        );
+
+        return redirect()
+            ->route('materias.secciones.index', $seccionActualizada->materia_id)
+            ->with('success', 'Sección actualizada correctamente.');
     }
 }

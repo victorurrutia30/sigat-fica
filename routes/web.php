@@ -39,6 +39,12 @@ Route::middleware(['auth', 'verified', 'rol:coordinacion'])->group(function () {
     Route::get('materias/{materia}/secciones', [SeccionController::class, 'index'])
         ->name('materias.secciones.index');
 
+    Route::get('secciones/{seccion}/edit', [SeccionController::class, 'edit'])
+        ->name('secciones.edit');
+
+    Route::put('secciones/{seccion}', [SeccionController::class, 'update'])
+        ->name('secciones.update');
+
     Route::get('docentes-detectados', [DocenteDetectadoController::class, 'index'])
         ->name('docentes-detectados.index');
 

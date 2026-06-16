@@ -151,6 +151,7 @@
                                     <th class="th-utec">Horarios</th>
                                     <th class="th-utec">Propuesta</th>
                                     <th class="th-utec">Casos</th>
+                                    <th class="th-utec text-right">Acciones</th>
                                 </tr>
                             </thead>
 
@@ -195,6 +196,7 @@
                                         <div class="font-semibold text-utec-gray-dark">
                                             {{ $seccion->numero_seccion }}
                                         </div>
+
                                         <div class="text-xs text-gray-500">
                                             Aula: {{ $seccion->aula ?: 'No definida' }}
                                         </div>
@@ -274,14 +276,21 @@
                                         <div class="text-sm">
                                             Casos: {{ $seccion->casos_seguimiento_count }}
                                         </div>
+
                                         <div class="text-xs text-gray-500">
                                             Nómina: {{ $seccion->nominas_seccion_count }}
                                         </div>
                                     </td>
+
+                                    <td class="td-utec text-right">
+                                        <a href="{{ route('secciones.edit', $seccion) }}" class="link-utec">
+                                            Editar
+                                        </a>
+                                    </td>
                                 </tr>
                                 @empty
                                 <tr>
-                                    <td colspan="7" class="px-6 py-8 text-center text-sm text-gray-500">
+                                    <td colspan="8" class="px-6 py-8 text-center text-sm text-gray-500">
                                         No hay secciones registradas para esta materia con los filtros seleccionados.
                                     </td>
                                 </tr>
