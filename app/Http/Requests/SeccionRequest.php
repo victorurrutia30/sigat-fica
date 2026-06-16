@@ -53,16 +53,26 @@ class SeccionRequest extends FormRequest
     public function rules(): array
     {
         $seccion = $this->route('seccion');
+        $materia = $this->route('materia');
+
+        $cicloId = $seccion?->ciclo_id ?? $this->integer('ciclo_id');
+        $materiaId = $seccion?->materia_id ?? $materia?->id;
 
         return [
+            'ciclo_id' => [
+                $seccion ? 'nullable' : 'required',
+                'integer',
+                'exists:ciclos,id',
+            ],
             'numero_seccion' => [
                 'required',
                 'string',
                 'max:10',
+                'regex:/^[A-Za-z0-9.\-_]+$/',
                 Rule::unique('secciones', 'numero_seccion')
                     ->where(fn($query) => $query
-                        ->where('ciclo_id', $seccion?->ciclo_id)
-                        ->where('materia_id', $seccion?->materia_id))
+                        ->where('ciclo_id', $cicloId)
+                        ->where('materia_id', $materiaId))
                     ->ignore($seccion?->id),
             ],
             'modalidad' => [
@@ -92,6 +102,7 @@ class SeccionRequest extends FormRequest
                 'nullable',
                 'string',
                 'max:30',
+                'regex:/^[A-Za-z0-9.\-_]+$/',
             ],
             'categoria_docente_titular' => [
                 'nullable',
@@ -201,6 +212,14 @@ class SeccionRequest extends FormRequest
     public function messages(): array
     {
         return [
+
+            'numero_seccion.regex' => 'El número de sección solo puede contener letras, números, guion, punto o guion bajo.',
+            'codigo_docente_titular.regex' => 'El código del docente titular solo puede contener letras, números, guion, punto o guion bajo.',
+
+            'ciclo_id.required' => 'El ciclo académico es obligatorio.',
+            'ciclo_id.integer' => 'El ciclo académico seleccionado no es válido.',
+            'ciclo_id.exists' => 'El ciclo académico seleccionado no existe.',
+
             'numero_seccion.required' => 'El número de sección es obligatorio.',
             'numero_seccion.max' => 'El número de sección no debe superar los 10 caracteres.',
             'numero_seccion.unique' => 'Ya existe una sección con ese número para esta materia y ciclo.',

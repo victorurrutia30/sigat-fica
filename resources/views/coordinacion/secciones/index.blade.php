@@ -9,8 +9,11 @@
                     Consulta de secciones, docentes titulares y horarios asociados a la materia.
                 </p>
             </div>
-
             <div class="flex flex-wrap gap-2">
+                <a href="{{ route('materias.secciones.create', $materia) }}" class="btn-primary">
+                    Nueva sección
+                </a>
+
                 <a href="{{ route('materias.edit', $materia) }}" class="btn-secondary">
                     Editar materia
                 </a>

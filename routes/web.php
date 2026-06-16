@@ -39,6 +39,12 @@ Route::middleware(['auth', 'verified', 'rol:coordinacion'])->group(function () {
     Route::get('materias/{materia}/secciones', [SeccionController::class, 'index'])
         ->name('materias.secciones.index');
 
+    Route::get('materias/{materia}/secciones/create', [SeccionController::class, 'create'])
+        ->name('materias.secciones.create');
+
+    Route::post('materias/{materia}/secciones', [SeccionController::class, 'store'])
+        ->name('materias.secciones.store');
+
     Route::get('secciones/{seccion}/edit', [SeccionController::class, 'edit'])
         ->name('secciones.edit');
 

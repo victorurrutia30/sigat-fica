@@ -1,0 +1,32 @@
+<x-app-layout>
+    <x-slot name="header">
+        <div class="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+            <div>
+                <h2 class="text-xl font-bold text-utec-primary">
+                    Nueva sección
+                </h2>
+                <p class="text-sm text-gray-500">
+                    {{ $materia->codigo }} — {{ $materia->nombre }}
+                </p>
+            </div>
+
+            <a href="{{ route('materias.secciones.index', $materia) }}" class="btn-secondary">
+                Volver a secciones
+            </a>
+        </div>
+    </x-slot>
+
+    <div class="py-6">
+        <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+            @if($errors->any())
+            <div class="mb-4 rounded-md border-l-4 border-red-600 bg-red-50 p-4 text-sm text-red-800">
+                {{ $errors->first() }}
+            </div>
+            @endif
+
+            <form method="POST" action="{{ route('materias.secciones.store', $materia) }}">
+                @include('coordinacion.secciones._form')
+            </form>
+        </div>
+    </div>
+</x-app-layout>

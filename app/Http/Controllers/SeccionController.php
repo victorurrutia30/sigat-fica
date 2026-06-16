@@ -86,6 +86,62 @@ class SeccionController extends Controller
         ));
     }
 
+    public function create(Materia $materia): View|RedirectResponse
+    {
+        $ciclos = Ciclo::query()
+            ->orderByDesc('activo')
+            ->orderByDesc('anio')
+            ->orderByDesc('periodo')
+            ->get();
+
+        if ($ciclos->isEmpty()) {
+            return redirect()
+                ->route('ciclos.index')
+                ->with('error', 'Debe existir al menos un ciclo académico antes de crear secciones.');
+        }
+
+        $cicloActivo = $ciclos->firstWhere('activo', true);
+
+        $seccion = new Seccion([
+            'materia_id' => $materia->id,
+            'ciclo_id' => $cicloActivo?->id,
+            'modalidad' => 'presencial',
+            'requiere_tutor' => (bool) $materia->gestionada_por_coordinacion,
+            'capacidad' => 35,
+        ]);
+
+        $seccion->setRelation('materia', $materia);
+        $seccion->setRelation('ciclo', $cicloActivo);
+        $seccion->setRelation('horarios', collect());
+        $seccion->setRelation('itemsPropuesta', collect());
+
+        $seccion->casos_seguimiento_count = 0;
+        $seccion->items_propuesta_count = 0;
+        $seccion->nominas_seccion_count = 0;
+
+        return view('coordinacion.secciones.create', compact(
+            'materia',
+            'seccion',
+            'ciclos'
+        ));
+    }
+
+    public function store(
+        SeccionRequest $request,
+        Materia $materia,
+        SeccionService $seccionService
+    ): RedirectResponse {
+        $seccion = $seccionService->crear(
+            materia: $materia,
+            datos: $request->validated(),
+            usuarioId: $request->user()->id
+        );
+
+        return redirect()
+            ->route('materias.secciones.index', $seccion->materia)
+            ->with('success', 'Sección creada correctamente.');
+    }
+
     public function edit(Seccion $seccion): View
     {
         $seccion->load([
@@ -102,7 +158,13 @@ class SeccionController extends Controller
             'nominasSeccion',
         ]);
 
-        return view('coordinacion.secciones.edit', compact('seccion'));
+        $ciclos = Ciclo::query()
+            ->orderByDesc('activo')
+            ->orderByDesc('anio')
+            ->orderByDesc('periodo')
+            ->get();
+
+        return view('coordinacion.secciones.edit', compact('seccion', 'ciclos'));
     }
 
     public function update(

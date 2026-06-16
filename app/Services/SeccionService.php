@@ -6,12 +6,53 @@ use App\Models\HistorialCambioPropuesta;
 use App\Models\ItemPropuesta;
 use App\Models\Seccion;
 use App\Models\Tutor;
+use App\Models\Materia;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 class SeccionService
 {
+
+    public function crear(Materia $materia, array $datos, int $usuarioId): Seccion
+    {
+        return DB::transaction(function () use ($materia, $datos) {
+            $seccion = new Seccion();
+            $seccion->ciclo_id = (int) $datos['ciclo_id'];
+            $seccion->materia_id = $materia->id;
+            $seccion->numero_seccion = $datos['numero_seccion'];
+            $seccion->modalidad = $datos['modalidad'];
+            $seccion->requiere_tutor = $materia->gestionada_por_coordinacion
+                ? (bool) ($datos['requiere_tutor'] ?? false)
+                : false;
+            $seccion->aula = $datos['aula'] ?? null;
+            $seccion->nombre_titular = $datos['nombre_titular'];
+            $seccion->correo_titular = $datos['correo_titular'] ?? null;
+            $seccion->codigo_docente_titular = $datos['codigo_docente_titular'] ?? null;
+            $seccion->categoria_docente_titular = $datos['categoria_docente_titular'] ?? null;
+            $seccion->capacidad = 35;
+            $seccion->observaciones_carga = $datos['observaciones_carga'] ?? null;
+
+            $horarios = $datos['horarios'] ?? [];
+
+            if ($seccion->modalidad === 'virtual') {
+                $horarios = [];
+            }
+
+            $seccion->save();
+
+            foreach ($horarios as $horario) {
+                $seccion->horarios()->create([
+                    'dia_semana' => (int) $horario['dia_semana'],
+                    'hora_inicio' => $horario['hora_inicio'],
+                    'hora_fin' => $horario['hora_fin'],
+                ]);
+            }
+
+            return $seccion->load(['materia', 'ciclo', 'horarios']);
+        });
+    }
+
     public function actualizar(Seccion $seccion, array $datos, int $usuarioId): Seccion
     {
         return DB::transaction(function () use ($seccion, $datos, $usuarioId) {

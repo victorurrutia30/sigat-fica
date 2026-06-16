@@ -91,15 +91,34 @@ while (count($horariosFormulario) < 5) {
             <div class="card-body">
                 <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
                     <div>
-                        <label class="form-label">Ciclo académico</label>
+                        <label for="ciclo_id" class="form-label">
+                            Ciclo académico <span class="text-red-500">*</span>
+                        </label>
+
+                        @if($seccion->exists)
                         <input
                             type="text"
                             value="{{ $seccion->ciclo?->nombre ?? 'Sin ciclo' }}"
                             class="input-field bg-gray-100"
                             disabled>
                         <p class="form-hint">
-                            No se permite cambiar el ciclo de una sección ya importada.
+                            No se permite cambiar el ciclo de una sección ya creada.
                         </p>
+                        @else
+                        <select name="ciclo_id" id="ciclo_id" class="input-field" required>
+                            @foreach($ciclos as $ciclo)
+                            <option
+                                value="{{ $ciclo->id }}"
+                                @selected((string) old('ciclo_id', $seccion->ciclo_id) === (string) $ciclo->id)>
+                                {{ $ciclo->nombre }} {{ $ciclo->activo ? '(Activo)' : '' }}
+                            </option>
+                            @endforeach
+                        </select>
+                        @endif
+
+                        @error('ciclo_id')
+                        <p class="form-error">{{ $message }}</p>
+                        @enderror
                     </div>
 
                     <div>
