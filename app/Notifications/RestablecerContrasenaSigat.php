@@ -31,10 +31,10 @@ class RestablecerContrasenaSigat extends Notification
 
         return (new MailMessage)
             ->theme('utec')
-            ->subject('Invitación de acceso a SIGAT-FICA')
+            ->subject('Acceso a SIGAT-FICA')
             ->greeting("Hola, {$nombre}.")
-            ->line('Coordinación ha generado tu acceso al Sistema de Gestión de Tutorías de FICA.')
-            ->line('Para ingresar por primera vez, establece tu contraseña personal mediante el siguiente enlace.')
+            ->line('Este enlace permite establecer o restablecer la contraseña de tu cuenta en SIGAT-FICA.')
+            ->line('Usa el siguiente botón para definir una contraseña personal.')
             ->action('Establecer contraseña', $url)
             ->line("Por seguridad, este enlace vence en {$minutosExpiracion} minutos.")
             ->line('Si no reconoces esta solicitud, informa a Coordinación.')
