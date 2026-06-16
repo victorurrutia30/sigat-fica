@@ -168,6 +168,7 @@ class ConsolidadoService
         Consolidado $consolidado
     ): array {
         $confirmaciones = ConfirmacionSeccionConsolidado::query()
+            ->with('confirmadoPor')
             ->where('consolidado_id', $consolidado->id)
             ->get()
             ->keyBy('seccion_id');
@@ -460,10 +461,23 @@ class ConsolidadoService
 
         $diagnostico = $this->diagnosticarCasos($casos);
 
+        $secciones = $this->seccionesAsignadasParaTutor(
+            tutor: $consolidado->tutor,
+            periodo: $consolidado->periodoEvaluacion
+        );
+
+        $coberturaSecciones = $this->coberturaSecciones(
+            secciones: $secciones,
+            casos: $casos,
+            consolidado: $consolidado
+        );
+
         return [
             'consolidado' => $consolidado,
             'casos' => $casos,
             'diagnostico' => $diagnostico,
+            'secciones' => $secciones,
+            'coberturaSecciones' => $coberturaSecciones,
         ];
     }
 

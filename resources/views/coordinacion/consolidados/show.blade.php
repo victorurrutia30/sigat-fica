@@ -154,15 +154,126 @@
                         @endif
 
                         <p class="mt-3 text-sm text-gray-500">
-                            @if($consolidado->sin_casos)
-                            El tutor confirmó que no hubo estudiantes no evaluados.
-                            @else
-                            Consolidado con casos registrados o pendiente de confirmación.
-                            @endif
+                            La cobertura por sección se detalla abajo. Cada sección debe tener casos registrados o confirmación de que todos realizaron la evaluación.
                         </p>
                     </div>
                 </div>
             </div>
+
+            @if(isset($coberturaSecciones))
+            <div class="card mt-6">
+                <div class="card-header">
+                    <div>
+                        <h3 class="text-base font-semibold text-utec-gray-dark">
+                            Cobertura por sección asignada
+                        </h3>
+                        <p class="mt-1 text-sm text-gray-500">
+                            Muestra si cada sección tuvo casos registrados o si el tutor confirmó que todos los estudiantes realizaron la evaluación.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    <div class="mb-4 grid gap-4 md:grid-cols-4">
+                        <div class="rounded-lg border border-utec-gray-medium bg-gray-50 p-4">
+                            <p class="text-xs text-gray-500">Secciones asignadas</p>
+                            <p class="mt-2 text-2xl font-bold text-utec-primary">
+                                {{ $coberturaSecciones['total_secciones'] }}
+                            </p>
+                        </div>
+
+                        <div class="rounded-lg border border-utec-gray-medium bg-gray-50 p-4">
+                            <p class="text-xs text-gray-500">Con casos</p>
+                            <p class="mt-2 text-2xl font-bold text-utec-primary">
+                                {{ $coberturaSecciones['con_casos'] }}
+                            </p>
+                        </div>
+
+                        <div class="rounded-lg border border-utec-gray-medium bg-gray-50 p-4">
+                            <p class="text-xs text-gray-500">Sin casos confirmadas</p>
+                            <p class="mt-2 text-2xl font-bold text-utec-primary">
+                                {{ $coberturaSecciones['sin_casos_confirmadas'] }}
+                            </p>
+                        </div>
+
+                        <div class="rounded-lg border border-utec-gray-medium bg-gray-50 p-4">
+                            <p class="text-xs text-gray-500">Pendientes</p>
+                            <p class="mt-2 text-2xl font-bold text-utec-primary">
+                                {{ $coberturaSecciones['pendientes_confirmacion'] }}
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-utec-gray-medium">
+                            <thead>
+                                <tr>
+                                    <th class="th-utec">Materia / sección</th>
+                                    <th class="th-utec">Casos</th>
+                                    <th class="th-utec">Estado de cobertura</th>
+                                    <th class="th-utec">Confirmación</th>
+                                </tr>
+                            </thead>
+
+                            <tbody class="divide-y divide-utec-gray-medium bg-white">
+                                @foreach($coberturaSecciones['detalle'] as $fila)
+                                @php
+                                $seccionCobertura = $fila['seccion'];
+                                $confirmacion = $fila['confirmacion'];
+                                @endphp
+
+                                <tr>
+                                    <td class="td-utec">
+                                        <div class="font-semibold text-utec-gray-dark">
+                                            {{ $seccionCobertura->materia?->codigo }}
+                                            —
+                                            {{ $seccionCobertura->materia?->nombre }}
+                                        </div>
+                                        <div class="text-xs text-gray-500">
+                                            Sección {{ $seccionCobertura->numero_seccion }}
+                                        </div>
+                                    </td>
+
+                                    <td class="td-utec">
+                                        {{ $fila['casos_total'] }}
+                                    </td>
+
+                                    <td class="td-utec">
+                                        @if($fila['casos_total'] > 0)
+                                        <span class="badge-success">Con casos registrados</span>
+                                        @elseif($fila['confirmada_sin_casos'])
+                                        <span class="badge-success">Todos realizaron evaluación</span>
+                                        @else
+                                        <span class="badge-warning">Pendiente de confirmación</span>
+                                        @endif
+                                    </td>
+
+                                    <td class="td-utec">
+                                        @if($confirmacion)
+                                        <div class="text-sm text-utec-gray-dark">
+                                            {{ $confirmacion->confirmadoPor?->nombre ?: 'Usuario no disponible' }}
+                                        </div>
+                                        <div class="text-xs text-gray-500">
+                                            {{ $confirmacion->confirmado_en?->format('d/m/Y H:i') }}
+                                        </div>
+                                        @else
+                                        <span class="text-sm text-gray-500">No aplica o pendiente</span>
+                                        @endif
+                                    </td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+
+                    @if($coberturaSecciones['pendientes_confirmacion'] > 0)
+                    <div class="alert-warning mt-5">
+                        Hay secciones sin casos y sin confirmación. El tutor debe completar la cobertura antes de entregar correctamente.
+                    </div>
+                    @endif
+                </div>
+            </div>
+            @endif
 
             @if($diagnostico['incompletos'] > 0)
             <div class="card mt-6">
@@ -207,6 +318,15 @@
                 </div>
 
                 <div class="card-body">
+
+                    <div class="mb-5 rounded-lg border border-yellow-200 bg-yellow-50 p-4">
+                        <p class="text-sm text-yellow-900">
+                            Al guardar una observación, el consolidado pasará a estado
+                            <span class="font-semibold">Con observaciones</span>.
+                            El tutor deberá revisarlo y volver a entregarlo si corresponde.
+                        </p>
+                    </div>
+
                     @if($consolidado->observaciones_coord)
                     <div class="mb-5 rounded-lg border border-yellow-200 bg-yellow-50 p-4">
                         <p class="whitespace-pre-line text-sm text-yellow-800">
